@@ -125,37 +125,12 @@ public class Effortless implements ModInitializer {
         //Disable modifiers
         var modifierSettings = ModifierSettingsManager.getModifierSettings(player);
         var arraySettings = modifierSettings.arraySettings();
-        arraySettings = new Array.ArraySettings(
-                false,
-                arraySettings.offset(),
-                arraySettings.count()
-        );
+        arraySettings = arraySettings.clone(false);
         var mirrorSettings = modifierSettings.mirrorSettings();
-        mirrorSettings = new Mirror.MirrorSettings(
-                false,
-                mirrorSettings.position(),
-                mirrorSettings.mirrorX(),
-                mirrorSettings.mirrorY(),
-                mirrorSettings.mirrorZ(),
-                mirrorSettings.radius(),
-                mirrorSettings.drawLines(),
-                mirrorSettings.drawPlanes()
-        );
+        mirrorSettings = mirrorSettings.clone(false);
         var radialMirrorSettings = modifierSettings.radialMirrorSettings();
-        radialMirrorSettings = new RadialMirror.RadialMirrorSettings(
-                false,
-                radialMirrorSettings.position(),
-                radialMirrorSettings.slices(),
-                radialMirrorSettings.alternate(),
-                radialMirrorSettings.radius(),
-                radialMirrorSettings.drawLines(),
-                radialMirrorSettings.drawPlanes()
-        );
-        modifierSettings = new ModifierSettingsManager.ModifierSettings(
-                arraySettings, mirrorSettings,
-                radialMirrorSettings,
-                modifierSettings.quickReplace()
-        );
+        radialMirrorSettings = radialMirrorSettings.clone(false);
+        modifierSettings = new ModifierSettingsManager.ModifierSettings(arraySettings, mirrorSettings, radialMirrorSettings, modifierSettings.quickReplace());
         ModifierSettingsManager.setModifierSettings(player, modifierSettings);
 
         ModifierSettingsManager.handleNewPlayer(player);

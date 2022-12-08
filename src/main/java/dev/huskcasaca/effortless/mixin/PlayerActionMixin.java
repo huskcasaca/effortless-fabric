@@ -49,13 +49,16 @@ public class PlayerActionMixin {
     // startAttack
     @Inject(method = "startAttack", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/phys/HitResult;getType()Lnet/minecraft/world/phys/HitResult$Type;"), cancellable = true)
     private void onStartAttack(CallbackInfoReturnable<Boolean> cir) {
+        var player = Minecraft.getInstance().player;
+        var buildMode = ModeSettingsManager.getModeSettings(player).buildMode();
+
+        if (buildMode == BuildMode.VANILLA) return;
 
         if (this.hitResult.getType() != HitResult.Type.ENTITY) {
-            var player = Minecraft.getInstance().player;
-            var buildMode = ModeSettingsManager.getModeSettings(player).buildMode();
-            if (buildMode == BuildMode.VANILLA || player.isHandsBusy()) {
+            if (player.isHandsBusy()) {
                 // let vanilla handle attack action
 
+                return;
             } else {
                 if (hitResult != null && hitResult.getType() == HitResult.Type.ENTITY) {
                     // let vanilla handle entity attack
@@ -95,13 +98,16 @@ public class PlayerActionMixin {
 
     @Inject(method = "continueAttack", at = @At("HEAD"), cancellable = true)
     private void onContinueAttack(boolean bl, CallbackInfo ci) {
+        var player = Minecraft.getInstance().player;
+        var buildMode = ModeSettingsManager.getModeSettings(player).buildMode();
+
+        if (buildMode == BuildMode.VANILLA) return;
+
         if (!bl) {
             this.missTime = 0;
         }
 
-        var player = Minecraft.getInstance().player;
-        var buildMode = ModeSettingsManager.getModeSettings(player).buildMode();
-        if (buildMode == BuildMode.VANILLA || player.isHandsBusy()) {
+        if (player.isHandsBusy()) {
 
         } else {
             if (hitResult != null && hitResult.getType() == HitResult.Type.ENTITY) {
@@ -115,9 +121,12 @@ public class PlayerActionMixin {
 
     @Inject(method = "startUseItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/phys/HitResult;getType()Lnet/minecraft/world/phys/HitResult$Type;"), cancellable = true)
     private void onStartOption(CallbackInfo ci) {
+        var player = Minecraft.getInstance().player;
+        var buildMode = ModeSettingsManager.getModeSettings(player).buildMode();
+
+        if (buildMode == BuildMode.VANILLA) return;
+
         if (hitResult != null && hitResult.getType() != HitResult.Type.ENTITY) {
-            var player = Minecraft.getInstance().player;
-            var buildMode = ModeSettingsManager.getModeSettings(player).buildMode();
 
             if (buildMode == BuildMode.VANILLA) {
                 // let vanilla handle use action

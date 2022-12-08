@@ -4,7 +4,7 @@
 build/
 out/
 classes/
-gradle.properties
+local.properties
 
 # eclipse
 

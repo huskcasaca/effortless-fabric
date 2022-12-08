@@ -233,5 +233,9 @@ public class Mirror implements Modifier {
         public int reach() {
             return radius * 2; //Change ModifierSettings#setReachUpgrade too
         }
+
+        public MirrorSettings clone(boolean enabled) {
+            return new MirrorSettings(enabled, position, mirrorX, mirrorY, mirrorZ, radius, drawLines, drawPlanes);
+        }
     }
 }

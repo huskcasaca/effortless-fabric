@@ -1,10 +1,12 @@
 import io.github.themrmilchmann.gradle.publish.curseforge.*
+import java.util.Properties
+import java.io.*
 
 plugins {
     id("fabric-loom") version "0.13.20"
     id("io.github.themrmilchmann.curseforge-publish") version "0.1.0"
 }
-version = "1.2.0"
+version = "1.2.1"
 group = "dev.huskcasaca"
 
 base {
@@ -48,20 +50,20 @@ loom {
     }
 }
 
-val curseForgeKey: String by project
 val curseForgeId: String by project
 
 publishing {
     repositories {
         curseForge {
-            apiKey.set(curseForgeKey)
+            apiKey.set(getLocalProperty("curseforge.apikey"))
         }
     }
     publications.create<CurseForgePublication>("curseForge") {
-        projectID.set(curseForgeId.toInt()) // The CurseForge project ID (required)
+        projectID.set(getLocalProperty("curseforge.id").toInt()) // The CurseForge project ID (required)
         // Specify which game and version the mod/plugin targets (required)
         includeGameVersions { type, version -> type == "modloader" || version == "fabric" }
         includeGameVersions { type, version -> type == "minecraft-1-19" || version == "minecraft-1-19-2" || version == "minecraft-1-19-1" }
+
         artifact {
             changelog = Changelog("Changelog...", ChangelogType.TEXT) // The changelog (required)
             releaseType = ReleaseType.RELEASE // The release type (required)
@@ -71,6 +73,7 @@ publishing {
 }
 
 tasks {
+
     withType<JavaCompile> {
         options.encoding = "UTF-8"
         sourceCompatibility = JavaVersion.VERSION_17.toString()
@@ -88,4 +91,16 @@ tasks {
         }
     }
 
+}
+
+fun getLocalProperty(key: String): String {
+    val properties = Properties()
+    val localProperties = File("local.properties")
+    if (localProperties.isFile) {
+        InputStreamReader(FileInputStream(localProperties), Charsets.UTF_8).use { reader ->
+            properties.load(reader)
+        }
+    } else error(localProperties.name + " is not found")
+
+    return properties.getProperty(key)
 }

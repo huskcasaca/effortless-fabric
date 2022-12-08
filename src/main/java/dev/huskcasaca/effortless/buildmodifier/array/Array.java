@@ -68,7 +68,7 @@ public class Array implements Modifier {
     }
 
     public static boolean isEnabled(ArraySettings a) {
-        if (a == null || !a.enabled) return false;
+        if (a == null || !a.enabled()) return false;
 
         return a.offset.getX() != 0 || a.offset.getY() != 0 || a.offset.getZ() != 0;
     }
@@ -91,6 +91,10 @@ public class Array implements Modifier {
             int largestOffset = Math.max(Math.max(x, y), z);
 
             return largestOffset * count;
+        }
+
+        public ArraySettings clone(boolean enabled) {
+            return new ArraySettings(enabled, offset, count);
         }
     }
 

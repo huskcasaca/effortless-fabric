@@ -143,13 +143,10 @@ public class ModifierSettingsManager {
     }
 
     public static void handleNewPlayer(Player player) {
-        //Makes sure player has modifier settings (if it doesn't it will create it)
-        getModifierSettings(player);
-
         //Only on server
         if (!player.level.isClientSide) {
             //Send to client
-            ModifierSettingsMessage msg = new ModifierSettingsMessage(getModifierSettings(player));
+            ModifierSettingsMessage msg = new ModifierSettingsMessage(new ModifierSettings());
             PacketHandler.sendToClient(msg, (ServerPlayer) player);
         }
     }

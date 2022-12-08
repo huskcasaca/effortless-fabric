@@ -157,10 +157,9 @@ public class RadialMirror implements Modifier {
     }
 
     public static boolean isEnabled(RadialMirrorSettings radialMirrorSettings, BlockPos startPos) {
-        if (radialMirrorSettings == null || !radialMirrorSettings.enabled) return false;
+        if (radialMirrorSettings == null || !radialMirrorSettings.enabled()) return false;
 
-        return !(new Vec3(startPos.getX() + 0.5, startPos.getY() + 0.5, startPos.getZ() + 0.5).subtract(radialMirrorSettings.position).lengthSqr() >
-                radialMirrorSettings.radius * radialMirrorSettings.radius);
+        return !(radialMirrorSettings.radius * radialMirrorSettings.radius < new Vec3(startPos.getX() + 0.5, startPos.getY() + 0.5, startPos.getZ() + 0.5).subtract(radialMirrorSettings.position).lengthSqr());
     }
 
     public record RadialMirrorSettings(
@@ -179,6 +178,10 @@ public class RadialMirror implements Modifier {
 
         public int reach() {
             return radius * 2;
+        }
+
+        public RadialMirrorSettings clone(boolean enabled) {
+            return new RadialMirrorSettings(enabled, position, slices, alternate, radius, drawLines, drawPlanes);
         }
     }
 

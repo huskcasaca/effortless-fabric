@@ -184,7 +184,7 @@ public class BlockPreviewRenderer {
                 }
 
                 //Render block previews
-                if (blockStates.size() != 0 && newCoordinates.size() == blockStates.size()) {
+                if (!blockStates.isEmpty() && newCoordinates.size() == blockStates.size()) {
                     int blockCount;
 
                     //Use fancy shader if config allows, otherwise outlines
@@ -232,12 +232,8 @@ public class BlockPreviewRenderer {
 
                         Effortless.log(player, ChatFormatting.GOLD + ModeSettingsManager.getTranslatedModeOptionName(player) + ChatFormatting.RESET + " of " + blockCount + " " + (blockCount == 1 ? "block" : "blocks") + dimensions, true);
                     }
-                } else {
-                    Effortless.log(player, ChatFormatting.GOLD + ModeSettingsManager.getTranslatedModeOptionName(player) + ChatFormatting.RESET + " cannot be built", true);
                 }
 
-            } else {
-                Effortless.log(player, ChatFormatting.GOLD + ModeSettingsManager.getTranslatedModeOptionName(player) + ChatFormatting.RESET + " is reset ", true);
             }
 
             VertexConsumer buffer = RenderHandler.beginLines(renderTypeBuffer);

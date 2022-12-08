@@ -67,13 +67,14 @@ public class ModeSettingsManager {
 
     public static void handleNewPlayer(Player player) {
         //Makes sure player has mode settings (if it doesnt it will create it)
-        getModeSettings(player);
 
         //Only on server
         if (!player.level.isClientSide) {
             //Send to client
-            ModeSettingsMessage msg = new ModeSettingsMessage(getModeSettings(player));
+            ModeSettingsMessage msg = new ModeSettingsMessage(new ModeSettings());
             PacketHandler.sendToClient(msg, (ServerPlayer) player);
+        } else {
+            setModeSettings(player, new ModeSettings());
         }
     }
 
