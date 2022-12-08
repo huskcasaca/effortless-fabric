@@ -4,16 +4,18 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Vector4f;
 import dev.huskcasaca.effortless.Effortless;
-import dev.huskcasaca.effortless.EffortlessClient;
 import dev.huskcasaca.effortless.buildmode.*;
-import dev.huskcasaca.effortless.buildmodifier.ModifierSettingsManager;
+import dev.huskcasaca.effortless.buildmodifier.BuildModifierHelper;
+import dev.huskcasaca.effortless.control.Keys;
+import dev.huskcasaca.effortless.entity.player.ModeSettings;
 import dev.huskcasaca.effortless.mixin.KeyMappingAccessor;
-import dev.huskcasaca.effortless.network.ModeActionMessage;
-import dev.huskcasaca.effortless.network.ModeSettingsMessage;
-import dev.huskcasaca.effortless.network.PacketHandler;
+import dev.huskcasaca.effortless.network.Packets;
+import dev.huskcasaca.effortless.network.protocol.player.ServerboundPlayerBuildActionPacket;
+import dev.huskcasaca.effortless.network.protocol.player.ServerboundPlayerSetBuildModePacket;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
@@ -39,6 +41,7 @@ import static dev.huskcasaca.effortless.buildmode.BuildActionHandler.*;
  * https://github.com/AlgorithmX2/Chisels-and-Bits/blob/1.12/src/main/java/mod/chiselsandbits/client/gui/ChiselsAndBitsMenu.java
  */
 
+@Environment(EnvType.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class RadialMenuScreen extends Screen {
@@ -95,14 +98,14 @@ public class RadialMenuScreen extends Screen {
     public void tick() {
         super.tick();
 
-        if (!EffortlessClient.isKeybindDown(2)) {
+        if (!Keys.SHOW_RADIAL_MENU.isKeyDown()) {
             onClose();
         }
     }
 
     @Override
     public void render(PoseStack ms, final int mouseX, final int mouseY, final float partialTicks) {
-        BuildMode currentBuildMode = ModeSettingsManager.getModeSettings(minecraft.player).buildMode();
+        BuildMode currentBuildMode = BuildModeHelper.getModeSettings(minecraft.player).buildMode();
 
         ms.pushPose();
 //        ms.translate(0, 0, 200);
@@ -417,21 +420,15 @@ public class RadialMenuScreen extends Screen {
     }
 
     private String findKeybind(MenuButton button, BuildMode currentBuildMode) {
-        String result = "";
-        int keybindingIndex = -1;
-        if (button.action == BuildAction.UNDO) keybindingIndex = 3;
-        if (button.action == BuildAction.REDO) keybindingIndex = 4;
-        if (button.action == BuildAction.REPLACE) keybindingIndex = 1;
-        if (button.action == BuildAction.MODIFIER) keybindingIndex = 0;
+        Keys keybindingIndex = null;
+        if (button.action == BuildAction.REPLACE) keybindingIndex = Keys.TOGGLE_QUICK_REPLACE;
+        if (button.action == BuildAction.MODIFIER) keybindingIndex = Keys.MODIFIER_MENU;
 
-        if (keybindingIndex != -1) {
-            KeyMapping keyMap = EffortlessClient.keyBindings[keybindingIndex];
-
-//			if (!keyMap.getKeyModifier().name().equals("none")) {
-//				result = keyMap.getKeyModifier().name() + " ";
-//			}
-            result += I18n.get(((KeyMappingAccessor) keyMap).getKey().getName());
+        if (keybindingIndex == null) {
+            return "";
         }
+
+        return ((KeyMappingAccessor) keybindingIndex.getKeyMapping()).getKey().getName();
 
 //        if (currentBuildMode.options.length > 0) {
 //            //Add (ctrl) to first two actions of first option
@@ -441,7 +438,6 @@ public class RadialMenuScreen extends Screen {
 //                if (result.equals("Left Control")) result = "Ctrl";
 //            }
 //        }
-        return result;
     }
 
     private boolean inTriangle(final double x1, final double y1, final double x2, final double y2,
@@ -477,15 +473,15 @@ public class RadialMenuScreen extends Screen {
         var player = Minecraft.getInstance().player;
         if (player != null) {
             if (lastAction == null) {
-                BuildMode mode = ModeSettingsManager.getModeSettings(player).buildMode();
+                BuildMode mode = BuildModeHelper.getModeSettings(player).buildMode();
                 if (mode == BuildMode.DISABLE) {
-                    Effortless.log(player, ModeSettingsManager.getTranslatedModeOptionName(player), true);
+                    Effortless.log(player, BuildModeHelper.getTranslatedModeOptionName(player), true);
                 } else {
-                    Effortless.log(player, ChatFormatting.GOLD + ModeSettingsManager.getTranslatedModeOptionName(player) + ChatFormatting.RESET, true);
+                    Effortless.log(player, ChatFormatting.GOLD + BuildModeHelper.getTranslatedModeOptionName(player) + ChatFormatting.RESET, true);
                 }
             } else {
-                var modeSettings = ModeSettingsManager.getModeSettings(player);
-                var modifierSettings = ModifierSettingsManager.getModifierSettings(player);
+                var modeSettings = BuildModeHelper.getModeSettings(player);
+                var modifierSettings = BuildModifierHelper.getModifierSettings(player);
                 switch (lastAction) {
                     case UNDO -> {
                         Effortless.log(player, "Undo", true);
@@ -515,18 +511,18 @@ public class RadialMenuScreen extends Screen {
     private void performAction(boolean fromMouseClick) {
         var player = Minecraft.getInstance().player;
 
-        var modeSettings = ModeSettingsManager.getModeSettings(player);
+        var modeSettings = BuildModeHelper.getModeSettings(player);
 
         if (switchTo != null) {
             playRadialMenuSound();
 
             lastAction = null;
-            modeSettings = new ModeSettingsManager.ModeSettings(switchTo, modeSettings.enableMagnet());
-            ModeSettingsManager.setModeSettings(player, modeSettings);
+            modeSettings = new ModeSettings(switchTo, modeSettings.enableMagnet());
+            BuildModeHelper.setModeSettings(player, modeSettings);
             if (player != null) {
                 BuildModeHandler.initializeMode(player);
             }
-            PacketHandler.sendToServer(new ModeSettingsMessage(modeSettings));
+            Packets.sendToServer(new ServerboundPlayerSetBuildModePacket(modeSettings));
 
             if (fromMouseClick) performedActionUsingMouse = true;
         }
@@ -538,7 +534,7 @@ public class RadialMenuScreen extends Screen {
             lastAction = action;
 
             BuildActionHandler.performAction(player, action);
-            PacketHandler.sendToServer(new ModeActionMessage(action));
+            Packets.sendToServer(new ServerboundPlayerBuildActionPacket(action));
 
             if (fromMouseClick) performedActionUsingMouse = true;
         }

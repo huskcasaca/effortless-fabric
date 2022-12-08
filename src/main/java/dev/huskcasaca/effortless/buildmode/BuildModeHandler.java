@@ -1,14 +1,18 @@
 package dev.huskcasaca.effortless.buildmode;
 
 import dev.huskcasaca.effortless.Effortless;
+import dev.huskcasaca.effortless.EffortlessDataProvider;
 import dev.huskcasaca.effortless.buildmodifier.BuildModifierHandler;
-import dev.huskcasaca.effortless.buildmodifier.ModifierSettingsManager;
-import dev.huskcasaca.effortless.helper.ReachHelper;
-import dev.huskcasaca.effortless.helper.SurvivalHelper;
-import dev.huskcasaca.effortless.network.BlockBrokenMessage;
-import dev.huskcasaca.effortless.network.BlockPlacedMessage;
+import dev.huskcasaca.effortless.buildmodifier.BuildModifierHelper;
+import dev.huskcasaca.effortless.buildreach.ReachHelper;
+import dev.huskcasaca.effortless.utils.SurvivalHelper;
+import dev.huskcasaca.effortless.network.Packets;
+import dev.huskcasaca.effortless.network.protocol.player.ClientboundPlayerBuildModePacket;
+import dev.huskcasaca.effortless.network.protocol.player.ServerboundPlayerBreakBlockPacket;
+import dev.huskcasaca.effortless.network.protocol.player.ServerboundPlayerPlaceBlockPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.HitResult;
@@ -29,7 +33,7 @@ public class BuildModeHandler {
     //Uses a network message to get the previous raytraceresult from the player
     //The server could keep track of all raytraceresults but this might lag with many players
     //Raytraceresult is needed for sideHit and hitVec
-    public static void onBlockPlacedMessage(Player player, BlockPlacedMessage message) {
+    public static void onBlockPlacedPacketReceived(Player player, ServerboundPlayerPlaceBlockPacket packet) {
 
         //Check if not in the middle of breaking
         var currentlyBreaking = player.level.isClientSide ? currentlyBreakingClient : currentlyBreakingServer;
@@ -39,21 +43,21 @@ public class BuildModeHandler {
             return;
         }
 
-        var modifierSettings = ModifierSettingsManager.getModifierSettings(player);
-        var modeSettings = ModeSettingsManager.getModeSettings(player);
+        var modifierSettings = BuildModifierHelper.getModifierSettings(player);
+        var modeSettings = BuildModeHelper.getModeSettings(player);
         var buildMode = modeSettings.buildMode();
 
         BlockPos startPos = null;
 
-        if (message.blockHit() && message.blockPos() != null) {
-            startPos = message.blockPos();
+        if (packet.blockHit() && packet.blockPos() != null) {
+            startPos = packet.blockPos();
 
             //Offset in direction of sidehit if not quickreplace and not replaceable
             //TODO 1.13 replaceable
             boolean replaceable = player.level.getBlockState(startPos).getMaterial().isReplaceable();
-            boolean becomesDoubleSlab = SurvivalHelper.doesBecomeDoubleSlab(player, startPos, message.sideHit());
+            boolean becomesDoubleSlab = SurvivalHelper.doesBecomeDoubleSlab(player, startPos, packet.sideHit());
             if (!modifierSettings.quickReplace() && !replaceable && !becomesDoubleSlab) {
-                startPos = startPos.relative(message.sideHit());
+                startPos = startPos.relative(packet.sideHit());
             }
 
             //Get under tall grass and other replaceable blocks
@@ -71,7 +75,7 @@ public class BuildModeHandler {
 
         //Even when no starting block is found, call buildmode instance
         //We might want to place things in the air
-        List<BlockPos> coordinates = buildMode.instance.onRightClick(player, startPos, message.sideHit(), message.hitVec(), modifierSettings.quickReplace());
+        List<BlockPos> coordinates = buildMode.instance.onRightClick(player, startPos, packet.sideHit(), packet.hitVec(), modifierSettings.quickReplace());
 
         if (coordinates.isEmpty()) {
             currentlyBreaking.put(player, false);
@@ -85,12 +89,12 @@ public class BuildModeHandler {
         }
 
         var sideHit = buildMode.instance.getSideHit(player);
-        if (sideHit == null) sideHit = message.sideHit();
+        if (sideHit == null) sideHit = packet.sideHit();
 
         var hitVec = buildMode.instance.getHitVec(player);
-        if (hitVec == null) hitVec = message.hitVec();
+        if (hitVec == null) hitVec = packet.hitVec();
 
-        BuildModifierHandler.onBlockPlaced(player, coordinates, sideHit, hitVec, message.placeStartPos());
+        BuildModifierHandler.onBlockPlaced(player, coordinates, sideHit, hitVec, packet.placeStartPos());
 
         //Only works when finishing a buildmode is equal to placing some blocks
         //No intermediate blocks allowed
@@ -98,9 +102,9 @@ public class BuildModeHandler {
 
     }
 
-    //Use a network message to break blocks in the distance using clientside mouse input
-    public static void onBlockBrokenMessage(Player player, BlockBrokenMessage message) {
-        var startPos = message.blockHit() ? message.blockPos() : null;
+    //Use a network packet to break blocks in the distance using clientside mouse input
+    public static void onBlockBrokenPacketReceived(Player player, ServerboundPlayerBreakBlockPacket packet) {
+        var startPos = packet.blockHit() ? packet.blockPos() : null;
         onBlockBroken(player, startPos, true);
     }
 
@@ -122,8 +126,8 @@ public class BuildModeHandler {
             if (startPos == null) return;
         }
 
-        var modifierSettings = ModifierSettingsManager.getModifierSettings(player);
-        var modeSettings = ModeSettingsManager.getModeSettings(player);
+        var modifierSettings = BuildModifierHelper.getModifierSettings(player);
+        var modeSettings = BuildModeHelper.getModeSettings(player);
 
         //Get coordinates
         var buildMode = modeSettings.buildMode();
@@ -145,7 +149,7 @@ public class BuildModeHandler {
     public static List<BlockPos> findCoordinates(Player player, BlockPos startPos, boolean skipRaytrace) {
         List<BlockPos> coordinates = new ArrayList<>();
 
-        var modeSettings = ModeSettingsManager.getModeSettings(player);
+        var modeSettings = BuildModeHelper.getModeSettings(player);
         coordinates.addAll(modeSettings.buildMode().instance.findCoordinates(player, startPos, skipRaytrace));
 
         return coordinates;
@@ -159,7 +163,7 @@ public class BuildModeHandler {
         var currentlyBreaking = player.level.isClientSide ? currentlyBreakingClient : currentlyBreakingServer;
         currentlyBreaking.remove(player);
 
-        ModeSettingsManager.getModeSettings(player).buildMode().instance.initialize(player);
+        BuildModeHelper.getModeSettings(player).buildMode().instance.initialize(player);
     }
 
     public static boolean isCurrentlyPlacing(Player player) {
@@ -246,4 +250,8 @@ public class BuildModeHandler {
                 !intersects;
     }
 
+    public static void handleNewPlayer(ServerPlayer player) {
+        //Makes sure player has mode settings (if it doesnt it will create it)
+        Packets.sendToClient(new ClientboundPlayerBuildModePacket(((EffortlessDataProvider) player).getModeSettings()), (ServerPlayer) player);
+    }
 }

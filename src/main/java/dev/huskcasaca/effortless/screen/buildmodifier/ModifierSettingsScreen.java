@@ -2,15 +2,17 @@ package dev.huskcasaca.effortless.screen.buildmodifier;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.huskcasaca.effortless.Effortless;
-import dev.huskcasaca.effortless.EffortlessClient;
-import dev.huskcasaca.effortless.buildmodifier.ModifierSettingsManager;
+import dev.huskcasaca.effortless.control.Keys;
+import dev.huskcasaca.effortless.entity.player.ModifierSettings;
+import dev.huskcasaca.effortless.buildmodifier.BuildModifierHelper;
 import dev.huskcasaca.effortless.mixin.KeyMappingAccessor;
 import dev.huskcasaca.effortless.mixin.ScreenRenderablesAccessor;
-import dev.huskcasaca.effortless.network.ModifierSettingsMessage;
-import dev.huskcasaca.effortless.network.PacketHandler;
+import dev.huskcasaca.effortless.network.Packets;
+import dev.huskcasaca.effortless.network.protocol.player.ServerboundPlayerSetBuildModifierPacket;
 import dev.huskcasaca.effortless.screen.widget.ScrollPane;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -18,7 +20,11 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.player.Player;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
 @Environment(EnvType.CLIENT)
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class ModifierSettingsScreen extends Screen {
 
     private ScrollPane scrollPane;
@@ -91,7 +97,7 @@ public class ModifierSettingsScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int p_96553_, int p_96554_) {
-        if (keyCode == ((KeyMappingAccessor) EffortlessClient.keyBindings[0]).getKey().getValue()) {
+        if (keyCode == ((KeyMappingAccessor) Keys.MODIFIER_MENU.getKeyMapping()).getKey().getValue()) {
             return true;
         }
         return super.keyPressed(keyCode, p_96553_, p_96554_);
@@ -134,19 +140,19 @@ public class ModifierSettingsScreen extends Screen {
         var mirrorSettings = mirrorSettingsPane.getMirrorSettings();
         var radialMirrorSettings = radialMirrorSettingsPane.getRadialMirrorSettings();
 
-        var modifierSettings = ModifierSettingsManager.getModifierSettings(minecraft.player);
+        var modifierSettings = BuildModifierHelper.getModifierSettings(minecraft.player);
 
-        modifierSettings = new ModifierSettingsManager.ModifierSettings(arraySettings, mirrorSettings, radialMirrorSettings, modifierSettings.quickReplace());
+        modifierSettings = new ModifierSettings(arraySettings, mirrorSettings, radialMirrorSettings, modifierSettings.quickReplace());
 
         //Sanitize
-        String error = ModifierSettingsManager.getSanitizeMessage(modifierSettings, minecraft.player);
+        String error = BuildModifierHelper.getSanitizeMessage(modifierSettings, minecraft.player);
         if (!error.isEmpty()) Effortless.log(minecraft.player, error);
 
-        modifierSettings = ModifierSettingsManager.sanitize(modifierSettings, minecraft.player);
-        ModifierSettingsManager.setModifierSettings(minecraft.player, modifierSettings);
+        modifierSettings = BuildModifierHelper.sanitize(modifierSettings, minecraft.player);
+        BuildModifierHelper.setModifierSettings(minecraft.player, modifierSettings);
 
         //Send to server
-        PacketHandler.sendToServer(new ModifierSettingsMessage(modifierSettings));
+        Packets.sendToServer(new ServerboundPlayerSetBuildModifierPacket(modifierSettings));
 
         // TODO: 17/9/22 grabMouse
 //        Minecraft.getInstance().mouseHandler.grabMouse();

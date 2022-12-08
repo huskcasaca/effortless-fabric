@@ -7,19 +7,21 @@
   },
   "mixins": [
     "BlockItemAccessor",
-    "KeyMappingAccessor",
     "PlayerEventMixin",
     "PlayerPickupMixin",
     "PlayerTagMixin",
-    "ScreenRenderablesAccessor",
-    "ScreenRenderHeaderAccessor",
+    "ServerGamePacketListenerMixin",
     "ServerPlayerEventMixin"
   ],
   "client": [
+    "ClientGamePacketListenerMixin",
     "KeyEventMixin",
+    "KeyMappingAccessor",
     "LevelRendererMixin",
     "PlayerActionMixin",
     "ScreenMixin",
+    "ScreenRenderablesAccessor",
+    "ScreenRenderHeaderAccessor",
     "ShaderRendererMixin"
   ]
 }

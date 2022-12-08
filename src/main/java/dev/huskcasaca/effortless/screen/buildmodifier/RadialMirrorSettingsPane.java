@@ -2,13 +2,14 @@ package dev.huskcasaca.effortless.screen.buildmodifier;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.huskcasaca.effortless.Effortless;
-import dev.huskcasaca.effortless.buildmodifier.ModifierSettingsManager;
+import dev.huskcasaca.effortless.buildmodifier.BuildModifierHelper;
 import dev.huskcasaca.effortless.buildmodifier.mirror.RadialMirror;
-import dev.huskcasaca.effortless.helper.ReachHelper;
+import dev.huskcasaca.effortless.buildreach.ReachHelper;
 import dev.huskcasaca.effortless.screen.widget.*;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.screens.Screen;
@@ -16,12 +17,14 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@SuppressWarnings("Duplicates")
 @Environment(EnvType.CLIENT)
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class RadialMirrorSettingsPane extends ExpandableScrollEntry {
 
     protected static final ResourceLocation BUILDING_ICONS = new ResourceLocation(Effortless.MOD_ID, "textures/gui/building_icons.png");
@@ -132,7 +135,7 @@ public class RadialMirrorSettingsPane extends ExpandableScrollEntry {
         buttonRadialMirrorAlternate = new FixedCheckbox(left + 140, y, " Alternate", false);
         radialMirrorButtonList.add(buttonRadialMirrorAlternate);
 
-        var modifierSettings = ModifierSettingsManager.getModifierSettings(mc.player);
+        var modifierSettings = BuildModifierHelper.getModifierSettings(mc.player);
         if (modifierSettings != null) {
             var radialMirrorSettings = modifierSettings.radialMirrorSettings();
             buttonRadialMirrorEnabled.setIsChecked(radialMirrorSettings.enabled());

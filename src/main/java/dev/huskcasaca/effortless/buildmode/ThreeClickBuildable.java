@@ -1,6 +1,6 @@
 package dev.huskcasaca.effortless.buildmode;
 
-import dev.huskcasaca.effortless.helper.ReachHelper;
+import dev.huskcasaca.effortless.buildreach.ReachHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;

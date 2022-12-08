@@ -1,8 +1,10 @@
 package dev.huskcasaca.effortless.mixin;
 
 import dev.huskcasaca.effortless.EffortlessDataProvider;
-import dev.huskcasaca.effortless.buildmode.ModeSettingsManager;
-import dev.huskcasaca.effortless.buildmodifier.ModifierSettingsManager;
+import dev.huskcasaca.effortless.entity.player.ModeSettings;
+import dev.huskcasaca.effortless.entity.player.ModifierSettings;
+import dev.huskcasaca.effortless.entity.player.ReachSettings;
+import dev.huskcasaca.effortless.buildmode.BuildMode;
 import dev.huskcasaca.effortless.buildmodifier.array.Array;
 import dev.huskcasaca.effortless.buildmodifier.mirror.Mirror;
 import dev.huskcasaca.effortless.buildmodifier.mirror.RadialMirror;
@@ -20,42 +22,82 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class PlayerTagMixin implements EffortlessDataProvider {
 
     @Unique
-    private ModeSettingsManager.ModeSettings modeSettings = null;
+    private ModeSettings modeSettings = null;
     @Unique
-    private ModifierSettingsManager.ModifierSettings modifierSettings = null;
+    private ModifierSettings modifierSettings = null;
+    @Unique
+    private ReachSettings reachSettings = null;
 
     @Inject(method = "readAdditionalSaveData", at = @At("RETURN"))
     private void readTag(CompoundTag tag, CallbackInfo info) {
-        readModeSettings(tag.getCompound("EffortlessMode"));
-        readModifierSettings(tag.getCompound("EffortlessModifier"));
+//        readModeSettings(tag.getCompound("EffortlessMode"));
+//        readModifierSettings(tag.getCompound("EffortlessModifier"));
+        if (tag.contains("Effortless")) {
+            readSettings(tag.getCompound("Effortless"));
+        } else {
+            reachSettings = new ReachSettings();
+        }
     }
 
     @Inject(method = "addAdditionalSaveData", at = @At("RETURN"))
     private void writeTag(CompoundTag tag, CallbackInfo info) {
-        CompoundTag modeTag = new CompoundTag();
-        writeModeSettings(modeTag);
-        tag.put("EffortlessMode", modeTag);
+//        CompoundTag modeTag = new CompoundTag();
+//        writeModeSettings(modeTag);
+//        tag.put("EffortlessMode", modeTag);
+//
+//        CompoundTag modifierTag = new CompoundTag();
+//        writeModifierSettings(modifierTag);
+//        tag.put("EffortlessModifier", modifierTag);
 
-        CompoundTag modifierTag = new CompoundTag();
-        writeModifierSettings(modifierTag);
-        tag.put("EffortlessModifier", modifierTag);
+        CompoundTag tag1 = new CompoundTag();
+        writeSettings(tag1);
+        tag.put("Effortless", tag1);
     }
 
     @Unique
+    private void readSettings(CompoundTag tag) {
+        reachSettings = new ReachSettings(
+                tag.getInt("maxReachDistance"),
+                tag.getInt("maxBlockPlacePerAxis"),
+                tag.getInt("maxBlockPlaceAtOnce"),
+                tag.getBoolean("canBreakFar"),
+                tag.getBoolean("enableUndo"),
+                tag.getInt("undoStackSize")
+        );
+    }
+
+    @Unique
+    private void writeSettings(CompoundTag tag) {
+        if (reachSettings == null) reachSettings = new ReachSettings();
+
+        tag.putInt("maxReachDistance", reachSettings.maxReachDistance());
+        tag.putInt("maxBlockPlacePerAxis", reachSettings.maxBlockPlacePerAxis());
+        tag.putInt("maxBlockPlaceAtOnce", reachSettings.maxBlockPlaceAtOnce());
+        tag.putBoolean("canBreakFar", reachSettings.canBreakFar());
+        tag.putBoolean("enableUndo", reachSettings.enableUndo());
+        tag.putInt("undoStackSize", reachSettings.undoStackSize());
+
+        //TODO add mode settings
+    }
+
+
+    @Unique
     private void readModeSettings(CompoundTag tag) {
-        modeSettings = new ModeSettingsManager.ModeSettings();
+        modeSettings = new ModeSettings(
+                BuildMode.values()[tag.getInt("buildMode")],
+                false
+        );
     }
 
     @Unique
     private void writeModeSettings(CompoundTag tag) {
-        if (modeSettings == null) modeSettings = new ModeSettingsManager.ModeSettings();
-        //tag.putInteger("buildMode", modeSettings.buildMode().ordinal());
-        //TODO add mode settings
+        if (modeSettings == null) modeSettings = new ModeSettings();
+        tag.putInt("buildMode", modeSettings.buildMode().ordinal());
     }
 
     @Unique
     public void writeModifierSettings(CompoundTag tag) {
-        if (modifierSettings == null) modifierSettings = new ModifierSettingsManager.ModifierSettings();
+        if (modifierSettings == null) modifierSettings = new ModifierSettings();
 
         //ARRAY
         var arraySettings = modifierSettings.arraySettings();
@@ -139,29 +181,41 @@ public class PlayerTagMixin implements EffortlessDataProvider {
         var radialMirrorSettings = new RadialMirror.RadialMirrorSettings(radialMirrorEnabled, radialMirrorPosition,
                 radialMirrorSlices, radialMirrorAlternate, radialMirrorRadius, radialMirrorDrawLines, radialMirrorDrawPlanes);
 
-        modifierSettings = new ModifierSettingsManager.ModifierSettings(arraySettings, mirrorSettings, radialMirrorSettings, false);
+        modifierSettings = new ModifierSettings(arraySettings, mirrorSettings, radialMirrorSettings, false);
     }
 
 
     @Override
-    public ModeSettingsManager.ModeSettings getModeSettings() {
-        if (modeSettings == null) modeSettings = new ModeSettingsManager.ModeSettings();
+    public ModeSettings getModeSettings() {
+        if (modeSettings == null) modeSettings = new ModeSettings();
         return modeSettings;
     }
 
     @Override
-    public void setModeSettings(ModeSettingsManager.ModeSettings modeSettings) {
+    public void setModeSettings(ModeSettings modeSettings) {
         this.modeSettings = modeSettings;
     }
 
     @Override
-    public ModifierSettingsManager.ModifierSettings getModifierSettings() {
-        if (modifierSettings == null) modifierSettings = new ModifierSettingsManager.ModifierSettings();
+    public ModifierSettings getModifierSettings() {
+        if (modifierSettings == null) modifierSettings = new ModifierSettings();
         return modifierSettings;
     }
 
     @Override
-    public void setModifierSettings(ModifierSettingsManager.ModifierSettings modifierSettings) {
+    public void setModifierSettings(ModifierSettings modifierSettings) {
         this.modifierSettings = modifierSettings;
+    }
+
+    @Override
+    public ReachSettings getReachSettings() {
+        if (reachSettings == null) reachSettings = new ReachSettings();
+        return reachSettings;
+    }
+
+    @Override
+    public void setReachSettings(ReachSettings reachSettings) {
+        this.reachSettings = reachSettings;
+
     }
 }

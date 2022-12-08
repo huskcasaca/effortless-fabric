@@ -2,11 +2,10 @@ package dev.huskcasaca.effortless.mixin;
 
 import dev.huskcasaca.effortless.buildmode.BuildMode;
 import dev.huskcasaca.effortless.buildmode.BuildModeHandler;
-import dev.huskcasaca.effortless.buildmode.ModeSettingsManager;
-import dev.huskcasaca.effortless.helper.CompatHelper;
-import dev.huskcasaca.effortless.network.BlockBrokenMessage;
-import dev.huskcasaca.effortless.network.BlockPlacedMessage;
-import dev.huskcasaca.effortless.network.PacketHandler;
+import dev.huskcasaca.effortless.buildmode.BuildModeHelper;
+import dev.huskcasaca.effortless.network.protocol.player.ServerboundPlayerBreakBlockPacket;
+import dev.huskcasaca.effortless.network.protocol.player.ServerboundPlayerPlaceBlockPacket;
+import dev.huskcasaca.effortless.network.Packets;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
@@ -15,7 +14,6 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.Nullable;
@@ -51,7 +49,7 @@ public class PlayerActionMixin {
     // startAttack
     @Inject(method = "startAttack", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/phys/HitResult;getType()Lnet/minecraft/world/phys/HitResult$Type;"), cancellable = true)
     private void onStartAttack(CallbackInfoReturnable<Boolean> cir) {
-        var buildMode = ModeSettingsManager.getModeSettings(player).buildMode();
+        var buildMode = BuildModeHelper.getModeSettings(player).buildMode();
         if (buildMode == BuildMode.DISABLE) return;
         // let vanilla handle entity attack
         if (hitResult != null && hitResult.getType() == HitResult.Type.ENTITY) return;
@@ -64,8 +62,8 @@ public class PlayerActionMixin {
         if (lookingAt != null && lookingAt.getType() == HitResult.Type.BLOCK) {
             BlockHitResult blockLookingAt = (BlockHitResult) lookingAt;
 
-            BuildModeHandler.onBlockBrokenMessage(player, new BlockBrokenMessage(blockLookingAt));
-            PacketHandler.sendToServer(new BlockBrokenMessage(blockLookingAt));
+            BuildModeHandler.onBlockBrokenPacketReceived(player, new ServerboundPlayerBreakBlockPacket(blockLookingAt));
+            Packets.sendToServer(new ServerboundPlayerBreakBlockPacket(blockLookingAt));
 
             //play sound if further than normal
             if ((blockLookingAt.getLocation().subtract(player.getEyePosition(1f))).lengthSqr() > 25f) {
@@ -78,8 +76,8 @@ public class PlayerActionMixin {
             }
             cir.setReturnValue(true);
         } else {
-            BuildModeHandler.onBlockBrokenMessage(player, new BlockBrokenMessage());
-            PacketHandler.sendToServer(new BlockBrokenMessage());
+            BuildModeHandler.onBlockBrokenPacketReceived(player, new ServerboundPlayerBreakBlockPacket());
+            Packets.sendToServer(new ServerboundPlayerBreakBlockPacket());
             cir.setReturnValue(false);
         }
         player.swing(InteractionHand.MAIN_HAND);
@@ -90,7 +88,7 @@ public class PlayerActionMixin {
 
     @Inject(method = "continueAttack", at = @At("HEAD"), cancellable = true)
     private void onContinueAttack(boolean bl, CallbackInfo ci) {
-        var buildMode = ModeSettingsManager.getModeSettings(player).buildMode();
+        var buildMode = BuildModeHelper.getModeSettings(player).buildMode();
         if (buildMode == BuildMode.DISABLE) return;
 
         if (!bl) {
@@ -109,7 +107,7 @@ public class PlayerActionMixin {
 
     @Inject(method = "startUseItem", at = @At(value = "HEAD"), cancellable = true)
     private void onStartUseItem(CallbackInfo ci) {
-        var buildMode = ModeSettingsManager.getModeSettings(player).buildMode();
+        var buildMode = BuildModeHelper.getModeSettings(player).buildMode();
         if (buildMode == BuildMode.DISABLE) return;
         // let vanilla handle entity attack
         if (hitResult != null && hitResult.getType() == HitResult.Type.ENTITY) return;
@@ -131,8 +129,8 @@ public class PlayerActionMixin {
             if (lookingAt.getType() == HitResult.Type.BLOCK) {
                 //find position in distance
                 BlockHitResult blockLookingAt = (BlockHitResult) lookingAt;
-                BuildModeHandler.onBlockPlacedMessage(player, new BlockPlacedMessage(blockLookingAt, true));
-                PacketHandler.sendToServer(new BlockPlacedMessage(blockLookingAt, true));
+                BuildModeHandler.onBlockPlacedPacketReceived(player, new ServerboundPlayerPlaceBlockPacket(blockLookingAt, true));
+                Packets.sendToServer(new ServerboundPlayerPlaceBlockPacket(blockLookingAt, true));
                 //play sound if further than normal
                 if ((blockLookingAt.getLocation().subtract(player.getEyePosition(1f))).lengthSqr() > 25f) {
                     var state = ((BlockItem) itemStack.getItem()).getBlock().defaultBlockState();
@@ -144,8 +142,8 @@ public class PlayerActionMixin {
                 }
             } else {
 
-                BuildModeHandler.onBlockPlacedMessage(player, new BlockPlacedMessage());
-                PacketHandler.sendToServer(new BlockPlacedMessage());
+                BuildModeHandler.onBlockPlacedPacketReceived(player, new ServerboundPlayerPlaceBlockPacket());
+                Packets.sendToServer(new ServerboundPlayerPlaceBlockPacket());
             }
             ci.cancel();
             return;

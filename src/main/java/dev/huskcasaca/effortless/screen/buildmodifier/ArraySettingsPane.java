@@ -2,9 +2,9 @@ package dev.huskcasaca.effortless.screen.buildmodifier;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.huskcasaca.effortless.Effortless;
-import dev.huskcasaca.effortless.buildmodifier.ModifierSettingsManager;
+import dev.huskcasaca.effortless.buildmodifier.BuildModifierHelper;
 import dev.huskcasaca.effortless.buildmodifier.array.Array;
-import dev.huskcasaca.effortless.helper.ReachHelper;
+import dev.huskcasaca.effortless.buildreach.ReachHelper;
 import dev.huskcasaca.effortless.screen.widget.ExpandableScrollEntry;
 import dev.huskcasaca.effortless.screen.widget.FixedCheckbox;
 import dev.huskcasaca.effortless.screen.widget.NumberField;
@@ -12,15 +12,19 @@ import dev.huskcasaca.effortless.screen.widget.ScrollPane;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.TextComponent;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 
 @Environment(EnvType.CLIENT)
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class ArraySettingsPane extends ExpandableScrollEntry {
 
     protected List<NumberField> arrayNumberFieldList = new ArrayList<>();
@@ -68,7 +72,7 @@ public class ArraySettingsPane extends ExpandableScrollEntry {
         textArrayCount.setTooltip(new TextComponent("How many copies should be made."));
         arrayNumberFieldList.add(textArrayCount);
 
-        var modifierSettings = ModifierSettingsManager.getModifierSettings(mc.player);
+        var modifierSettings = BuildModifierHelper.getModifierSettings(mc.player);
         if (modifierSettings != null) {
             var arraySettings = modifierSettings.arraySettings();
             buttonArrayEnabled.setIsChecked(arraySettings.enabled());

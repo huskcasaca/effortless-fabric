@@ -1,17 +1,22 @@
 package dev.huskcasaca.effortless;
 
-import dev.huskcasaca.effortless.buildmode.ModeSettingsManager;
-import dev.huskcasaca.effortless.buildmodifier.ModifierSettingsManager;
+import dev.huskcasaca.effortless.entity.player.ModeSettings;
+import dev.huskcasaca.effortless.entity.player.ModifierSettings;
+import dev.huskcasaca.effortless.entity.player.ReachSettings;
 
 
 public interface EffortlessDataProvider {
 
-    ModeSettingsManager.ModeSettings getModeSettings();
+    ModeSettings getModeSettings();
 
-    void setModeSettings(ModeSettingsManager.ModeSettings modeSettings);
+    void setModeSettings(ModeSettings modeSettings);
 
-    ModifierSettingsManager.ModifierSettings getModifierSettings();
+    ModifierSettings getModifierSettings();
 
-    void setModifierSettings(ModifierSettingsManager.ModifierSettings modifierSettings);
+    void setModifierSettings(ModifierSettings modifierSettings);
+
+    ReachSettings getReachSettings();
+
+    void setReachSettings(ReachSettings reachSettings);
 
 }

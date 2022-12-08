@@ -1,16 +1,24 @@
 package dev.huskcasaca.effortless.screen.widget;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.Mth;
 import org.lwjgl.glfw.GLFW;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.text.DecimalFormat;
 
 /**
  * Slider widget implementation which allows inputting values in a certain range with optional step size.
  */
+
+@Environment(EnvType.CLIENT)
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class Slider extends AbstractSliderButton {
     private final DecimalFormat format;
     protected Component prefix;

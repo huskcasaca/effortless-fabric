@@ -23,6 +23,7 @@ import net.minecraft.util.Mth;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
+@Environment(EnvType.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class PlayerSettingsScreen extends Screen {

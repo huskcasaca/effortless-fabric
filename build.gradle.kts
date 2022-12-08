@@ -1,12 +1,13 @@
-import io.github.themrmilchmann.gradle.publish.curseforge.*
-import java.util.Properties
-import java.io.*
+import io.github.huskcasaca.gradlecurseforgeplugin.*
+import java.util.*
 
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    id("fabric-loom") version "0.13.20"
-    id("io.github.themrmilchmann.curseforge-publish") version "0.1.0"
+    alias(libs.plugins.loom)
+    id("io.github.huskcasaca.gradle-curseforge-plugin") version "1.0.0-alpha"
 }
-version = "1.3.0"
+
+version = "1.4.0"
 group = "dev.huskcasaca"
 
 base {
@@ -20,27 +21,21 @@ repositories {
 
 dependencies {
     minecraft(libs.minecraft)
+
     mappings(loom.officialMojangMappings())
+
     modImplementation(libs.fabric.loader)
     modImplementation(libs.fabric.api)
     modImplementation(libs.modmenu) { isTransitive = false }
-    modImplementation(libs.cloth.config) { isTransitive = false }
-    implementation("com.google.code.findbugs:jsr305:3.0.2")
+    modImplementation(libs.cloth.config)
 
-//    minecraft("com.mojang:minecraft:$minecraftVersion")
-//    mappings(loom.officialMojangMappings())
-//
-//    modImplementation("net.fabricmc:fabric-loader:$fabricLoaderVersion")
-//    modImplementation("net.fabricmc.fabric-api:fabric-api:$fabricApiVersion")
-//    modApi("com.terraformersmc:modmenu:$modmenuVersion") { isTransitive = false }
-//    modApi("me.shedaniel.cloth:cloth-config-fabric:$clothConfigVersion") { isTransitive = false }
-//
+    implementation(libs.findbugs)
 }
 
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(JavaVersion.VERSION_17.toString()))
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
     withSourcesJar()
 }
 
@@ -50,39 +45,7 @@ loom {
     }
 }
 
-val curseForgeId: String by project
-
-publishing {
-    repositories {
-        curseForge {
-            apiKey.set(getLocalProperty("curseforge.apikey"))
-        }
-    }
-    publications.create<CurseForgePublication>("curseForge") {
-        projectID.set(getLocalProperty("curseforge.id").toInt()) // The CurseForge project ID (required)
-        // Specify which game and version the mod/plugin targets (required)
-        includeGameVersions { type, version -> type == "modloader" || version == "fabric" }
-        includeGameVersions { type, version -> type == "minecraft-1-19" || version == "minecraft-1-19-2" || version == "minecraft-1-19-1" }
-
-        artifact {
-            changelog = Changelog("Changelog...", ChangelogType.TEXT) // The changelog (required)
-            releaseType = ReleaseType.RELEASE // The release type (required)
-            displayName = "effortless-fabric-$version-${libs.versions.minecraft.version}.jar"
-        }
-    }
-}
-
 tasks {
-
-    withType<JavaCompile> {
-        options.encoding = "UTF-8"
-        sourceCompatibility = JavaVersion.VERSION_17.toString()
-        targetCompatibility = JavaVersion.VERSION_17.toString()
-        if (JavaVersion.current().isJava9Compatible) {
-            options.release.set(JavaVersion.VERSION_17.toString().toInt())
-        }
-    }
-
     processResources {
         duplicatesStrategy = DuplicatesStrategy.INCLUDE
         from("src/main/resources")
@@ -90,17 +53,42 @@ tasks {
             expand(project.properties)
         }
     }
-
+    remapJar {
+        archiveClassifier.set(libs.versions.minecraft.get())
+    }
+    remapSourcesJar {
+        archiveClassifier.set(libs.versions.minecraft.get() + "-source")
+    }
 }
 
-fun getLocalProperty(key: String): String {
-    val properties = Properties()
-    val localProperties = File("local.properties")
-    if (localProperties.isFile) {
-        InputStreamReader(FileInputStream(localProperties), Charsets.UTF_8).use { reader ->
-            properties.load(reader)
+publishing {
+    val properties = Properties().apply {
+        file("local.properties").apply {
+            if (isFile) {
+                inputStream().use { reader -> load(reader) }
+            } else {
+                println("$name is not found")
+                return@publishing
+            }
         }
-    } else error(localProperties.name + " is not found")
+    }
+    repositories {
+        curseForge {
+            token.set(properties.getProperty("curseforge.apikey"))
+        }
+    }
+    publications {
+        create<CurseForgePublication>("Effortless") {
 
-    return properties.getProperty(key)
+            id.set(properties.getProperty("curseforge.id").toInt())
+
+            artifact(tasks.remapJar) {
+                releaseType = ReleaseType.ALPHA // The release type (required)
+                changelog = Changelog("Changelog...", ChangelogType.TEXT) // The changelog (required)
+                loader = LoaderType.FABRIC
+                gameVersion = MinecraftVersion.VERSION_1_19_2
+                javaVersion = JavaVersion.VERSION_17
+            }
+        }
+    }
 }

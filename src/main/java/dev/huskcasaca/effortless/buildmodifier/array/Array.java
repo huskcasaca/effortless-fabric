@@ -1,7 +1,7 @@
 package dev.huskcasaca.effortless.buildmodifier.array;
 
 import dev.huskcasaca.effortless.buildmodifier.Modifier;
-import dev.huskcasaca.effortless.buildmodifier.ModifierSettingsManager;
+import dev.huskcasaca.effortless.buildmodifier.BuildModifierHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.entity.player.Player;
@@ -17,7 +17,7 @@ public class Array implements Modifier {
         List<BlockPos> coordinates = new ArrayList<>();
 
         //find arraysettings for the player
-        var arraySettings = ModifierSettingsManager.getModifierSettings(player).arraySettings();
+        var arraySettings = BuildModifierHelper.getModifierSettings(player).arraySettings();
         if (!isEnabled(arraySettings)) return coordinates;
 
         var pos = startPos;
@@ -35,7 +35,7 @@ public class Array implements Modifier {
         List<BlockState> blockStates = new ArrayList<>();
 
         //find arraysettings for the player that placed the block
-        var arraySettings = ModifierSettingsManager.getModifierSettings(player).arraySettings();
+        var arraySettings = BuildModifierHelper.getModifierSettings(player).arraySettings();
         if (!isEnabled(arraySettings)) return blockStates;
 
         var pos = startPos;

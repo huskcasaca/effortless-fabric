@@ -2,11 +2,19 @@ package dev.huskcasaca.effortless.screen.widget;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import dev.huskcasaca.effortless.screen.ScreenUtils;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
+@Environment(EnvType.CLIENT)
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class ExtendedButton extends Button {
     public ExtendedButton(int xPos, int yPos, int width, int height, Component displayString, OnPress handler) {
         super(xPos, yPos, width, height, displayString, handler);

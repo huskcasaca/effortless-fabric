@@ -3,14 +3,18 @@ package dev.huskcasaca.effortless.screen.widget;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.screens.Screen;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
 @Environment(EnvType.CLIENT)
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public abstract class ExpandableScrollEntry implements ScrollPane.IScrollEntry {
 
     public ScrollPane scrollPane;

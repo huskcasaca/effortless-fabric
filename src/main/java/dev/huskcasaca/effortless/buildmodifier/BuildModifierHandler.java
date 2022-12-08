@@ -1,15 +1,20 @@
 package dev.huskcasaca.effortless.buildmodifier;
 
+import dev.huskcasaca.effortless.EffortlessDataProvider;
 import dev.huskcasaca.effortless.buildmodifier.array.Array;
 import dev.huskcasaca.effortless.buildmodifier.mirror.Mirror;
 import dev.huskcasaca.effortless.buildmodifier.mirror.RadialMirror;
-import dev.huskcasaca.effortless.helper.CompatHelper;
-import dev.huskcasaca.effortless.helper.InventoryHelper;
-import dev.huskcasaca.effortless.helper.SurvivalHelper;
+import dev.huskcasaca.effortless.entity.player.ModifierSettings;
+import dev.huskcasaca.effortless.utils.CompatHelper;
+import dev.huskcasaca.effortless.utils.InventoryHelper;
+import dev.huskcasaca.effortless.utils.SurvivalHelper;
 import dev.huskcasaca.effortless.mixin.BlockItemAccessor;
+import dev.huskcasaca.effortless.network.Packets;
+import dev.huskcasaca.effortless.network.protocol.player.ClientboundPlayerBuildModifierPacket;
 import dev.huskcasaca.effortless.render.BlockPreviewRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
@@ -241,13 +246,12 @@ public class BuildModifierHandler {
         return blockStates;
     }
 
-    public static boolean isEnabled(ModifierSettingsManager.ModifierSettings modifierSettings, BlockPos startPos) {
+    public static boolean isEnabled(ModifierSettings modifierSettings, BlockPos startPos) {
         return Array.isEnabled(modifierSettings.arraySettings()) ||
                 Mirror.isEnabled(modifierSettings.mirrorSettings(), startPos) ||
                 RadialMirror.isEnabled(modifierSettings.radialMirrorSettings(), startPos) ||
                 modifierSettings.quickReplace();
     }
-
 
     public static BlockState getBlockStateFromItem(ItemStack itemStack, Player player, BlockPos blockPos, Direction facing, Vec3 hitVec, InteractionHand hand) {
         var hitresult = new BlockHitResult(hitVec, facing, blockPos, false);
@@ -260,7 +264,6 @@ public class BuildModifierHandler {
             return Block.byItem(item).getStateForPlacement(new BlockPlaceContext(new UseOnContext(player, hand, new BlockHitResult(hitVec, facing, blockPos, false))));
         }
     }
-
 
     //Returns true if equal (or both null)
     public static boolean compareCoordinates(List<BlockPos> coordinates1, List<BlockPos> coordinates2) {
@@ -278,5 +281,10 @@ public class BuildModifierHandler {
         }
 
 //        return coordinates1.equals(coordinates2);
+    }
+
+    public static void handleNewPlayer(ServerPlayer player) {
+        //Only on server
+        Packets.sendToClient(new ClientboundPlayerBuildModifierPacket(((EffortlessDataProvider) player).getModifierSettings()), player);
     }
 }

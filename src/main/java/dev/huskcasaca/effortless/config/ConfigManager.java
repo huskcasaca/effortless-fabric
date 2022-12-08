@@ -30,20 +30,8 @@ public class ConfigManager {
         return INSTANCE.getConfig();
     }
 
-    public static BuildConfig getGlobalBuildConfig() {
-        return getGlobalConfig().getBuildConfig();
-    }
-
     public static PreviewConfig getGlobalPreviewConfig() {
         return getGlobalConfig().getPreviewConfig();
-    }
-
-    public static void writeGlobalConfig() {
-        INSTANCE.writeConfig(false);
-    }
-
-    public static int getMaxReachDistance() {
-        return getGlobalConfig().getBuildConfig().getMaxReachDistance();
     }
 
     public void readConfig(boolean async) {

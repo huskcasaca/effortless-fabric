@@ -7,16 +7,16 @@ import dev.huskcasaca.effortless.EffortlessClient;
 import dev.huskcasaca.effortless.buildmode.BuildMode;
 import dev.huskcasaca.effortless.buildmode.BuildModeHandler;
 import dev.huskcasaca.effortless.buildmode.Buildable;
-import dev.huskcasaca.effortless.buildmode.ModeSettingsManager;
-import dev.huskcasaca.effortless.buildmode.ModeSettingsManager.ModeSettings;
+import dev.huskcasaca.effortless.buildmode.BuildModeHelper;
+import dev.huskcasaca.effortless.entity.player.ModeSettings;
 import dev.huskcasaca.effortless.buildmodifier.BuildModifierHandler;
-import dev.huskcasaca.effortless.buildmodifier.ModifierSettingsManager;
-import dev.huskcasaca.effortless.buildmodifier.ModifierSettingsManager.ModifierSettings;
+import dev.huskcasaca.effortless.buildmodifier.BuildModifierHelper;
+import dev.huskcasaca.effortless.entity.player.ModifierSettings;
 import dev.huskcasaca.effortless.config.ConfigManager;
 import dev.huskcasaca.effortless.config.PreviewConfig;
-import dev.huskcasaca.effortless.helper.CompatHelper;
-import dev.huskcasaca.effortless.helper.ReachHelper;
-import dev.huskcasaca.effortless.helper.SurvivalHelper;
+import dev.huskcasaca.effortless.utils.CompatHelper;
+import dev.huskcasaca.effortless.buildreach.ReachHelper;
+import dev.huskcasaca.effortless.utils.SurvivalHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
@@ -230,7 +230,7 @@ public class BlockPreviewRenderer {
                         dimensions = dimensions.substring(0, dimensions.length() - 1);
                         if (dimensions.length() > 1) dimensions += ")";
 
-                        Effortless.log(player, ChatFormatting.GOLD + ModeSettingsManager.getTranslatedModeOptionName(player) + ChatFormatting.RESET + " of " + blockCount + " " + (blockCount == 1 ? "block" : "blocks") + dimensions, true);
+                        Effortless.log(player, ChatFormatting.GOLD + BuildModeHelper.getTranslatedModeOptionName(player) + ChatFormatting.RESET + " of " + blockCount + " " + (blockCount == 1 ? "block" : "blocks") + dimensions, true);
                     }
                 }
 
@@ -272,7 +272,7 @@ public class BlockPreviewRenderer {
                                              List<ItemStack> itemStacks, float dissolve, BlockPos firstPos,
                                              BlockPos secondPos, boolean checkCanPlace, boolean red) {
         var player = Minecraft.getInstance().player;
-        var modifierSettings = ModifierSettingsManager.getModifierSettings(player);
+        var modifierSettings = BuildModifierHelper.getModifierSettings(player);
         var dispatcher = Minecraft.getInstance().getBlockRenderer();
         int blocksValid = 0;
 
@@ -304,8 +304,8 @@ public class BlockPreviewRenderer {
     public static void onBlocksPlaced(List<BlockPos> coordinates, List<ItemStack> itemStacks, List<BlockState> blockStates,
                                       BlockPos firstPos, BlockPos secondPos) {
         var player = Minecraft.getInstance().player;
-        var modifierSettings = ModifierSettingsManager.getModifierSettings(player);
-        var modeSettings = ModeSettingsManager.getModeSettings(player);
+        var modifierSettings = BuildModifierHelper.getModifierSettings(player);
+        var modeSettings = BuildModeHelper.getModeSettings(player);
 
         //Check if block previews are enabled
         if (doRenderBlockPreviews(modifierSettings, modeSettings, firstPos)) {
@@ -328,8 +328,8 @@ public class BlockPreviewRenderer {
     public static void onBlocksBroken(List<BlockPos> coordinates, List<ItemStack> itemStacks, List<BlockState> blockStates,
                                       BlockPos firstPos, BlockPos secondPos) {
         var player = Minecraft.getInstance().player;
-        var modifierSettings = ModifierSettingsManager.getModifierSettings(player);
-        var modeSettings = ModeSettingsManager.getModeSettings(player);
+        var modifierSettings = BuildModifierHelper.getModifierSettings(player);
+        var modeSettings = BuildModeHelper.getModeSettings(player);
 
         //Check if block previews are enabled
         if (doRenderBlockPreviews(modifierSettings, modeSettings, firstPos)) {

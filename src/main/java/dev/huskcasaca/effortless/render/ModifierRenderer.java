@@ -3,7 +3,7 @@ package dev.huskcasaca.effortless.render;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Matrix4f;
-import dev.huskcasaca.effortless.buildmodifier.ModifierSettingsManager;
+import dev.huskcasaca.effortless.entity.player.ModifierSettings;
 import dev.huskcasaca.effortless.buildmodifier.mirror.Mirror;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -23,7 +23,7 @@ public class ModifierRenderer {
     protected static final int planeAlpha = 50;
     protected static final Vec3 epsilon = new Vec3(0.001, 0.001, 0.001); //prevents z-fighting
 
-    public static void render(PoseStack matrixStack, MultiBufferSource.BufferSource renderTypeBuffer, ModifierSettingsManager.ModifierSettings modifierSettings) {
+    public static void render(PoseStack matrixStack, MultiBufferSource.BufferSource renderTypeBuffer, ModifierSettings modifierSettings) {
         //Mirror lines and areas
         var m = modifierSettings.mirrorSettings();
         if (m != null && m.enabled() && (m.mirrorX() || m.mirrorY() || m.mirrorZ())) {

@@ -5,6 +5,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import dev.huskcasaca.effortless.Effortless;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.ShaderInstance;
@@ -14,7 +16,7 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.OptionalDouble;
 
-
+@Environment(EnvType.CLIENT)
 public class BuildRenderTypes extends RenderType {
     public static final RenderType EB_LINES;
     public static final RenderType EB_PLANES;

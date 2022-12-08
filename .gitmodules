@@ -1,0 +1,4 @@
+[submodule "gradle-curseforge-publish"]
+	path = gradle-curseforge-publish
+	url = git@github.com:huskcasaca/gradle-curseforge-publish.git
+	branch = master

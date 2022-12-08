@@ -10,8 +10,8 @@
   ],
   "contact": {
     "homepage": "https://minecraft.curseforge.com/projects/effortless-fabric",
-    "issues": "https://bitbucket.org/Requios/effortless-building/issues?status=new&status=open",
-    "sources": "https://bitbucket.org/Requios/effortless-building"
+    "issues": "https://github.com/huskcasaca/effortless-fabric/issues",
+    "sources": "https://github.com/huskcasaca/effortless-fabric"
   },
   "license": "GNU Lesser General Public License version 3 (LGPLv3)",
   "icon": "assets/effortless/icon.png",

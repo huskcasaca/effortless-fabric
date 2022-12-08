@@ -2,7 +2,9 @@ package dev.huskcasaca.effortless.buildmode;
 
 import dev.huskcasaca.effortless.Effortless;
 import dev.huskcasaca.effortless.EffortlessClient;
-import dev.huskcasaca.effortless.buildmodifier.ModifierSettingsManager;
+import dev.huskcasaca.effortless.entity.player.ModeSettings;
+import dev.huskcasaca.effortless.entity.player.ModifierSettings;
+import dev.huskcasaca.effortless.buildmodifier.BuildModifierHelper;
 import dev.huskcasaca.effortless.buildmodifier.UndoRedo;
 import net.minecraft.ChatFormatting;
 import net.minecraft.world.entity.player.Player;
@@ -71,21 +73,21 @@ public class BuildActionHandler {
                 UndoRedo.redo(player);
                 break;
             case REPLACE:
-                var modifierSettings = ModifierSettingsManager.getModifierSettings(player);
+                var modifierSettings = BuildModifierHelper.getModifierSettings(player);
 
-                modifierSettings = new ModifierSettingsManager.ModifierSettings(
+                modifierSettings = new ModifierSettings(
                         modifierSettings.arraySettings(), modifierSettings.mirrorSettings(), modifierSettings.radialMirrorSettings(),
                         !modifierSettings.quickReplace()
                 );
-                ModifierSettingsManager.setModifierSettings(player, modifierSettings);
+                BuildModifierHelper.setModifierSettings(player, modifierSettings);
 
                 Effortless.log(player, ChatFormatting.GOLD + "Replace " + ChatFormatting.RESET + (
                         modifierSettings.quickReplace() ? (ChatFormatting.GREEN + "ON") : (ChatFormatting.RED + "OFF")) + ChatFormatting.RESET, true);
                 break;
             case MAGNET:
-                var modeSettings = ModeSettingsManager.getModeSettings(player);
-                modeSettings = new ModeSettingsManager.ModeSettings(modeSettings.buildMode(), !modeSettings.enableMagnet());
-                ModeSettingsManager.setModeSettings(player, modeSettings);
+                var modeSettings = BuildModeHelper.getModeSettings(player);
+                modeSettings = new ModeSettings(modeSettings.buildMode(), !modeSettings.enableMagnet());
+                BuildModeHelper.setModeSettings(player, modeSettings);
 
                 Effortless.log(player, ChatFormatting.GOLD + "Item Magnet " + ChatFormatting.RESET + (modeSettings.enableMagnet() ? (ChatFormatting.GREEN + "ON") : (ChatFormatting.RED + "OFF")) + ChatFormatting.RESET, true);
                 break;

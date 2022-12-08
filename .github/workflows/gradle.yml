@@ -1,0 +1,37 @@
+name: Java CI with Gradle
+
+# Controls when the action will run. 
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  build:
+    
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: 'true'
+
+      # Setup JDK
+      - name: Setup Java JDK
+        uses: actions/setup-java@v3.5.1
+        with:
+          java-version: 17
+          distribution: 'zulu'
+
+      # Build with Gradle
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@v2.3.1
+        with:
+          arguments: build
+
+      # Test with Gradle
+      - name: Test with Gradle
+        uses: gradle/gradle-build-action@v2.3.1
+        with:
+          arguments: test

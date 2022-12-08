@@ -1,15 +1,16 @@
 package dev.huskcasaca.effortless;
 
+import dev.huskcasaca.effortless.buildmodifier.BuildModifierHandler;
+import dev.huskcasaca.effortless.entity.player.ModeSettings;
+import dev.huskcasaca.effortless.buildreach.ReachHelper;
 import dev.huskcasaca.effortless.buildmode.BuildMode;
 import dev.huskcasaca.effortless.buildmode.BuildModeHandler;
-import dev.huskcasaca.effortless.buildmode.ModeSettingsManager;
-import dev.huskcasaca.effortless.buildmodifier.ModifierSettingsManager;
+import dev.huskcasaca.effortless.buildmode.BuildModeHelper;
+import dev.huskcasaca.effortless.buildmodifier.BuildModifierHelper;
 import dev.huskcasaca.effortless.buildmodifier.UndoRedo;
-import dev.huskcasaca.effortless.helper.ReachHelper;
-import dev.huskcasaca.effortless.network.AddUndoMessage;
-import dev.huskcasaca.effortless.network.ClearUndoMessage;
-import dev.huskcasaca.effortless.network.PacketHandler;
-import dev.huskcasaca.effortless.network.RequestLookAtMessage;
+import dev.huskcasaca.effortless.network.*;
+import dev.huskcasaca.effortless.network.protocol.player.ClientboundPlayerRequestLookAtPacket;
+import dev.huskcasaca.effortless.buildreach.ReachHelper;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.minecraft.core.BlockPos;
@@ -17,7 +18,6 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.apache.logging.log4j.LogManager;
@@ -40,23 +40,23 @@ public class Effortless implements ModInitializer {
 
         //Cancel event if necessary
 //        ServerPlayer player = ((ServerPlayer) event.getEntity());
-        var buildMode = ModeSettingsManager.getModeSettings(player).buildMode();
-        var modifierSettings = ModifierSettingsManager.getModifierSettings(player);
+        var buildMode = BuildModeHelper.getModeSettings(player).buildMode();
+        var modifierSettings = BuildModifierHelper.getModifierSettings(player);
 
         if (buildMode == BuildMode.DISABLE) {
             return false;
         } else if (modifierSettings.quickReplace()) {
             //Cancel event and send message if QuickReplace
-            PacketHandler.sendToClient(new RequestLookAtMessage(true), (ServerPlayer) player);
-//            PacketHandler.sendToClient(new AddUndoMessage(pos, event.getBlockSnapshot().getReplacedBlock(), state), (ServerPlayer)  player);
+            Packets.sendToClient(new ClientboundPlayerRequestLookAtPacket(true), (ServerPlayer) player);
+//            Packets.sendToClient(new AddUndoMessage(pos, event.getBlockSnapshot().getReplacedBlock(), state), (ServerPlayer)  player);
             return false;
         } else {
             //NORMAL mode, let vanilla handle block placing
             //But modifiers should still work
 
             //Send message to client, which sends message back with raytrace info
-            PacketHandler.sendToClient(new RequestLookAtMessage(false), (ServerPlayer) player);
-//            PacketHandler.sendToClient(new AddUndoMessage(pos, event.getBlockSnapshot().getReplacedBlock(), state), (ServerPlayer) player);
+            Packets.sendToClient(new ClientboundPlayerRequestLookAtPacket(false), (ServerPlayer) player);
+//            Packets.sendToClient(new AddUndoMessage(pos, event.getBlockSnapshot().getReplacedBlock(), state), (ServerPlayer) player);
             return true;
         }
 
@@ -74,7 +74,7 @@ public class Effortless implements ModInitializer {
 
         //Cancel event if necessary
         //If cant break far then dont cancel event ever
-        var buildMode = ModeSettingsManager.getModeSettings(player).buildMode();
+        var buildMode = BuildModeHelper.getModeSettings(player).buildMode();
         if (buildMode != BuildMode.DISABLE && ReachHelper.canBreakFar(player)) {
             return false;
         } else {
@@ -85,7 +85,8 @@ public class Effortless implements ModInitializer {
 
             //Add to undo stack in client
             if (player instanceof ServerPlayer && state != null && pos != null) {
-                PacketHandler.sendToClient(new AddUndoMessage(pos, state, Blocks.AIR.defaultBlockState()), ((ServerPlayer) player));
+                // FIXME: 18/11/22
+//                Packets.sendToClient(new AddUndoMessage(pos, state, Blocks.AIR.defaultBlockState()), ((ServerPlayer) player));
             }
             return true;
         }
@@ -93,54 +94,46 @@ public class Effortless implements ModInitializer {
 
     //
     public static void onPlayerLogin(ServerPlayer player) {
-        ModifierSettingsManager.handleNewPlayer(player);
-        ModeSettingsManager.handleNewPlayer(player);
+        BuildModifierHandler.handleNewPlayer(player);
+        BuildModeHandler.handleNewPlayer(player);
+        ReachHelper.handleNewPlayer(player);
     }
 
     public static void onPlayerLogout(ServerPlayer player) {
-        if (player.getCommandSenderWorld().isClientSide) return;
         UndoRedo.clear(player);
-        PacketHandler.sendToClient(new ClearUndoMessage(), player);
+        // FIXME: 18/11/22
+//        Packets.sendToClient(new ClearUndoMessage(), player);
     }
 
     public static void onPlayerRespawn(ServerPlayer player) {
-        ModifierSettingsManager.handleNewPlayer(player);
-        ModeSettingsManager.handleNewPlayer(player);
+        BuildModifierHandler.handleNewPlayer(player);
+        BuildModeHandler.handleNewPlayer(player);
+        ReachHelper.handleNewPlayer(player);
     }
 
     public static void onPlayerChangedDimension(ServerPlayer player) {
-        if (player.getCommandSenderWorld().isClientSide) return;
-
-        //Set build mode to normal
-        var modeSettings = ModeSettingsManager.getModeSettings(player);
-        modeSettings = new ModeSettingsManager.ModeSettings(
+//        //Set build mode to normal
+        var modeSettings = BuildModeHelper.getModeSettings(player);
+        modeSettings = new ModeSettings(
                 BuildMode.DISABLE,
                 modeSettings.enableMagnet()
         );
-        ModeSettingsManager.setModeSettings(player, modeSettings);
+        BuildModeHelper.setModeSettings(player, modeSettings);
 
-        //Disable modifiers
-        var modifierSettings = ModifierSettingsManager.getModifierSettings(player);
-        var arraySettings = modifierSettings.arraySettings();
-        arraySettings = arraySettings.clone(false);
-        var mirrorSettings = modifierSettings.mirrorSettings();
-        mirrorSettings = mirrorSettings.clone(false);
-        var radialMirrorSettings = modifierSettings.radialMirrorSettings();
-        radialMirrorSettings = radialMirrorSettings.clone(false);
-        modifierSettings = new ModifierSettingsManager.ModifierSettings(arraySettings, mirrorSettings, radialMirrorSettings, modifierSettings.quickReplace());
-        ModifierSettingsManager.setModifierSettings(player, modifierSettings);
-
-        ModifierSettingsManager.handleNewPlayer(player);
-        ModeSettingsManager.handleNewPlayer(player);
+        BuildModifierHandler.handleNewPlayer(player);
+        BuildModeHandler.handleNewPlayer(player);
+        ReachHelper.handleNewPlayer(player);
 
         UndoRedo.clear(player);
-        PacketHandler.sendToClient(new ClearUndoMessage(), player);
+        // FIXME: 18/11/22
+//        Packets.sendToClient(new ClearUndoMessage(), player);
     }
 
     //
     public static void onPlayerClone(ServerPlayer oldPlayer, ServerPlayer newPlayer, boolean alive) {
-        ModifierSettingsManager.setModifierSettings(newPlayer, ModifierSettingsManager.getModifierSettings(oldPlayer));
-        ModeSettingsManager.setModeSettings(newPlayer, ModeSettingsManager.getModeSettings(oldPlayer));
+        BuildModifierHelper.setModifierSettings(newPlayer, BuildModifierHelper.getModifierSettings(oldPlayer));
+        BuildModeHelper.setModeSettings(newPlayer, BuildModeHelper.getModeSettings(oldPlayer));
+        ReachHelper.setReachSettings(newPlayer, ReachHelper.getReachSettings(oldPlayer));
     }
 
     public static void log(String msg) {
@@ -162,8 +155,6 @@ public class Effortless implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        PacketHandler.register();
-
         ServerPlayerEvents.COPY_FROM.register(Effortless::onPlayerClone);
     }
 }

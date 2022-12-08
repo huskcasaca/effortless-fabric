@@ -1,11 +1,10 @@
 package dev.huskcasaca.effortless.buildmodifier;
 
 import dev.huskcasaca.effortless.Effortless;
-import dev.huskcasaca.effortless.config.BuildConfig;
-import dev.huskcasaca.effortless.config.ConfigManager;
-import dev.huskcasaca.effortless.helper.FixedStack;
-import dev.huskcasaca.effortless.helper.InventoryHelper;
-import dev.huskcasaca.effortless.helper.SurvivalHelper;
+import dev.huskcasaca.effortless.buildreach.ReachHelper;
+import dev.huskcasaca.effortless.utils.FixedStack;
+import dev.huskcasaca.effortless.utils.InventoryHelper;
+import dev.huskcasaca.effortless.utils.SurvivalHelper;
 import dev.huskcasaca.effortless.render.BlockPreviewRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -29,12 +28,12 @@ public class UndoRedo {
     private static final Map<UUID, FixedStack<BlockSet>> redoStacksClient = new HashMap<>();
     private static final Map<UUID, FixedStack<BlockSet>> redoStacksServer = new HashMap<>();
 
-    public static boolean isEnableUndo() {
-        return ConfigManager.getGlobalBuildConfig().isEnableUndo();
+    public static boolean isUndoEnabled(Player player) {
+        return ReachHelper.getReachSettings(player).enableUndo();
     }
     //add to undo stack
     public static void addUndo(Player player, BlockSet blockSet) {
-        if (!isEnableUndo()) return;
+        if (!isUndoEnabled(player)) return;
         
         Map<UUID, FixedStack<BlockSet>> undoStacks = player.level.isClientSide ? undoStacksClient : undoStacksServer;
 
@@ -63,14 +62,14 @@ public class UndoRedo {
     }
 
     private static int getUndoStackSize(Player player) {
-        if (!isEnableUndo()) {
+        if (!isUndoEnabled(player)) {
             return 0;
         }
-        return ConfigManager.getGlobalBuildConfig().getUndoStackSize();
+        return ReachHelper.getReachSettings(player).undoStackSize();
     }
 
     private static void addRedo(Player player, BlockSet blockSet) {
-        if (!isEnableUndo()) return;
+        if (!isUndoEnabled(player)) return;
         Map<UUID, FixedStack<BlockSet>> redoStacks = player.level.isClientSide ? redoStacksClient : redoStacksServer;
 
         //(No asserts necessary, it's private)
@@ -84,7 +83,7 @@ public class UndoRedo {
     }
 
     public static boolean undo(Player player) {
-        if (!isEnableUndo()) return false;
+        if (!isUndoEnabled(player)) return false;
         Map<UUID, FixedStack<BlockSet>> undoStacks = player.level.isClientSide ? undoStacksClient : undoStacksServer;
 
         if (!undoStacks.containsKey(player.getUUID())) return false;
@@ -145,7 +144,7 @@ public class UndoRedo {
     }
 
     public static boolean redo(Player player) {
-        if (!isEnableUndo()) return false;
+        if (!isUndoEnabled(player)) return false;
         Map<UUID, FixedStack<BlockSet>> redoStacks = player.level.isClientSide ? redoStacksClient : redoStacksServer;
 
         if (!redoStacks.containsKey(player.getUUID())) return false;

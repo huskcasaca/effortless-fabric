@@ -4,7 +4,7 @@ import dev.huskcasaca.effortless.buildmode.BuildAction;
 import dev.huskcasaca.effortless.buildmode.BuildActionHandler;
 import dev.huskcasaca.effortless.buildmode.BuildModeHandler;
 import dev.huskcasaca.effortless.buildmode.TwoClickBuildable;
-import dev.huskcasaca.effortless.helper.ReachHelper;
+import dev.huskcasaca.effortless.buildreach.ReachHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;

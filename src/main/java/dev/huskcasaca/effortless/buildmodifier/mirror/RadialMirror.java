@@ -1,7 +1,7 @@
 package dev.huskcasaca.effortless.buildmodifier.mirror;
 
 import dev.huskcasaca.effortless.buildmodifier.Modifier;
-import dev.huskcasaca.effortless.buildmodifier.ModifierSettingsManager;
+import dev.huskcasaca.effortless.buildmodifier.BuildModifierHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
@@ -20,7 +20,7 @@ public class RadialMirror implements Modifier {
         List<BlockPos> coordinates = new ArrayList<>();
 
         //find radial mirror settings for the player
-        var radialMirrorSettings = ModifierSettingsManager.getModifierSettings(player).radialMirrorSettings();
+        var radialMirrorSettings = BuildModifierHelper.getModifierSettings(player).radialMirrorSettings();
         if (!isEnabled(radialMirrorSettings, startPos)) return coordinates;
 
         //get angle between slices
@@ -54,7 +54,7 @@ public class RadialMirror implements Modifier {
         List<BlockPos> coordinates = new ArrayList<>(); //to keep track of duplicates
 
         //find radial mirror settings for the player that placed the block
-        var radialMirrorSettings = ModifierSettingsManager.getModifierSettings(player).radialMirrorSettings();
+        var radialMirrorSettings = BuildModifierHelper.getModifierSettings(player).radialMirrorSettings();
         if (!isEnabled(radialMirrorSettings, startPos)) return blockStates;
 
 

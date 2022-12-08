@@ -1,7 +1,7 @@
 package dev.huskcasaca.effortless.buildmodifier.mirror;
 
 import dev.huskcasaca.effortless.buildmodifier.Modifier;
-import dev.huskcasaca.effortless.buildmodifier.ModifierSettingsManager;
+import dev.huskcasaca.effortless.buildmodifier.BuildModifierHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.Container;
@@ -26,7 +26,7 @@ public class Mirror implements Modifier {
         List<BlockPos> coordinates = new ArrayList<>();
 
         //find mirrorsettings for the player
-        var mirrorSettings = ModifierSettingsManager.getModifierSettings(player).mirrorSettings();
+        var mirrorSettings = BuildModifierHelper.getModifierSettings(player).mirrorSettings();
         if (!isEnabled(mirrorSettings, startPos)) return coordinates;
 
         if (mirrorSettings.mirrorX) coordinateMirrorX(mirrorSettings, startPos, coordinates);
@@ -66,7 +66,7 @@ public class Mirror implements Modifier {
         List<BlockState> blockStates = new ArrayList<>();
 
         //find mirrorsettings for the player
-        MirrorSettings mirrorSettings = ModifierSettingsManager.getModifierSettings(player).mirrorSettings();
+        MirrorSettings mirrorSettings = BuildModifierHelper.getModifierSettings(player).mirrorSettings();
         if (!isEnabled(mirrorSettings, startPos)) return blockStates;
 
         //Randomizer bag synergy

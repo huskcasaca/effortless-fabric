@@ -4,8 +4,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.huskcasaca.effortless.Effortless;
-import dev.huskcasaca.effortless.buildmode.ModeSettingsManager;
-import dev.huskcasaca.effortless.buildmodifier.ModifierSettingsManager;
+import dev.huskcasaca.effortless.buildmode.BuildModeHelper;
+import dev.huskcasaca.effortless.buildmodifier.BuildModifierHelper;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
@@ -39,8 +39,8 @@ public class RenderHandler {
         var renderTypeBuffer = MultiBufferSource.immediate(bufferBuilder);
 
         var player = Minecraft.getInstance().player;
-        var modeSettings = ModeSettingsManager.getModeSettings(player);
-        var modifierSettings = ModifierSettingsManager.getModifierSettings(player);
+        var modeSettings = BuildModeHelper.getModeSettings(player);
+        var modifierSettings = BuildModifierHelper.getModifierSettings(player);
 
         var projectedView = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
 
