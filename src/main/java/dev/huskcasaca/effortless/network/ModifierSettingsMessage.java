@@ -70,8 +70,6 @@ public record ModifierSettingsMessage(
         }
 
         buf.writeBoolean(message.modifierSettings.quickReplace());
-
-        buf.writeInt(message.modifierSettings.reachUpgrade());
     }
 
     public static ModifierSettingsMessage decode(FriendlyByteBuf buf) {
@@ -116,9 +114,7 @@ public record ModifierSettingsMessage(
 
         boolean quickReplace = buf.readBoolean();
 
-        int reachUpgrade = buf.readInt();
-
-        var modifierSettings = new ModifierSettings(arraySettings, mirrorSettings, radialMirrorSettings, quickReplace, reachUpgrade);
+        var modifierSettings = new ModifierSettings(arraySettings, mirrorSettings, radialMirrorSettings, quickReplace);
         return new ModifierSettingsMessage(modifierSettings);
     }
 

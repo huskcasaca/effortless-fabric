@@ -4,7 +4,7 @@ plugins {
     id("fabric-loom") version "0.13.20"
     id("io.github.themrmilchmann.curseforge-publish") version "0.1.0"
 }
-version = "1.1.1"
+version = "1.2.0"
 group = "dev.huskcasaca"
 
 base {
@@ -61,11 +61,11 @@ publishing {
         projectID.set(curseForgeId.toInt()) // The CurseForge project ID (required)
         // Specify which game and version the mod/plugin targets (required)
         includeGameVersions { type, version -> type == "modloader" || version == "fabric" }
-//        includeGameVersions { type, version -> type == "minecraft-1-19" && version == "minecraft-1-19-2" }
+        includeGameVersions { type, version -> type == "minecraft-1-19" || version == "minecraft-1-19-2" || version == "minecraft-1-19-1" }
         artifact {
             changelog = Changelog("Changelog...", ChangelogType.TEXT) // The changelog (required)
             releaseType = ReleaseType.RELEASE // The release type (required)
-            displayName = "effortless-fabric-$version.jar" // A user-friendly name for the project (optional)
+            displayName = "effortless-fabric-$version-${libs.versions.minecraft.version}.jar"
         }
     }
 }

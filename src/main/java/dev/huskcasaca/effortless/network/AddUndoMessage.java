@@ -18,6 +18,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /***
  * Sends a message to the client asking to add a block to the undo stack.
@@ -65,6 +66,7 @@ public record AddUndoMessage(
 
         @Override
         public void handleServerSide(MinecraftServer server, ServerPlayer player, ServerGamePacketListenerImpl handler, AddUndoMessage message, PacketSender responseSender) {
+            // client only
         }
     }
 
@@ -75,16 +77,17 @@ public record AddUndoMessage(
         public void handleClientSide(Minecraft client, LocalPlayer player, ClientPacketListener handler, AddUndoMessage message, PacketSender responseSender) {
             client.execute(() -> {
                 if (player != null) {
+                    final var coordinates = new ArrayList<BlockPos>();
+                    final var previousBlockState = new ArrayList<BlockState>();
+                    final var newBlockState = new ArrayList<BlockState>();
+                    coordinates.add(message.coordinate());
+                    previousBlockState.add(message.previousBlockState());
+                    newBlockState.add(message.newBlockState());
+
                     UndoRedo.addUndo(player, new BlockSet(
-                            new ArrayList<>() {{
-                                add(message.coordinate());
-                            }},
-                            new ArrayList<>() {{
-                                add(message.previousBlockState());
-                            }},
-                            new ArrayList<>() {{
-                                add(message.newBlockState());
-                            }},
+                            coordinates,
+                            previousBlockState,
+                            newBlockState,
                             new Vec3(0, 0, 0),
                             message.coordinate(), message.coordinate()
                     ));

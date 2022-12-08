@@ -154,8 +154,7 @@ public class Effortless implements ModInitializer {
         modifierSettings = new ModifierSettingsManager.ModifierSettings(
                 arraySettings, mirrorSettings,
                 radialMirrorSettings,
-                modifierSettings.quickReplace(),
-                modifierSettings.reachUpgrade()
+                modifierSettings.quickReplace()
         );
         ModifierSettingsManager.setModifierSettings(player, modifierSettings);
 

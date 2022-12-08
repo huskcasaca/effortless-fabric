@@ -93,8 +93,6 @@ public class PlayerTagMixin implements EffortlessDataProvider {
         tag.putBoolean("radialMirrorDrawLines", radialMirrorSettings.drawLines());
         tag.putBoolean("radialMirrorDrawPlanes", radialMirrorSettings.drawPlanes());
 
-        tag.putInt("reachUpgrade", modifierSettings.reachUpgrade());
-
         //compound.putBoolean("quickReplace", buildSettings.quickReplace()); dont save quickreplace
 
     }
@@ -125,8 +123,6 @@ public class PlayerTagMixin implements EffortlessDataProvider {
         boolean mirrorDrawPlanes = tag.getBoolean("mirrorDrawPlanes");
         var mirrorSettings = new Mirror.MirrorSettings(mirrorEnabled, mirrorPosition, mirrorX, mirrorY, mirrorZ, mirrorRadius, mirrorDrawLines, mirrorDrawPlanes);
 
-        int reachUpgrade = tag.getInt("reachUpgrade");
-
         //boolean quickReplace = compound.getBoolean("quickReplace"); //dont load quickreplace
 
         //RADIAL MIRROR
@@ -143,7 +139,7 @@ public class PlayerTagMixin implements EffortlessDataProvider {
         var radialMirrorSettings = new RadialMirror.RadialMirrorSettings(radialMirrorEnabled, radialMirrorPosition,
                 radialMirrorSlices, radialMirrorAlternate, radialMirrorRadius, radialMirrorDrawLines, radialMirrorDrawPlanes);
 
-        modifierSettings = new ModifierSettingsManager.ModifierSettings(arraySettings, mirrorSettings, radialMirrorSettings, false, reachUpgrade);
+        modifierSettings = new ModifierSettingsManager.ModifierSettings(arraySettings, mirrorSettings, radialMirrorSettings, false);
     }
 
 

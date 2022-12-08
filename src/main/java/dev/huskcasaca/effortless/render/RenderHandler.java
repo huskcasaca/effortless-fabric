@@ -57,7 +57,7 @@ public class RenderHandler {
     }
 
     protected static VertexConsumer beginLines(MultiBufferSource.BufferSource renderTypeBuffer) {
-        return renderTypeBuffer.getBuffer(BuildRenderTypes.LINES);
+        return renderTypeBuffer.getBuffer(BuildRenderTypes.EB_LINES);
     }
 
     protected static void endLines(MultiBufferSource.BufferSource renderTypeBuffer) {
@@ -65,7 +65,7 @@ public class RenderHandler {
     }
 
     protected static VertexConsumer beginPlanes(MultiBufferSource.BufferSource renderTypeBuffer) {
-        return renderTypeBuffer.getBuffer(BuildRenderTypes.PLANES);
+        return renderTypeBuffer.getBuffer(BuildRenderTypes.EB_PLANES);
     }
 
     protected static void endPlanes(MultiBufferSource.BufferSource renderTypeBuffer) {

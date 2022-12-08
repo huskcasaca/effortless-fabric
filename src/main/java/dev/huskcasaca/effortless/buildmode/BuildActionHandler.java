@@ -75,7 +75,7 @@ public class BuildActionHandler {
 
                 modifierSettings = new ModifierSettingsManager.ModifierSettings(
                         modifierSettings.arraySettings(), modifierSettings.mirrorSettings(), modifierSettings.radialMirrorSettings(),
-                        !modifierSettings.quickReplace(), modifierSettings.reachUpgrade()
+                        !modifierSettings.quickReplace()
                 );
                 ModifierSettingsManager.setModifierSettings(player, modifierSettings);
 

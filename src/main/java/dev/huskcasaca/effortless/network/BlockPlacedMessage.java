@@ -77,9 +77,7 @@ public record BlockPlacedMessage(
 
         @Override
         public void handleServerSide(MinecraftServer server, ServerPlayer player, ServerGamePacketListenerImpl handler, BlockPlacedMessage message, PacketSender responseSender) {
-            server.execute(() -> {
-                BuildModeHandler.onBlockPlacedMessage(player, message);
-            });
+            server.execute(() -> BuildModeHandler.onBlockPlacedMessage(player, message));
         }
     }
 
@@ -89,9 +87,7 @@ public record BlockPlacedMessage(
         @Override
         public void handleClientSide(Minecraft client, LocalPlayer player, ClientPacketListener handler, BlockPlacedMessage message, PacketSender responseSender) {
             //Nod RenderHandler to do the dissolve shader effect
-            client.execute(() -> {
-                BlockPreviewRenderer.onBlocksPlaced();
-            });
+            client.execute(() -> BlockPreviewRenderer.onBlocksPlaced());
         }
     }
 

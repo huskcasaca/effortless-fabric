@@ -10,8 +10,8 @@ public enum BuildOption {
     LINE_THICKNESS("thickness", BuildAction.THICKNESS_1, BuildAction.THICKNESS_3, BuildAction.THICKNESS_5),
     CIRCLE_START("circle_start", BuildAction.CIRCLE_START_CORNER, BuildAction.CIRCLE_START_CENTER);
 
-    public final String name;
-    public final BuildAction[] actions;
+    private final String name;
+    private final BuildAction[] actions;
 
     BuildOption(String name, BuildAction... actions) {
         this.name = name;
@@ -20,5 +20,9 @@ public enum BuildOption {
 
     public String getNameKey() {
         return Effortless.MOD_ID + ".option." + name;
+    }
+
+    public BuildAction[] getActions() {
+        return actions;
     }
 }

@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 
 public class ClientReloadShadersEvent {
 
-    public static Event<ShaderRegister> REGISTER_SHADER = EventFactory.createArrayBacked(ShaderRegister.class, callbacks -> (manager, sink) -> {
+    public static final Event<ShaderRegister> REGISTER_SHADER = EventFactory.createArrayBacked(ShaderRegister.class, callbacks -> (manager, sink) -> {
         for (ShaderRegister callback : callbacks) {
             callback.onRegisterShader(manager, sink);
         }

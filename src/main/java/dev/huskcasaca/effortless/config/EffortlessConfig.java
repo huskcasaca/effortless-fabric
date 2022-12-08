@@ -20,8 +20,6 @@ public class EffortlessConfig extends Config {
         this.previewConfig = previewConfig;
     }
 
-    ;
-
     public EffortlessConfig() {
         this(new BuildConfig(), new PreviewConfig());
     }

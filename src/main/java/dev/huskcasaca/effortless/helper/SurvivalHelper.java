@@ -287,8 +287,6 @@ public class SurvivalHelper {
     public static boolean canBreak(Level world, Player player, BlockPos pos) {
         BlockState blockState = world.getBlockState(pos);
         return world.getFluidState(pos).isEmpty();
-
-//		return ForgeEventFactory.doPlayerHarvestCheck(player, blockState, true);
     }
 
     public static boolean doesBecomeDoubleSlab(Player player, BlockPos pos, Direction facing) {

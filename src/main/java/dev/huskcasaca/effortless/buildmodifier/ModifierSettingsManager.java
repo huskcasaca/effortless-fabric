@@ -65,15 +65,6 @@ public class ModifierSettingsManager {
             error += "Radial mirror exceeds your maximum reach of " + (maxReach / 2) + ". Radius has been set to " + (maxReach / 2) + ". \n";
         }
 
-        //Other
-        // TODO: 17/9/22 remove
-        if (modifierSettings.reachUpgrade < 0) {
-            error += "Reach upgrade should be at least 0. This has been corrected. \n";
-        }
-        if (modifierSettings.reachUpgrade > 3) {
-            error += "Reach upgrade should be at most 2. This has been corrected. \n";
-        }
-        // TODO: 17/9/22 remove \n
         return error;
     }
 
@@ -143,20 +134,11 @@ public class ModifierSettingsManager {
         //Other
         boolean quickReplace = modifierSettings.quickReplace;
 
-        int reachUpgrade = modifierSettings.reachUpgrade;
-        if (reachUpgrade < 0) {
-            reachUpgrade = 0;
-        }
-        if (reachUpgrade > 3) {
-            reachUpgrade = 3;
-        }
-
         return new ModifierSettings(
                 arraySettings,
                 mirrorSettings,
                 radialMirrorSettings,
-                quickReplace,
-                reachUpgrade
+                quickReplace
         );
     }
 
@@ -176,17 +158,16 @@ public class ModifierSettingsManager {
             Array.ArraySettings arraySettings,
             Mirror.MirrorSettings mirrorSettings,
             RadialMirror.RadialMirrorSettings radialMirrorSettings,
-            boolean quickReplace,
-            int reachUpgrade
+            boolean quickReplace
     ) {
 
         public ModifierSettings() {
-            this(new Array.ArraySettings(), new Mirror.MirrorSettings(), new RadialMirror.RadialMirrorSettings(), false, 0);
+            this(new Array.ArraySettings(), new Mirror.MirrorSettings(), new RadialMirror.RadialMirrorSettings(), false);
         }
 
         public ModifierSettings(Mirror.MirrorSettings mirrorSettings, Array.ArraySettings arraySettings,
                                 RadialMirror.RadialMirrorSettings radialMirrorSettings) {
-            this(arraySettings, mirrorSettings, radialMirrorSettings, false, 0);
+            this(arraySettings, mirrorSettings, radialMirrorSettings, false);
         }
 
 //        public void setReachUpgrade(int reachUpgrade) {

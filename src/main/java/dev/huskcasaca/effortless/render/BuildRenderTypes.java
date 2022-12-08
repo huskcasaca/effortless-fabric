@@ -16,14 +16,14 @@ import java.util.OptionalDouble;
 
 
 public class BuildRenderTypes extends RenderType {
-    public static final RenderType LINES;
-    public static final RenderType PLANES;
+    public static final RenderType EB_LINES;
+    public static final RenderType EB_PLANES;
     //Between 0 and 7, but dont override vanilla textures
     //Also update dissolve.fsh SamplerX
-    private static final int maskTextureIndex = 2;
-    public static ResourceLocation shaderMaskTextureLocation = new ResourceLocation("textures/shader_mask.png");
+    private static final int MASK_TEXTURE_INDEX = 2;
+    public static final ResourceLocation shaderMaskTextureLocation = new ResourceLocation("textures/shader_mask.png");
     public static ShaderInstance dissolveShaderInstance;
-    private static final ShaderStateShard RENDERTYPE_DISSOLVE_SHADER = new ShaderStateShard(() -> dissolveShaderInstance);
+    private static final ShaderStateShard RENDER_TYPE_DISSOLVE_SHADER = new ShaderStateShard(() -> dissolveShaderInstance);
 
     static {
         final LineStateShard LINE = new LineStateShard(OptionalDouble.of(2.0));
@@ -42,7 +42,7 @@ public class BuildRenderTypes extends RenderType {
                 .setWriteMaskState(COLOR_DEPTH_WRITE)
                 .setCullState(RenderStateShard.NO_CULL)
                 .createCompositeState(false);
-        LINES = RenderType.create("eb_lines",
+        EB_LINES = RenderType.create("eb_lines",
                 DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.LINES, INITIAL_BUFFER_SIZE, false, false, renderState);
 
         //PLANES
@@ -57,7 +57,7 @@ public class BuildRenderTypes extends RenderType {
                 .setWriteMaskState(COLOR_WRITE)
                 .setCullState(RenderStateShard.NO_CULL)
                 .createCompositeState(false);
-        PLANES = RenderType.create("eb_planes",
+        EB_PLANES = RenderType.create("eb_planes",
                 DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.TRIANGLE_STRIP, INITIAL_BUFFER_SIZE, false, false, renderState);
     }
 
@@ -77,7 +77,7 @@ public class BuildRenderTypes extends RenderType {
         });
 
         RenderType.CompositeState renderState = RenderType.CompositeState.builder()
-                .setShaderState(RENDERTYPE_DISSOLVE_SHADER)
+                .setShaderState(RENDER_TYPE_DISSOLVE_SHADER)
                 .setTexturingState(MY_TEXTURING)
                 .setTextureState(RenderStateShard.BLOCK_SHEET_MIPPED)
                 .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
@@ -101,22 +101,22 @@ public class BuildRenderTypes extends RenderType {
         Uniform firstposUniform = shader.getUniform("firstpos");
         Uniform secondposUniform = shader.getUniform("secondpos");
 
-        RenderSystem.setShaderTexture(maskTextureIndex, shaderMaskTextureLocation);
+        RenderSystem.setShaderTexture(MASK_TEXTURE_INDEX, shaderMaskTextureLocation);
 
         if (percentileUniform != null) percentileUniform.set(dissolve);
-        else Effortless.log("percentileUniform is null");
+        else Effortless.log("percentile uniform is null");
         if (highlightUniform != null) highlightUniform.set(highlight ? 1 : 0);
-        else Effortless.log("highlightUniform is null");
+        else Effortless.log("highlight uniform is null");
         if (redUniform != null) redUniform.set(red ? 1 : 0);
         else Effortless.log("redUniform is null");
 
         if (blockposUniform != null) blockposUniform.set((float) blockpos.x, (float) blockpos.y, (float) blockpos.z);
-        else Effortless.log("blockposUniform is null");
+        else Effortless.log("blockpos uniform is null");
         if (firstposUniform != null) firstposUniform.set((float) firstpos.x, (float) firstpos.y, (float) firstpos.z);
-        else Effortless.log("firstposUniform is null");
+        else Effortless.log("firstpos uniform is null");
         if (secondposUniform != null)
             secondposUniform.set((float) secondpos.x, (float) secondpos.y, (float) secondpos.z);
-        else Effortless.log("secondposUniform is null");
+        else Effortless.log("secondpos uniform is null");
     }
 
     private record ShaderInfo(

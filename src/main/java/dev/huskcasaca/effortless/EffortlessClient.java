@@ -225,15 +225,6 @@ public class EffortlessClient implements ClientModInitializer {
         );
     }
 
-//    public Player getPlayerEntityFromContext(Supplier<NetworkEvent.Context> ctx) {
-//        return (ctx.get().getDirection().getReceptionSide() == LogicalSide.CLIENT ? Minecraft.getInstance().player : ctx.get().getSender());
-//    }
-//
-//    @Override
-//    public void logTranslate(Player player, String prefix, String translationKey, String suffix, boolean actionBar) {
-//        Forge_Effortless.log(Minecraft.getInstance().player, prefix + I18n.get(translationKey) + suffix, actionBar);
-//    }
-
     @Override
     public void onInitializeClient() {
         // register key bindings

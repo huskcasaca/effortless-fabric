@@ -5,7 +5,7 @@ import com.google.gson.annotations.Expose;
 public class BuildConfig extends Config {
 
     public static int MIN_MAX_REACH_DISTANCE = 0;
-    public static int MAX_MAX_REACH_DISTANCE = 64;
+    public static int MAX_MAX_REACH_DISTANCE = 512;
 
     public static int MIN_MAX_BLOCK_PLACE_PER_AXIS = 0;
     public static int MAX_MAX_BLOCK_PLACE_PER_AXIS = 512;
@@ -16,9 +16,8 @@ public class BuildConfig extends Config {
     public static int MIN_UNDO_STACK_SIZE = 0;
     public static int MAX_UNDO_STACK_SIZE = 100;
 
-
     @Expose
-    private int maxReachDistance = 16;
+    private int maxReachDistance = 512;
     @Expose
     private int maxBlockPlacePerAxis = 128;
     @Expose
@@ -38,10 +37,6 @@ public class BuildConfig extends Config {
     public void setMaxReachDistance(int maxReachDistance) {
         this.maxReachDistance = maxReachDistance;
     }
-
-    /**
-     * @return true if anything was changed
-     */
 
     public int getMaxBlockPlacePerAxis() {
         return maxBlockPlacePerAxis;

@@ -135,9 +135,8 @@ public class ModifierSettingsScreen extends Screen {
         var radialMirrorSettings = radialMirrorSettingsPane.getRadialMirrorSettings();
 
         var modifierSettings = ModifierSettingsManager.getModifierSettings(minecraft.player);
-        if (modifierSettings == null) {
-            modifierSettings = new ModifierSettingsManager.ModifierSettings(mirrorSettings, arraySettings, radialMirrorSettings);
-        }
+
+        modifierSettings = new ModifierSettingsManager.ModifierSettings(arraySettings, mirrorSettings, radialMirrorSettings, modifierSettings.quickReplace());
 
         //Sanitize
         String error = ModifierSettingsManager.getSanitizeMessage(modifierSettings, minecraft.player);

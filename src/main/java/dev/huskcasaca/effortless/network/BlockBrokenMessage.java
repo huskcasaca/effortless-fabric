@@ -77,14 +77,6 @@ public record BlockBrokenMessage(
                 BuildModeHandler.onBlockBrokenMessage(player, message);
             });
         }
-//        public static void handle(BlockBrokenMessage message, Supplier<NetworkEvent.Context> ctx) {
-//            ctx.get().enqueueWork(() -> {
-//                if (ctx.get().getDirection().getReceptionSide() == LogicalSide.SERVER) {
-//                    //Received serverside
-//                }
-//            });
-//            ctx.get().setPacketHandled(true);
-//        }
 
     }
 
@@ -93,7 +85,7 @@ public record BlockBrokenMessage(
 
         @Override
         public void handleClientSide(Minecraft client, LocalPlayer player, ClientPacketListener handler, BlockBrokenMessage message, PacketSender responseSender) {
-
+            // server only
         }
 
     }

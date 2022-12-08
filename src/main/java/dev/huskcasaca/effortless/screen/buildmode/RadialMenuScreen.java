@@ -163,8 +163,8 @@ public class RadialMenuScreen extends Screen {
         BuildOption[] enabledOptions = options;
         final ArrayList<MenuButton> optionButtons = new ArrayList<>();
         for (int row = 0; row < options.length; row++) {
-            for (int col = 0; col < options[row].actions.length; col++) {
-                BuildAction action = options[row].actions[col];
+            for (int col = 0; col < options[row].getActions().length; col++) {
+                BuildAction action = options[row].getActions()[col];
                 MenuButton button = new MenuButton(action.getNameKey(), action, buttonDistance + col * 26, -13 + row * 39, Direction.DOWN);
                 buttons.add(button);
                 optionButtons.add(button);

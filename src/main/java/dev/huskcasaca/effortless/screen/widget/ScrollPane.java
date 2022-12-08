@@ -36,8 +36,6 @@ public class ScrollPane extends Slot {
         this.font = font;
         this.renderSelection = false;
         listEntries = new ArrayList<>();
-        // FIXME: 13/9/22
-//        MinecraftForge.EVENT_BUS.register(this);
     }
 
     public IScrollEntry getListEntry(int index) {

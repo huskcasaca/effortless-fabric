@@ -4,8 +4,6 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-//import net.minecraftforge.items.IItemHandler;
-//import nl.requios.effortlessbuilding.item.AbstractRandomizerBagItem;
 
 public class CompatHelper {
 
