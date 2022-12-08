@@ -5,9 +5,6 @@ import dev.huskcasaca.effortless.buildmode.BuildModeHandler;
 import dev.huskcasaca.effortless.buildmode.ModeSettingsManager;
 import dev.huskcasaca.effortless.buildmodifier.ModifierSettingsManager;
 import dev.huskcasaca.effortless.buildmodifier.UndoRedo;
-import dev.huskcasaca.effortless.buildmodifier.array.Array;
-import dev.huskcasaca.effortless.buildmodifier.mirror.Mirror;
-import dev.huskcasaca.effortless.buildmodifier.mirror.RadialMirror;
 import dev.huskcasaca.effortless.helper.ReachHelper;
 import dev.huskcasaca.effortless.network.AddUndoMessage;
 import dev.huskcasaca.effortless.network.ClearUndoMessage;
@@ -46,7 +43,7 @@ public class Effortless implements ModInitializer {
         var buildMode = ModeSettingsManager.getModeSettings(player).buildMode();
         var modifierSettings = ModifierSettingsManager.getModifierSettings(player);
 
-        if (buildMode != BuildMode.VANILLA) {
+        if (buildMode == BuildMode.DISABLE) {
             return false;
         } else if (modifierSettings.quickReplace()) {
             //Cancel event and send message if QuickReplace
@@ -78,7 +75,7 @@ public class Effortless implements ModInitializer {
         //Cancel event if necessary
         //If cant break far then dont cancel event ever
         var buildMode = ModeSettingsManager.getModeSettings(player).buildMode();
-        if (buildMode != BuildMode.VANILLA && ReachHelper.canBreakFar(player)) {
+        if (buildMode != BuildMode.DISABLE && ReachHelper.canBreakFar(player)) {
             return false;
         } else {
             //NORMAL mode, let vanilla handle block breaking
@@ -117,7 +114,7 @@ public class Effortless implements ModInitializer {
         //Set build mode to normal
         var modeSettings = ModeSettingsManager.getModeSettings(player);
         modeSettings = new ModeSettingsManager.ModeSettings(
-                BuildMode.VANILLA,
+                BuildMode.DISABLE,
                 modeSettings.enableMagnet()
         );
         ModeSettingsManager.setModeSettings(player, modeSettings);

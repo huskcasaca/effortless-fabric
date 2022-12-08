@@ -72,7 +72,7 @@ public class BlockPreviewRenderer {
 
         //Render block previews
         HitResult lookingAt = EffortlessClient.getLookingAt(player);
-        if (modeSettings.buildMode() == BuildMode.VANILLA)
+        if (modeSettings.buildMode() == BuildMode.DISABLE)
             lookingAt = Minecraft.getInstance().hitResult;
 
         ItemStack mainhand = player.getMainHandItem();
@@ -265,7 +265,7 @@ public class BlockPreviewRenderer {
 
     //Whether to draw any block previews or outlines
     public static boolean doRenderBlockPreviews(ModifierSettings modifierSettings, ModeSettings modeSettings, BlockPos startPos) {
-        return ConfigManager.getGlobalPreviewConfig().isAlwaysShowBlockPreview() || (modeSettings.buildMode() != BuildMode.VANILLA);
+        return ConfigManager.getGlobalPreviewConfig().isAlwaysShowBlockPreview() || (modeSettings.buildMode() != BuildMode.DISABLE);
     }
 
     protected static int renderBlockPreviews(PoseStack matrixStack, MultiBufferSource.BufferSource renderTypeBuffer, List<BlockPos> coordinates, List<BlockState> blockStates,

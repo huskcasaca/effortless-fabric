@@ -79,7 +79,7 @@ public class BuildActionHandler {
                 );
                 ModifierSettingsManager.setModifierSettings(player, modifierSettings);
 
-                Effortless.log(player, ChatFormatting.GOLD + "Quick Replace " + ChatFormatting.RESET + (
+                Effortless.log(player, ChatFormatting.GOLD + "Replace " + ChatFormatting.RESET + (
                         modifierSettings.quickReplace() ? (ChatFormatting.GREEN + "ON") : (ChatFormatting.RED + "OFF")) + ChatFormatting.RESET, true);
                 break;
             case MAGNET:
@@ -89,13 +89,17 @@ public class BuildActionHandler {
 
                 Effortless.log(player, ChatFormatting.GOLD + "Item Magnet " + ChatFormatting.RESET + (modeSettings.enableMagnet() ? (ChatFormatting.GREEN + "ON") : (ChatFormatting.RED + "OFF")) + ChatFormatting.RESET, true);
                 break;
-            case OPEN_MODIFIER_SETTINGS:
+            case MODIFIER:
                 if (player.level.isClientSide)
                     EffortlessClient.openModifierSettings();
                 break;
             case OPEN_PLAYER_SETTINGS:
                 if (player.level.isClientSide)
                     EffortlessClient.openPlayerSettings();
+                break;
+            case SETTINGS:
+                if (player.level.isClientSide)
+                    EffortlessClient.openSettings();
                 break;
             case NORMAL_SPEED:
                 buildSpeed = BuildAction.NORMAL_SPEED;
@@ -143,7 +147,7 @@ public class BuildActionHandler {
 
         if (player.level.isClientSide &&
                 action != BuildAction.REPLACE &&
-                action != BuildAction.OPEN_MODIFIER_SETTINGS &&
+                action != BuildAction.MODIFIER &&
                 action != BuildAction.OPEN_PLAYER_SETTINGS) {
 
             Effortless.logTranslate(player, "", action.getNameKey(), "", true);

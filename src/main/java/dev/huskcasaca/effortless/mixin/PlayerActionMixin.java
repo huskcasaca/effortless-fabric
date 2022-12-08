@@ -8,6 +8,10 @@ import dev.huskcasaca.effortless.network.BlockBrokenMessage;
 import dev.huskcasaca.effortless.network.BlockPlacedMessage;
 import dev.huskcasaca.effortless.network.PacketHandler;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.multiplayer.MultiPlayerGameMode;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.BlockItem;
@@ -15,6 +19,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -33,140 +38,118 @@ public class PlayerActionMixin {
 
     @Shadow
     protected int missTime;
+    @Shadow @Nullable public MultiPlayerGameMode gameMode;
 
-//        Minecraft mc = Minecraft.getInstance();
-//        LocalPlayer player = mc.player;
-//        if (player == null) return;
-//        var buildMode = ModeSettingsManager.getModeSettings(player).buildMode();
-//
-//        if (Minecraft.getInstance().screen != null ||
-//                buildMode == BuildMode.VANILLA ||
-//                RadialMenuScreen.instance.isVisible()) {
-//            return;
-//        }
+    @Shadow @Nullable public LocalPlayer player;
+    @Shadow @Final public GameRenderer gameRenderer;
+
+    @Shadow @Nullable public ClientLevel level;
+
+    @Shadow private int rightClickDelay;
 
     // TODO: 15/9/22 extract to EffortlessClient class
     // startAttack
     @Inject(method = "startAttack", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/phys/HitResult;getType()Lnet/minecraft/world/phys/HitResult$Type;"), cancellable = true)
     private void onStartAttack(CallbackInfoReturnable<Boolean> cir) {
-        var player = Minecraft.getInstance().player;
         var buildMode = ModeSettingsManager.getModeSettings(player).buildMode();
+        if (buildMode == BuildMode.DISABLE) return;
+        // let vanilla handle entity attack
+        if (hitResult != null && hitResult.getType() == HitResult.Type.ENTITY) return;
+        // let vanilla handle attack action
+        if (player.isHandsBusy()) return;
 
-        if (buildMode == BuildMode.VANILLA) return;
 
-        if (this.hitResult.getType() != HitResult.Type.ENTITY) {
-            if (player.isHandsBusy()) {
-                // let vanilla handle attack action
+        // FIXME: 15/9/22 grass hit result is incorrect using getLookingAt
+        HitResult lookingAt = getLookingAt(player);
+        if (lookingAt != null && lookingAt.getType() == HitResult.Type.BLOCK) {
+            BlockHitResult blockLookingAt = (BlockHitResult) lookingAt;
 
-                return;
-            } else {
-                if (hitResult != null && hitResult.getType() == HitResult.Type.ENTITY) {
-                    // let vanilla handle entity attack
+            BuildModeHandler.onBlockBrokenMessage(player, new BlockBrokenMessage(blockLookingAt));
+            PacketHandler.sendToServer(new BlockBrokenMessage(blockLookingAt));
 
-                } else {
-                    // FIXME: 15/9/22 grass hit result is incorrect using getLookingAt
-                    HitResult lookingAt = getLookingAt(player);
-                    if (lookingAt != null && lookingAt.getType() == HitResult.Type.BLOCK) {
-                        BlockHitResult blockLookingAt = (BlockHitResult) lookingAt;
+            //play sound if further than normal
+            if ((blockLookingAt.getLocation().subtract(player.getEyePosition(1f))).lengthSqr() > 25f) {
 
-                        BuildModeHandler.onBlockBrokenMessage(player, new BlockBrokenMessage(blockLookingAt));
-                        PacketHandler.sendToServer(new BlockBrokenMessage(blockLookingAt));
-
-                        //play sound if further than normal
-                        if ((blockLookingAt.getLocation().subtract(player.getEyePosition(1f))).lengthSqr() > 25f) {
-
-                            var blockPos = blockLookingAt.getBlockPos();
-                            var state = player.level.getBlockState(blockPos);
-                            var soundtype = state.getBlock().getSoundType(state);
-                            player.level.playSound(player, player.blockPosition(), soundtype.getBreakSound(), SoundSource.BLOCKS,
-                                    0.4f, soundtype.getPitch());
-                        }
-                        cir.setReturnValue(true);
-                    } else {
-                        BuildModeHandler.onBlockBrokenMessage(player, new BlockBrokenMessage());
-                        PacketHandler.sendToServer(new BlockBrokenMessage());
-                        cir.setReturnValue(false);
-                    }
-                    player.swing(InteractionHand.MAIN_HAND);
-                    cir.cancel();
-                }
+                var blockPos = blockLookingAt.getBlockPos();
+                var state = player.level.getBlockState(blockPos);
+                var soundtype = state.getBlock().getSoundType(state);
+                player.level.playSound(player, player.blockPosition(), soundtype.getBreakSound(), SoundSource.BLOCKS,
+                        0.4f, soundtype.getPitch());
             }
+            cir.setReturnValue(true);
+        } else {
+            BuildModeHandler.onBlockBrokenMessage(player, new BlockBrokenMessage());
+            PacketHandler.sendToServer(new BlockBrokenMessage());
+            cir.setReturnValue(false);
         }
+        player.swing(InteractionHand.MAIN_HAND);
+        cir.cancel();
 
 
     }
 
     @Inject(method = "continueAttack", at = @At("HEAD"), cancellable = true)
     private void onContinueAttack(boolean bl, CallbackInfo ci) {
-        var player = Minecraft.getInstance().player;
         var buildMode = ModeSettingsManager.getModeSettings(player).buildMode();
-
-        if (buildMode == BuildMode.VANILLA) return;
+        if (buildMode == BuildMode.DISABLE) return;
 
         if (!bl) {
             this.missTime = 0;
         }
 
-        if (player.isHandsBusy()) {
+        // let vanilla handle entity attack
+        if (hitResult != null && hitResult.getType() == HitResult.Type.ENTITY) return;
+        // let vanilla handle attack action
+        if (player.isHandsBusy()) return;
 
-        } else {
-            if (hitResult != null && hitResult.getType() == HitResult.Type.ENTITY) {
-
-            } else {
-                ci.cancel();
-            }
-        }
+        ci.cancel();
 
     }
 
-    @Inject(method = "startUseItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/phys/HitResult;getType()Lnet/minecraft/world/phys/HitResult$Type;"), cancellable = true)
-    private void onStartOption(CallbackInfo ci) {
-        var player = Minecraft.getInstance().player;
+
+    @Inject(method = "startUseItem", at = @At(value = "HEAD"), cancellable = true)
+    private void onStartUseItem(CallbackInfo ci) {
         var buildMode = ModeSettingsManager.getModeSettings(player).buildMode();
-
-        if (buildMode == BuildMode.VANILLA) return;
-
-        if (hitResult != null && hitResult.getType() != HitResult.Type.ENTITY) {
-
-            if (buildMode == BuildMode.VANILLA) {
-                // let vanilla handle use action
-
-            } else {
-                ItemStack currentItemStack = player.getItemInHand(InteractionHand.MAIN_HAND);
-                if (currentItemStack.getItem() instanceof BlockItem || (CompatHelper.isItemBlockProxy(currentItemStack) && !player.isShiftKeyDown())) {
-
-                    ItemStack itemStack = CompatHelper.getItemBlockFromStack(currentItemStack);
-
-                    //find position in distance
-                    HitResult lookingAt = getLookingAt(player);
-                    if (lookingAt != null && lookingAt.getType() == HitResult.Type.BLOCK) {
-                        BlockHitResult blockLookingAt = (BlockHitResult) lookingAt;
-
-                        BuildModeHandler.onBlockPlacedMessage(player, new BlockPlacedMessage(blockLookingAt, true));
-                        PacketHandler.sendToServer(new BlockPlacedMessage(blockLookingAt, true));
-
-                        //play sound if further than normal
-                        if ((blockLookingAt.getLocation().subtract(player.getEyePosition(1f))).lengthSqr() > 25f &&
-                                itemStack.getItem() instanceof BlockItem) {
-
-                            var state = ((BlockItem) itemStack.getItem()).getBlock().defaultBlockState();
-                            var blockPos = blockLookingAt.getBlockPos();
-                            var soundType = state.getBlock().getSoundType(state);
-                            player.level.playSound(player, player.blockPosition(), soundType.getPlaceSound(), SoundSource.BLOCKS,
-                                    0.4f, soundType.getPitch());
-                            player.swing(InteractionHand.MAIN_HAND);
-                        }
-                    } else {
-                        BuildModeHandler.onBlockPlacedMessage(player, new BlockPlacedMessage());
-                        PacketHandler.sendToServer(new BlockPlacedMessage());
-                    }
-                }
-
-                ci.cancel();
-            }
-
+        if (buildMode == BuildMode.DISABLE) return;
+        // let vanilla handle entity attack
+        if (hitResult != null && hitResult.getType() == HitResult.Type.ENTITY) return;
+        // let vanilla handle attack action
+        if (this.gameMode.isDestroying()) {
+            ci.cancel();
+            return;
+        }
+        rightClickDelay = 4;
+        if (this.player.isHandsBusy()) {
+            ci.cancel();
+            return;
         }
 
+        for (var interactionHand : InteractionHand.values()) {
+            var itemStack = player.getItemInHand(interactionHand);
+            HitResult lookingAt = getLookingAt(player);
+            if (!(itemStack.getItem() instanceof BlockItem blockItem)) return;
+            if (lookingAt.getType() == HitResult.Type.BLOCK) {
+                //find position in distance
+                BlockHitResult blockLookingAt = (BlockHitResult) lookingAt;
+                BuildModeHandler.onBlockPlacedMessage(player, new BlockPlacedMessage(blockLookingAt, true));
+                PacketHandler.sendToServer(new BlockPlacedMessage(blockLookingAt, true));
+                //play sound if further than normal
+                if ((blockLookingAt.getLocation().subtract(player.getEyePosition(1f))).lengthSqr() > 25f) {
+                    var state = ((BlockItem) itemStack.getItem()).getBlock().defaultBlockState();
+                    var blockPos = blockLookingAt.getBlockPos();
+                    var soundType = state.getBlock().getSoundType(state);
+                    player.level.playSound(player, player.blockPosition(), soundType.getPlaceSound(), SoundSource.BLOCKS,
+                            0.4f, soundType.getPitch());
+                    player.swing(interactionHand);
+                }
+            } else {
 
+                BuildModeHandler.onBlockPlacedMessage(player, new BlockPlacedMessage());
+                PacketHandler.sendToServer(new BlockPlacedMessage());
+            }
+            ci.cancel();
+            return;
+        }
     }
+
 }

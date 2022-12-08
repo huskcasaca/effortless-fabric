@@ -2,6 +2,7 @@ package dev.huskcasaca.effortless.buildmode;
 
 import dev.huskcasaca.effortless.Effortless;
 import dev.huskcasaca.effortless.buildmode.oneclick.Single;
+import dev.huskcasaca.effortless.buildmode.oneclick.Disable;
 import dev.huskcasaca.effortless.buildmode.oneclick.Vanilla;
 import dev.huskcasaca.effortless.buildmode.threeclick.*;
 import dev.huskcasaca.effortless.buildmode.twoclick.Circle;
@@ -10,7 +11,8 @@ import dev.huskcasaca.effortless.buildmode.twoclick.Line;
 import dev.huskcasaca.effortless.buildmode.twoclick.Wall;
 
 public enum BuildMode {
-    VANILLA("vanilla", new Vanilla(), BuildCategory.BASIC),
+    DISABLE("disable", new Disable(), BuildCategory.BASIC),
+//    VANILLA("vanilla", new Vanilla(), BuildCategory.BASIC),
     SINGLE("single", new Single(), BuildCategory.BASIC /*, BuildOption.BUILD_SPEED*/),
 
     LINE("line", new Line(), BuildCategory.BASIC /*, OptionEnum.THICKNESS*/),

@@ -20,7 +20,7 @@ public class ModeSettingsManager {
 
     public static String getTranslatedModeOptionName(Player player) {
         BuildMode mode = ModeSettingsManager.getModeSettings(player).buildMode();
-        if (mode == BuildMode.VANILLA) {
+        if (mode == BuildMode.DISABLE) {
             return I18n.get(mode.getNameKey());
         } else {
             StringBuilder modeName = new StringBuilder();
@@ -84,7 +84,7 @@ public class ModeSettingsManager {
     ) {
 
         public ModeSettings() {
-            this(BuildMode.VANILLA, false);
+            this(BuildMode.DISABLE, false);
         }
 
     }

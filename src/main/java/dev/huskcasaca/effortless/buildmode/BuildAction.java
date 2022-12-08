@@ -7,8 +7,10 @@ public enum BuildAction {
     REDO("redo"),
     REPLACE("replace"),
     MAGNET("magnet"),
-    OPEN_MODIFIER_SETTINGS("open_modifier_settings"),
+    MODIFIER("modifier"),
+    // TODO: remove OPEN_PLAYER_SETTINGS
     OPEN_PLAYER_SETTINGS("open_player_settings"),
+    SETTINGS("settings"),
 
     NORMAL_SPEED("normal_speed"),
     FAST_SPEED("fast_speed"),

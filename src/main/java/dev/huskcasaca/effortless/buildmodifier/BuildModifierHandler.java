@@ -6,12 +6,14 @@ import dev.huskcasaca.effortless.buildmodifier.mirror.RadialMirror;
 import dev.huskcasaca.effortless.helper.CompatHelper;
 import dev.huskcasaca.effortless.helper.InventoryHelper;
 import dev.huskcasaca.effortless.helper.SurvivalHelper;
+import dev.huskcasaca.effortless.mixin.BlockItemAccessor;
 import dev.huskcasaca.effortless.render.BlockPreviewRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
@@ -71,7 +73,7 @@ public class BuildModifierHandler {
                         itemStack = InventoryHelper.findItemStackInInventory(player, blockState.getBlock());
                         if (itemStack.isEmpty()) continue;
                     }
-                    SurvivalHelper.placeBlock(world, player, blockPos, blockState, itemStack, Direction.UP, hitVec, false, false, false);
+                    SurvivalHelper.placeBlock(world, player, blockPos, blockState, itemStack, sideHit, hitVec, false, false, false);
                 }
             }
 
@@ -199,6 +201,7 @@ public class BuildModifierHandler {
         for (var blockPos : posList) {
             if (!(itemStack.getItem() instanceof BlockItem)) itemBlock = CompatHelper.getItemBlockFromStack(itemStack);
             BlockState blockState = getBlockStateFromItem(itemBlock, player, blockPos, facing, hitVec, InteractionHand.MAIN_HAND);
+//            Effortless.log(player, "getBlockStateFromItem " + blockState);
             if (blockState == null) continue;
 
             blockStates.add(blockState);
@@ -211,6 +214,7 @@ public class BuildModifierHandler {
 
             List<BlockState> arrayBlockStates = Array.findBlockStates(player, blockPos, blockState, itemStack, itemStacks);
             blockStates.addAll(arrayBlockStates);
+
             blockStates.addAll(Mirror.findBlockStates(player, blockPos, blockState, itemStack, itemStacks));
             blockStates.addAll(RadialMirror.findBlockStates(player, blockPos, blockState, itemStack, itemStacks));
             //add mirror for each array coordinate
@@ -244,9 +248,19 @@ public class BuildModifierHandler {
                 modifierSettings.quickReplace();
     }
 
+
     public static BlockState getBlockStateFromItem(ItemStack itemStack, Player player, BlockPos blockPos, Direction facing, Vec3 hitVec, InteractionHand hand) {
-        return Block.byItem(itemStack.getItem()).getStateForPlacement(new BlockPlaceContext(new UseOnContext(player, hand, new BlockHitResult(hitVec, facing, blockPos, false))));
+        var hitresult = new BlockHitResult(hitVec, facing, blockPos, false);
+
+        var item = itemStack.getItem();
+
+        if (item instanceof BlockItem) {
+            return ((BlockItemAccessor) Item.byBlock(((BlockItem) item).getBlock())).callGetPlacementState(new BlockPlaceContext(player, hand, itemStack, hitresult));
+        } else {
+            return Block.byItem(item).getStateForPlacement(new BlockPlaceContext(new UseOnContext(player, hand, new BlockHitResult(hitVec, facing, blockPos, false))));
+        }
     }
+
 
     //Returns true if equal (or both null)
     public static boolean compareCoordinates(List<BlockPos> coordinates1, List<BlockPos> coordinates2) {

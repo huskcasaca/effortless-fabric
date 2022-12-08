@@ -63,7 +63,7 @@ public class BuildModeHandler {
 
             //Check if player reach does not exceed startpos
             int maxReach = ReachHelper.getMaxReach(player);
-            if (buildMode != BuildMode.VANILLA && player.blockPosition().distSqr(startPos) > maxReach * maxReach) {
+            if (buildMode != BuildMode.DISABLE && player.blockPosition().distSqr(startPos) > maxReach * maxReach) {
                 Effortless.log(player, "Placement exceeds your reach.");
                 return;
             }
@@ -235,7 +235,7 @@ public class BuildModeHandler {
         boolean intersects = false;
         if (!skipRaytrace) {
             //collision within a 1 block radius to selected is fine
-            ClipContext rayTraceContext = new ClipContext(start, lineBound, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player);
+            ClipContext rayTraceContext = new ClipContext(start, lineBound, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player);
             HitResult rayTraceResult = player.level.clip(rayTraceContext);
             intersects = rayTraceResult != null && rayTraceResult.getType() == HitResult.Type.BLOCK &&
                     planeBound.subtract(rayTraceResult.getLocation()).lengthSqr() > 4;

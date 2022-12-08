@@ -8,15 +8,17 @@ For setup instructions please see the [fabric wiki page](https://fabricmc.net/wi
 
 ## Todo
 * [x] Configure screen
-* [ ] Item randomizer
+* [x] Item randomizer
+* [ ] Commands
 * [ ] Undo/Redo
 * [x] Magnet (pick up distant items)
 * [x] Rewrite attack/use logic
 * [ ] Rewrite shader
 * [ ] Rewrite S2C/C2S logic
 * [ ] Performance optimize (for large amount of blocks)
-* [ ] Makkit
-* [ ] Tweakeroo compat
+* [x] Wall blocks (torch) support
+* [ ] Makkit support
+* [ ] Tweakeroo support
 
 ## Credits
 * **[Requioss](https://www.curseforge.com/members/requioss)**, the author of [Effortless Building](https://www.curseforge.com/minecraft/mc-mods/effortless-building) 

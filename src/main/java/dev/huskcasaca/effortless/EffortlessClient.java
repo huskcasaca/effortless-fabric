@@ -15,6 +15,7 @@ import dev.huskcasaca.effortless.render.BuildRenderTypes;
 import dev.huskcasaca.effortless.screen.buildmode.PlayerSettingsScreen;
 import dev.huskcasaca.effortless.screen.buildmode.RadialMenuScreen;
 import dev.huskcasaca.effortless.screen.buildmodifier.ModifierSettingsScreen;
+import dev.huskcasaca.effortless.screen.config.EffortlessConfigScreen;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -94,7 +95,7 @@ public class EffortlessClient implements ClientModInitializer {
 //        if (keyBindings[1].consumeClick()) {
 //            var modifierSettings = ModifierSettingsManager.getModifierSettings(player);
 //            modifierSettings.setQuickReplace(!modifierSettings.quickReplace());
-//            Effortless.log(player, ChatFormatting.GOLD + "Quick Replace " + ChatFormatting.RESET + (
+//            Effortless.log(player, ChatFormatting.GOLD + "Replace " + ChatFormatting.RESET + (
 //                    modifierSettings.quickReplace() ? "ON" : "OFF"));
 //            PacketHandler.sendToServer(new ModifierSettingsMessage(modifierSettings));
 //        }
@@ -165,6 +166,12 @@ public class EffortlessClient implements ClientModInitializer {
 
     }
 
+    public static void openSettings() {
+        Minecraft mc = Minecraft.getInstance();
+        mc.setScreen(EffortlessConfigScreen.createConfigScreen(mc.screen));
+
+    }
+
     public static void onScreenEvent(Screen screen) {
         var player = Minecraft.getInstance().player;
         if (player != null) {
@@ -214,7 +221,7 @@ public class EffortlessClient implements ClientModInitializer {
         var end = new Vec3(player.getX() + look.x * raytraceRange, player.getY() + player.getEyeHeight() + look.y * raytraceRange, player.getZ() + look.z * raytraceRange);
 //        return player.rayTrace(raytraceRange, 1f, RayTraceFluidMode.NEVER);
         //TODO 1.14 check if correct
-        return world.clip(new ClipContext(start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player));
+        return world.clip(new ClipContext(start, end, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player));
     }
 
     public static void registerShaders(ResourceManager manager, ClientReloadShadersEvent.ShaderRegister.ShadersSink sink) throws IOException {

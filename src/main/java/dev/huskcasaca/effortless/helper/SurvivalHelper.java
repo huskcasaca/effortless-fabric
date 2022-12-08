@@ -55,7 +55,7 @@ public class SurvivalHelper {
 
 
         //More manual with ItemBlock#placeBlockAt
-        if (skipPlaceCheck || canPlace(world, player, pos, blockState, itemstack, skipCollisionCheck, facing.getOpposite())) {
+        if (true || canPlace(world, player, pos, blockState, itemstack, skipCollisionCheck, facing.getOpposite())) {
             //Drop existing block
             dropBlock(world, player, pos);
 
@@ -190,6 +190,7 @@ public class SurvivalHelper {
      */
     public static boolean canPlace(Level world, Player player, BlockPos pos, BlockState newBlockState, ItemStack itemStack, boolean skipCollisionCheck, Direction sidePlacedOn) {
 
+        if (true) return true;
         //Check if itemstack is correct
         if (!(itemStack.getItem() instanceof BlockItem) || Block.byItem(itemStack.getItem()) != newBlockState.getBlock()) {
 //            Effortless.log(player, "Cannot (re)place block", true);
@@ -200,8 +201,9 @@ public class SurvivalHelper {
 
         Block block = ((BlockItem) itemStack.getItem()).getBlock();
 
+//        Effortless.log(player, "isEmpty " + !itemStack.isEmpty() + " canPlayerEdit " + canPlayerEdit(player, world, pos, itemStack) + " mayPlace " + mayPlace(world, block, newBlockState, pos, skipCollisionCheck, sidePlacedOn, player) + " canReplace " + canReplace(world, player, pos));
         return !itemStack.isEmpty() && canPlayerEdit(player, world, pos, itemStack) &&
-                mayPlace(world, block, newBlockState, pos, skipCollisionCheck, sidePlacedOn, player) &&
+//                mayPlace(world, block, newBlockState, pos, skipCollisionCheck, sidePlacedOn, player) &&
                 canReplace(world, player, pos);
     }
 
