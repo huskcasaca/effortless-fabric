@@ -16,6 +16,8 @@ import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 
@@ -32,7 +34,7 @@ public class PlayerSettingsScreen extends Screen {
     private Button closeButton;
 
     public PlayerSettingsScreen() {
-        super(Component.translatable("effortless.screen.player_settings"));
+        super(new TranslatableComponent("effortless.screen.player_settings"));
     }
 
     @Override
@@ -53,10 +55,10 @@ public class PlayerSettingsScreen extends Screen {
         addRenderableOnly(shaderTypeButton);
 
         yy += 50;
-        Slider slider = new Slider(right - 200, yy, 200, 20, Component.empty(), Component.empty(), 0.5, 2.0, 1.0, true);
+        Slider slider = new Slider(right - 200, yy, 200, 20, TextComponent.EMPTY, TextComponent.EMPTY, 0.5, 2.0, 1.0, true);
         addRenderableOnly(slider);
 
-        closeButton = new ExtendedButton(left + 50, bottom - 20, 180, 20, Component.literal("Done"), (button) -> this.minecraft.player.closeContainer());
+        closeButton = new ExtendedButton(left + 50, bottom - 20, 180, 20, new TextComponent("Done"), (button) -> this.minecraft.player.closeContainer());
         addRenderableOnly(closeButton);
     }
 
@@ -108,7 +110,7 @@ public class PlayerSettingsScreen extends Screen {
         }
 
         ShaderType(String name) {
-            this.name = Component.literal(name);
+            this.name = new TextComponent(name);
         }
     }
 
@@ -214,7 +216,8 @@ public class PlayerSettingsScreen extends Screen {
                 this.renderHeader(ms, k, l, tessellator);
             }
 
-            this.renderList(ms, p_render_1_, p_render_2_, p_render_3_);
+            this.renderList(ms, k, l, p_render_1_, p_render_2_, p_render_3_);
+
             RenderSystem.disableDepthTest();
 //            this.renderHoleBackground(0, this.y0, 255, 255);
 //            this.renderHoleBackground(this.y1, this.height, 255, 255);

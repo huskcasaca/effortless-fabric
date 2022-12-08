@@ -7,6 +7,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -28,7 +29,7 @@ public class IconButton extends Button {
     }
 
     public IconButton(int x, int y, int width, int height, int iconX, int iconY, int iconWidth, int iconHeight, int iconAltX, int iconAltY, ResourceLocation resourceLocation, Button.OnPress onPress) {
-        super(x, y, width, height, Component.empty(), onPress);
+        super(x, y, width, height, TextComponent.EMPTY, onPress);
         this.iconX = iconX;
         this.iconY = iconY;
         this.iconWidth = iconWidth;

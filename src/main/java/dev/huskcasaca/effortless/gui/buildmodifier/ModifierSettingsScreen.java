@@ -17,7 +17,8 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.player.Player;
 
 @Environment(EnvType.CLIENT)
@@ -31,7 +32,7 @@ public class ModifierSettingsScreen extends Screen {
     private RadialMirrorSettingsPane radialMirrorSettingsPane;
 
     public ModifierSettingsScreen() {
-        super(Component.translatable("effortless.screen.modifier_settings"));
+        super(new TranslatableComponent("effortless.screen.modifier_settings"));
     }
 
     @Override
@@ -53,7 +54,7 @@ public class ModifierSettingsScreen extends Screen {
 
         //Close button
         int y = height - 26;
-        buttonClose = new Button(width / 2 - 100, y, 200, 20, Component.literal("Close"), (button) -> {
+        buttonClose = new Button(width / 2 - 100, y, 200, 20, new TextComponent("Close"), (button) -> {
             Player player = Minecraft.getInstance().player;
             if (player != null) {
                 player.closeContainer();

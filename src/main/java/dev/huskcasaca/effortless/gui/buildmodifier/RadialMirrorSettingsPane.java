@@ -12,7 +12,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
 
@@ -57,31 +57,31 @@ public class RadialMirrorSettingsPane extends ExpandableScrollEntry {
         textRadialMirrorPosX = new NumberField(font, renderables, left + 58, y, 62, 18);
         textRadialMirrorPosX.setNumber(0);
         textRadialMirrorPosX.setTooltip(
-                Arrays.asList(Component.literal("The position of the radial mirror."), Component.literal("For odd numbered builds add 0.5.").withStyle(ChatFormatting.GRAY)));
+                Arrays.asList(new TextComponent("The position of the radial mirror."), new TextComponent("For odd numbered builds add 0.5.").withStyle(ChatFormatting.GRAY)));
         radialMirrorNumberFieldList.add(textRadialMirrorPosX);
 
         textRadialMirrorPosY = new NumberField(font, renderables, left + 138, y, 62, 18);
         textRadialMirrorPosY.setNumber(64);
-        textRadialMirrorPosY.setTooltip(Arrays.asList(Component.literal("The position of the radial mirror."), Component.literal("For odd numbered builds add 0.5.").withStyle(ChatFormatting.GRAY)));
+        textRadialMirrorPosY.setTooltip(Arrays.asList(new TextComponent("The position of the radial mirror."), new TextComponent("For odd numbered builds add 0.5.").withStyle(ChatFormatting.GRAY)));
         radialMirrorNumberFieldList.add(textRadialMirrorPosY);
 
         textRadialMirrorPosZ = new NumberField(font, renderables, left + 218, y, 62, 18);
         textRadialMirrorPosZ.setNumber(0);
-        textRadialMirrorPosZ.setTooltip(Arrays.asList(Component.literal("The position of the radial mirror."), Component.literal("For odd numbered builds add 0.5.").withStyle(ChatFormatting.GRAY)));
+        textRadialMirrorPosZ.setTooltip(Arrays.asList(new TextComponent("The position of the radial mirror."), new TextComponent("For odd numbered builds add 0.5.").withStyle(ChatFormatting.GRAY)));
         radialMirrorNumberFieldList.add(textRadialMirrorPosZ);
 
         y = top + 47;
         textRadialMirrorSlices = new NumberField(font, renderables, left + 55, y, 50, 18);
         textRadialMirrorSlices.setNumber(4);
-        textRadialMirrorSlices.setTooltip(Arrays.asList(Component.literal("The number of repeating slices."), Component.literal("Minimally 2.").withStyle(ChatFormatting.GRAY)));
+        textRadialMirrorSlices.setTooltip(Arrays.asList(new TextComponent("The number of repeating slices."), new TextComponent("Minimally 2.").withStyle(ChatFormatting.GRAY)));
         radialMirrorNumberFieldList.add(textRadialMirrorSlices);
 
         textRadialMirrorRadius = new NumberField(font, renderables, left + 218, y, 62, 18);
         textRadialMirrorRadius.setNumber(50);
         //TODO change to diameter (remove /2)
-        textRadialMirrorRadius.setTooltip(Arrays.asList(Component.literal("How far the radial mirror reaches from its center position."),
-                Component.literal("Max: ").withStyle(ChatFormatting.GRAY).append(Component.literal(String.valueOf(ReachHelper.getMaxReach(mc.player) / 2)).withStyle(ChatFormatting.GOLD)),
-                Component.literal("Upgradeable in survival with reach upgrades.").withStyle(ChatFormatting.GRAY)));
+        textRadialMirrorRadius.setTooltip(Arrays.asList(new TextComponent("How far the radial mirror reaches from its center position."),
+                new TextComponent("Max: ").withStyle(ChatFormatting.GRAY).append(new TextComponent(String.valueOf(ReachHelper.getMaxReach(mc.player) / 2)).withStyle(ChatFormatting.GOLD)),
+                new TextComponent("Upgradeable in survival with reach upgrades.").withStyle(ChatFormatting.GRAY)));
         radialMirrorNumberFieldList.add(textRadialMirrorRadius);
 
         y = top + 72;
@@ -91,41 +91,41 @@ public class RadialMirrorSettingsPane extends ExpandableScrollEntry {
             textRadialMirrorPosY.setNumber(pos.y);
             textRadialMirrorPosZ.setNumber(pos.z);
         });
-        buttonCurrentPosition.setTooltip(Component.literal("Set radial mirror position to current player position"));
+        buttonCurrentPosition.setTooltip(new TextComponent("Set radial mirror position to current player position"));
         radialMirrorIconButtonList.add(buttonCurrentPosition);
 
         buttonToggleOdd = new IconButton(left + 35, y, 0, 20, BUILDING_ICONS, button -> {
             toggleOdd = !toggleOdd;
             buttonToggleOdd.setUseAlternateIcon(toggleOdd);
             if (toggleOdd) {
-                buttonToggleOdd.setTooltip(Arrays.asList(Component.literal("Set mirror position to corner of block"), Component.literal("for even numbered builds")));
+                buttonToggleOdd.setTooltip(Arrays.asList(new TextComponent("Set mirror position to corner of block"), new TextComponent("for even numbered builds")));
                 textRadialMirrorPosX.setNumber(textRadialMirrorPosX.getNumber() + 0.5);
                 textRadialMirrorPosY.setNumber(textRadialMirrorPosY.getNumber() + 0.5);
                 textRadialMirrorPosZ.setNumber(textRadialMirrorPosZ.getNumber() + 0.5);
             } else {
-                buttonToggleOdd.setTooltip(Arrays.asList(Component.literal("Set mirror position to middle of block"), Component.literal("for odd numbered builds")));
+                buttonToggleOdd.setTooltip(Arrays.asList(new TextComponent("Set mirror position to middle of block"), new TextComponent("for odd numbered builds")));
                 textRadialMirrorPosX.setNumber(Math.floor(textRadialMirrorPosX.getNumber()));
                 textRadialMirrorPosY.setNumber(Math.floor(textRadialMirrorPosY.getNumber()));
                 textRadialMirrorPosZ.setNumber(Math.floor(textRadialMirrorPosZ.getNumber()));
             }
         });
-        buttonToggleOdd.setTooltip(Arrays.asList(Component.literal("Set radial mirror position to middle of block"), Component.literal("for odd numbered builds")));
+        buttonToggleOdd.setTooltip(Arrays.asList(new TextComponent("Set radial mirror position to middle of block"), new TextComponent("for odd numbered builds")));
         radialMirrorIconButtonList.add(buttonToggleOdd);
 
         buttonDrawLines = new IconButton(left + 65, y, 0, 40, BUILDING_ICONS, button -> {
             drawLines = !drawLines;
             buttonDrawLines.setUseAlternateIcon(drawLines);
-            buttonDrawLines.setTooltip(Component.literal(drawLines ? "Hide lines" : "Show lines"));
+            buttonDrawLines.setTooltip(new TextComponent(drawLines ? "Hide lines" : "Show lines"));
         });
-        buttonDrawLines.setTooltip(Component.literal("Show lines"));
+        buttonDrawLines.setTooltip(new TextComponent("Show lines"));
         radialMirrorIconButtonList.add(buttonDrawLines);
 
         buttonDrawPlanes = new IconButton(left + 95, y, 0, 60, BUILDING_ICONS, button -> {
             drawPlanes = !drawPlanes;
             buttonDrawPlanes.setUseAlternateIcon(drawPlanes);
-            buttonDrawPlanes.setTooltip(Component.literal(drawPlanes ? "Hide area" : "Show area"));
+            buttonDrawPlanes.setTooltip(new TextComponent(drawPlanes ? "Hide area" : "Show area"));
         });
-        buttonDrawPlanes.setTooltip(Component.literal("Show area"));
+        buttonDrawPlanes.setTooltip(new TextComponent("Show area"));
         radialMirrorIconButtonList.add(buttonDrawPlanes);
 
         y = top + 76;
@@ -146,14 +146,14 @@ public class RadialMirrorSettingsPane extends ExpandableScrollEntry {
             drawPlanes = r.drawPlanes;
             buttonDrawLines.setUseAlternateIcon(drawLines);
             buttonDrawPlanes.setUseAlternateIcon(drawPlanes);
-            buttonDrawLines.setTooltip(Component.literal(drawLines ? "Hide lines" : "Show lines"));
-            buttonDrawPlanes.setTooltip(Component.literal(drawPlanes ? "Hide area" : "Show area"));
+            buttonDrawLines.setTooltip(new TextComponent(drawLines ? "Hide lines" : "Show lines"));
+            buttonDrawPlanes.setTooltip(new TextComponent(drawPlanes ? "Hide area" : "Show area"));
             if (textRadialMirrorPosX.getNumber() == Math.floor(textRadialMirrorPosX.getNumber())) {
                 toggleOdd = false;
-                buttonToggleOdd.setTooltip(Arrays.asList(Component.literal("Set radial mirror position to middle of block"), Component.literal("for odd numbered builds")));
+                buttonToggleOdd.setTooltip(Arrays.asList(new TextComponent("Set radial mirror position to middle of block"), new TextComponent("for odd numbered builds")));
             } else {
                 toggleOdd = true;
-                buttonToggleOdd.setTooltip(Arrays.asList(Component.literal("Set radial mirror position to corner of block"), Component.literal("for even numbered builds")));
+                buttonToggleOdd.setTooltip(Arrays.asList(new TextComponent("Set radial mirror position to corner of block"), new TextComponent("for even numbered builds")));
             }
             buttonToggleOdd.setUseAlternateIcon(toggleOdd);
         }

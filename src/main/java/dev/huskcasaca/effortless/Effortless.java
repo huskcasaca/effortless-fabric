@@ -13,7 +13,7 @@ import dev.huskcasaca.effortless.network.RequestLookAtMessage;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -144,7 +144,7 @@ public class Effortless implements ModInitializer {
     }
 
     public static void log(Player player, String msg, boolean actionBar) {
-        player.displayClientMessage(Component.literal(msg), actionBar);
+        player.displayClientMessage(new TextComponent(msg), actionBar);
     }
 
     //Log with translation supported, call either on client or server (which then sends a message)

@@ -4,7 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import dev.huskcasaca.effortless.gui.ScreenUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -17,7 +17,7 @@ public class FixedCheckbox extends Button {
     private boolean isChecked;
 
     public FixedCheckbox(int xPos, int yPos, String displayString, boolean isChecked) {
-        super(xPos, yPos, Minecraft.getInstance().font.width(displayString) + 2 + 11, 11, Component.literal(displayString), b -> {
+        super(xPos, yPos, Minecraft.getInstance().font.width(displayString) + 2 + 11, 11, new TextComponent(displayString), b -> {
         });
         this.isChecked = isChecked;
         this.boxWidth = 11;

@@ -2,6 +2,7 @@ package dev.huskcasaca.effortless.gui.widget;
 
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.util.Mth;
 import org.lwjgl.glfw.GLFW;
 
@@ -37,7 +38,7 @@ public class Slider extends AbstractSliderButton {
      * @param drawString   Should text be displayed on the widget
      */
     public Slider(int x, int y, int width, int height, Component prefix, Component suffix, double minValue, double maxValue, double currentValue, double stepSize, int precision, boolean drawString) {
-        super(x, y, width, height, Component.empty(), 0D);
+        super(x, y, width, height, TextComponent.EMPTY, 0D);
         this.prefix = prefix;
         this.suffix = suffix;
         this.minValue = minValue;
@@ -174,9 +175,9 @@ public class Slider extends AbstractSliderButton {
     @Override
     protected void updateMessage() {
         if (this.drawString) {
-            this.setMessage(Component.literal("").append(prefix).append(this.getValueString()).append(suffix));
+            this.setMessage(new TextComponent("").append(prefix).append(this.getValueString()).append(suffix));
         } else {
-            this.setMessage(Component.empty());
+            this.setMessage(TextComponent.EMPTY);
         }
     }
 

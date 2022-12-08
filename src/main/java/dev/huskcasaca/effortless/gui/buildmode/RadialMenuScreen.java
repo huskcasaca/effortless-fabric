@@ -20,11 +20,10 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import org.apache.commons.lang3.text.WordUtils;
 import org.lwjgl.opengl.GL11;
@@ -67,13 +66,13 @@ public class RadialMenuScreen extends Screen {
     private float visibility;
 
     public RadialMenuScreen() {
-        super(Component.translatable("effortless.screen.radial_menu"));
+        super(new TranslatableComponent("effortless.screen.radial_menu"));
     }
 
     public static void playRadialMenuSound() {
         final float volume = 0.1f;
         if (volume >= 0.0001f) {
-            SimpleSoundInstance sound = new SimpleSoundInstance(SoundEvents.UI_BUTTON_CLICK, SoundSource.MASTER, volume, 1.0f, RandomSource.create(), Minecraft.getInstance().player.blockPosition());
+            SimpleSoundInstance sound = new SimpleSoundInstance(SoundEvents.UI_BUTTON_CLICK, SoundSource.MASTER, volume, 1.0f, Minecraft.getInstance().player.blockPosition());
             Minecraft.getInstance().getSoundManager().play(sound);
         }
     }

@@ -15,7 +15,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,23 +49,23 @@ public class ArraySettingsPane extends ExpandableScrollEntry {
         y = top + 20;
         textArrayOffsetX = new NumberField(font, renderables, left + 70, y, 50, 18);
         textArrayOffsetX.setNumber(0);
-        textArrayOffsetX.setTooltip(Component.literal("How much each copy is shifted."));
+        textArrayOffsetX.setTooltip(new TextComponent("How much each copy is shifted."));
         arrayNumberFieldList.add(textArrayOffsetX);
 
         textArrayOffsetY = new NumberField(font, renderables, left + 140, y, 50, 18);
         textArrayOffsetY.setNumber(0);
-        textArrayOffsetY.setTooltip(Component.literal("How much each copy is shifted."));
+        textArrayOffsetY.setTooltip(new TextComponent("How much each copy is shifted."));
         arrayNumberFieldList.add(textArrayOffsetY);
 
         textArrayOffsetZ = new NumberField(font, renderables, left + 210, y, 50, 18);
         textArrayOffsetZ.setNumber(0);
-        textArrayOffsetZ.setTooltip(Component.literal("How much each copy is shifted."));
+        textArrayOffsetZ.setTooltip(new TextComponent("How much each copy is shifted."));
         arrayNumberFieldList.add(textArrayOffsetZ);
 
         y = top + 50;
         textArrayCount = new NumberField(font, renderables, left + 55, y, 50, 18);
         textArrayCount.setNumber(5);
-        textArrayCount.setTooltip(Component.literal("How many copies should be made."));
+        textArrayCount.setTooltip(new TextComponent("How many copies should be made."));
         arrayNumberFieldList.add(textArrayCount);
 
         ModifierSettingsManager.ModifierSettings modifierSettings = ModifierSettingsManager.getModifierSettings(mc.player);

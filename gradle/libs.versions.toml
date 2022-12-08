@@ -6,15 +6,15 @@ gson-version = "2.9.1"
 log4j2-version = "2.18.0"
 
 # Minecraft / Loaders
-minecraft-version = "1.19.2"
+minecraft-version = "1.18.2"
 fabric-loader-version = "0.14.9"
-fabric-api-version = "0.61.0+1.19.2"
+fabric-api-version = "0.59.0+1.18.2"
 fabric-kotlin-version = "1.8.0+kotlin.1.7.0"
 fabric-loom-version = "0.13.20"
 
 # Mod dependencies
-modmenu-version = "4.0.6"
-cloth-config-version = "8.2.88"
+modmenu-version = "3.2.3"
+cloth-config-version = "6.4.90"
 
 [libraries]
 minecraft = { group = "com.mojang", name = "minecraft", version.ref = "minecraft-version" }

@@ -12,7 +12,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
 
@@ -56,17 +56,17 @@ public class MirrorSettingsPane extends ExpandableScrollEntry {
         textMirrorPosX = new NumberField(font, renderables, left + 58, y, 62, 18);
         textMirrorPosX.setNumber(0);
         textMirrorPosX.setTooltip(
-                Arrays.asList(Component.literal("The position of the mirror."), Component.literal("For odd numbered builds add 0.5.").withStyle(ChatFormatting.GRAY)));
+                Arrays.asList(new TextComponent("The position of the mirror."), new TextComponent("For odd numbered builds add 0.5.").withStyle(ChatFormatting.GRAY)));
         mirrorNumberFieldList.add(textMirrorPosX);
 
         textMirrorPosY = new NumberField(font, renderables, left + 138, y, 62, 18);
         textMirrorPosY.setNumber(64);
-        textMirrorPosY.setTooltip(Arrays.asList(Component.literal("The position of the mirror."), Component.literal("For odd numbered builds add 0.5.").withStyle(ChatFormatting.GRAY)));
+        textMirrorPosY.setTooltip(Arrays.asList(new TextComponent("The position of the mirror."), new TextComponent("For odd numbered builds add 0.5.").withStyle(ChatFormatting.GRAY)));
         mirrorNumberFieldList.add(textMirrorPosY);
 
         textMirrorPosZ = new NumberField(font, renderables, left + 218, y, 62, 18);
         textMirrorPosZ.setNumber(0);
-        textMirrorPosZ.setTooltip(Arrays.asList(Component.literal("The position of the mirror."), Component.literal("For odd numbered builds add 0.5.").withStyle(ChatFormatting.GRAY)));
+        textMirrorPosZ.setTooltip(Arrays.asList(new TextComponent("The position of the mirror."), new TextComponent("For odd numbered builds add 0.5.").withStyle(ChatFormatting.GRAY)));
         mirrorNumberFieldList.add(textMirrorPosZ);
 
         y = top + 50;
@@ -83,9 +83,9 @@ public class MirrorSettingsPane extends ExpandableScrollEntry {
         textMirrorRadius = new NumberField(font, renderables, left + 218, y, 62, 18);
         textMirrorRadius.setNumber(50);
         //TODO change to diameter (remove /2)
-        textMirrorRadius.setTooltip(Arrays.asList(Component.literal("How far the mirror reaches in any direction."),
-                Component.literal("Max: ").withStyle(ChatFormatting.GRAY).append(Component.literal(String.valueOf(ReachHelper.getMaxReach(mc.player) / 2)).withStyle(ChatFormatting.GOLD)),
-                Component.literal("Upgradeable in survival with reach upgrades.").withStyle(ChatFormatting.GRAY)));
+        textMirrorRadius.setTooltip(Arrays.asList(new TextComponent("How far the mirror reaches in any direction."),
+                new TextComponent("Max: ").withStyle(ChatFormatting.GRAY).append(new TextComponent(String.valueOf(ReachHelper.getMaxReach(mc.player) / 2)).withStyle(ChatFormatting.GOLD)),
+                new TextComponent("Upgradeable in survival with reach upgrades.").withStyle(ChatFormatting.GRAY)));
         mirrorNumberFieldList.add(textMirrorRadius);
 
         y = top + 72;
@@ -95,41 +95,41 @@ public class MirrorSettingsPane extends ExpandableScrollEntry {
             textMirrorPosY.setNumber(pos.y);
             textMirrorPosZ.setNumber(pos.z);
         });
-        buttonCurrentPosition.setTooltip(Component.literal("Set mirror position to current player position"));
+        buttonCurrentPosition.setTooltip(new TextComponent("Set mirror position to current player position"));
         mirrorIconButtonList.add(buttonCurrentPosition);
 
         buttonToggleOdd = new IconButton(left + 35, y, 0, 20, BUILDING_ICONS, button -> {
             toggleOdd = !toggleOdd;
             buttonToggleOdd.setUseAlternateIcon(toggleOdd);
             if (toggleOdd) {
-                buttonToggleOdd.setTooltip(Arrays.asList(Component.literal("Set mirror position to corner of block"), Component.literal("for even numbered builds")));
+                buttonToggleOdd.setTooltip(Arrays.asList(new TextComponent("Set mirror position to corner of block"), new TextComponent("for even numbered builds")));
                 textMirrorPosX.setNumber(textMirrorPosX.getNumber() + 0.5);
                 textMirrorPosY.setNumber(textMirrorPosY.getNumber() + 0.5);
                 textMirrorPosZ.setNumber(textMirrorPosZ.getNumber() + 0.5);
             } else {
-                buttonToggleOdd.setTooltip(Arrays.asList(Component.literal("Set mirror position to middle of block"), Component.literal("for odd numbered builds")));
+                buttonToggleOdd.setTooltip(Arrays.asList(new TextComponent("Set mirror position to middle of block"), new TextComponent("for odd numbered builds")));
                 textMirrorPosX.setNumber(Math.floor(textMirrorPosX.getNumber()));
                 textMirrorPosY.setNumber(Math.floor(textMirrorPosY.getNumber()));
                 textMirrorPosZ.setNumber(Math.floor(textMirrorPosZ.getNumber()));
             }
         });
-        buttonToggleOdd.setTooltip(Arrays.asList(Component.literal("Set mirror position to middle of block"), Component.literal("for odd numbered builds")));
+        buttonToggleOdd.setTooltip(Arrays.asList(new TextComponent("Set mirror position to middle of block"), new TextComponent("for odd numbered builds")));
         mirrorIconButtonList.add(buttonToggleOdd);
 
         buttonDrawLines = new IconButton(left + 65, y, 0, 40, BUILDING_ICONS, button -> {
             drawLines = !drawLines;
             buttonDrawLines.setUseAlternateIcon(drawLines);
-            buttonDrawLines.setTooltip(Component.literal(drawLines ? "Hide lines" : "Show lines"));
+            buttonDrawLines.setTooltip(new TextComponent(drawLines ? "Hide lines" : "Show lines"));
         });
-        buttonDrawLines.setTooltip(Component.literal("Show lines"));
+        buttonDrawLines.setTooltip(new TextComponent("Show lines"));
         mirrorIconButtonList.add(buttonDrawLines);
 
         buttonDrawPlanes = new IconButton(left + 95, y, 0, 60, BUILDING_ICONS, button -> {
             drawPlanes = !drawPlanes;
             buttonDrawPlanes.setUseAlternateIcon(drawPlanes);
-            buttonDrawPlanes.setTooltip(Component.literal(drawPlanes ? "Hide area" : "Show area"));
+            buttonDrawPlanes.setTooltip(new TextComponent(drawPlanes ? "Hide area" : "Show area"));
         });
-        buttonDrawPlanes.setTooltip(Component.literal("Show area"));
+        buttonDrawPlanes.setTooltip(new TextComponent("Show area"));
         mirrorIconButtonList.add(buttonDrawPlanes);
 
         ModifierSettingsManager.ModifierSettings modifierSettings = ModifierSettingsManager.getModifierSettings(mc.player);
@@ -147,14 +147,14 @@ public class MirrorSettingsPane extends ExpandableScrollEntry {
             drawPlanes = m.drawPlanes;
             buttonDrawLines.setUseAlternateIcon(drawLines);
             buttonDrawPlanes.setUseAlternateIcon(drawPlanes);
-            buttonDrawLines.setTooltip(Component.literal(drawLines ? "Hide lines" : "Show lines"));
-            buttonDrawPlanes.setTooltip(Component.literal(drawPlanes ? "Hide area" : "Show area"));
+            buttonDrawLines.setTooltip(new TextComponent(drawLines ? "Hide lines" : "Show lines"));
+            buttonDrawPlanes.setTooltip(new TextComponent(drawPlanes ? "Hide area" : "Show area"));
             if (textMirrorPosX.getNumber() == Math.floor(textMirrorPosX.getNumber())) {
                 toggleOdd = false;
-                buttonToggleOdd.setTooltip(Arrays.asList(Component.literal("Set mirror position to middle of block"), Component.literal("for odd numbered builds")));
+                buttonToggleOdd.setTooltip(Arrays.asList(new TextComponent("Set mirror position to middle of block"), new TextComponent("for odd numbered builds")));
             } else {
                 toggleOdd = true;
-                buttonToggleOdd.setTooltip(Arrays.asList(Component.literal("Set mirror position to corner of block"), Component.literal("for even numbered builds")));
+                buttonToggleOdd.setTooltip(Arrays.asList(new TextComponent("Set mirror position to corner of block"), new TextComponent("for even numbered builds")));
             }
             buttonToggleOdd.setUseAlternateIcon(toggleOdd);
         }
