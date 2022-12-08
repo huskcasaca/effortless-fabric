@@ -15,8 +15,8 @@ public class DiagonalLine extends ThreeClickBuildable {
     public static List<BlockPos> getDiagonalLineBlocks(Player player, int x1, int y1, int z1, int x2, int y2, int z2, float sampleMultiplier) {
         List<BlockPos> list = new ArrayList<>();
 
-        Vec3 first = new Vec3(x1, y1, z1).add(0.5, 0.5, 0.5);
-        Vec3 second = new Vec3(x2, y2, z2).add(0.5, 0.5, 0.5);
+        var first = new Vec3(x1, y1, z1).add(0.5, 0.5, 0.5);
+        var second = new Vec3(x2, y2, z2).add(0.5, 0.5, 0.5);
 
         int iterations = (int) Math.ceil(first.distanceTo(second) * sampleMultiplier);
         for (double t = 0; t <= 1.0; t += 1.0 / iterations) {

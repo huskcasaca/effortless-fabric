@@ -6,6 +6,7 @@ public enum BuildAction {
     UNDO("undo"),
     REDO("redo"),
     REPLACE("replace"),
+    MAGNET("magnet"),
     OPEN_MODIFIER_SETTINGS("open_modifier_settings"),
     OPEN_PLAYER_SETTINGS("open_player_settings"),
 

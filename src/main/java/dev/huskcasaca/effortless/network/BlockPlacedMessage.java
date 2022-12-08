@@ -22,36 +22,21 @@ import net.minecraft.world.phys.Vec3;
  * Sends a message to the server indicating that a player wants to place a block.
  * Received clientside: server has placed blocks and its letting the client know.
  */
-public class BlockPlacedMessage implements Message {
+public record BlockPlacedMessage(
+        boolean blockHit,
+        BlockPos blockPos,
+        Direction sideHit,
+        Vec3 hitVec,
+        boolean placeStartPos //prevent double placing in normal mode
+) implements Message {
 
-    private final boolean blockHit;
-    private final BlockPos blockPos;
-    private final Direction sideHit;
-    private final Vec3 hitVec;
-    private final boolean placeStartPos; //prevent double placing in normal mode
 
     public BlockPlacedMessage() {
-        this.blockHit = false;
-        this.blockPos = BlockPos.ZERO;
-        this.sideHit = Direction.UP;
-        this.hitVec = new Vec3(0, 0, 0);
-        this.placeStartPos = true;
+        this(false, BlockPos.ZERO, Direction.UP, new Vec3(0, 0, 0), true);
     }
 
     public BlockPlacedMessage(BlockHitResult result, boolean placeStartPos) {
-        this.blockHit = result.getType() == HitResult.Type.BLOCK;
-        this.blockPos = result.getBlockPos();
-        this.sideHit = result.getDirection();
-        this.hitVec = result.getLocation();
-        this.placeStartPos = placeStartPos;
-    }
-
-    public BlockPlacedMessage(boolean blockHit, BlockPos blockPos, Direction sideHit, Vec3 hitVec, boolean placeStartPos) {
-        this.blockHit = blockHit;
-        this.blockPos = blockPos;
-        this.sideHit = sideHit;
-        this.hitVec = hitVec;
-        this.placeStartPos = placeStartPos;
+        this(result.getType() == HitResult.Type.BLOCK, result.getBlockPos(), result.getDirection(), result.getLocation(), placeStartPos);
     }
 
     public static void encode(BlockPlacedMessage message, FriendlyByteBuf buf) {
@@ -68,31 +53,11 @@ public class BlockPlacedMessage implements Message {
 
     public static BlockPlacedMessage decode(FriendlyByteBuf buf) {
         boolean blockHit = buf.readBoolean();
-        BlockPos blockPos = new BlockPos(buf.readInt(), buf.readInt(), buf.readInt());
-        Direction sideHit = Direction.from3DDataValue(buf.readInt());
-        Vec3 hitVec = new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble());
+        var blockPos = new BlockPos(buf.readInt(), buf.readInt(), buf.readInt());
+        var sideHit = Direction.from3DDataValue(buf.readInt());
+        var hitVec = new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble());
         boolean placeStartPos = buf.readBoolean();
         return new BlockPlacedMessage(blockHit, blockPos, sideHit, hitVec, placeStartPos);
-    }
-
-    public boolean isBlockHit() {
-        return blockHit;
-    }
-
-    public BlockPos getBlockPos() {
-        return blockPos;
-    }
-
-    public Direction getSideHit() {
-        return sideHit;
-    }
-
-    public Vec3 getHitVec() {
-        return hitVec;
-    }
-
-    public boolean getPlaceStartPos() {
-        return placeStartPos;
     }
 
     public static class Serializer implements MessageSerializer<BlockPlacedMessage> {

@@ -21,110 +21,104 @@ import net.minecraft.world.phys.Vec3;
 /**
  * Shares modifier settings (see ModifierSettingsManager) between server and client
  */
-public class ModifierSettingsMessage implements Message {
-
-    private ModifierSettings modifierSettings;
-
-    public ModifierSettingsMessage() {
-    }
-
-
-    public ModifierSettingsMessage(ModifierSettings modifierSettings) {
-        this.modifierSettings = modifierSettings;
-    }
+public record ModifierSettingsMessage(
+        ModifierSettings modifierSettings
+) implements Message {
 
     public static void encode(ModifierSettingsMessage message, FriendlyByteBuf buf) {
-        //MIRROR
-        Mirror.MirrorSettings m = message.modifierSettings.getMirrorSettings();
-        buf.writeBoolean(m != null);
-        if (m != null) {
-            buf.writeBoolean(m.enabled);
-            buf.writeDouble(m.position.x);
-            buf.writeDouble(m.position.y);
-            buf.writeDouble(m.position.z);
-            buf.writeBoolean(m.mirrorX);
-            buf.writeBoolean(m.mirrorY);
-            buf.writeBoolean(m.mirrorZ);
-            buf.writeInt(m.radius);
-            buf.writeBoolean(m.drawLines);
-            buf.writeBoolean(m.drawPlanes);
-        }
 
         //ARRAY
-        Array.ArraySettings a = message.modifierSettings.getArraySettings();
-        buf.writeBoolean(a != null);
-        if (a != null) {
-            buf.writeBoolean(a.enabled);
-            buf.writeInt(a.offset.getX());
-            buf.writeInt(a.offset.getY());
-            buf.writeInt(a.offset.getZ());
-            buf.writeInt(a.count);
+        var arraySettings = message.modifierSettings.arraySettings();
+        buf.writeBoolean(arraySettings != null);
+        if (arraySettings != null) {
+            buf.writeBoolean(arraySettings.enabled());
+            buf.writeInt(arraySettings.offset().getX());
+            buf.writeInt(arraySettings.offset().getY());
+            buf.writeInt(arraySettings.offset().getZ());
+            buf.writeInt(arraySettings.count());
         }
 
-        buf.writeBoolean(message.modifierSettings.doQuickReplace());
-
-        buf.writeInt(message.modifierSettings.getReachUpgrade());
+        //MIRROR
+        var mirrorSettings = message.modifierSettings.mirrorSettings();
+        buf.writeBoolean(mirrorSettings != null);
+        if (mirrorSettings != null) {
+            buf.writeBoolean(mirrorSettings.enabled());
+            buf.writeDouble(mirrorSettings.position().x);
+            buf.writeDouble(mirrorSettings.position().y);
+            buf.writeDouble(mirrorSettings.position().z);
+            buf.writeBoolean(mirrorSettings.mirrorX());
+            buf.writeBoolean(mirrorSettings.mirrorY());
+            buf.writeBoolean(mirrorSettings.mirrorZ());
+            buf.writeInt(mirrorSettings.radius());
+            buf.writeBoolean(mirrorSettings.drawLines());
+            buf.writeBoolean(mirrorSettings.drawPlanes());
+        }
 
         //RADIAL MIRROR
-        RadialMirror.RadialMirrorSettings r = message.modifierSettings.getRadialMirrorSettings();
-        buf.writeBoolean(r != null);
-        if (r != null) {
-            buf.writeBoolean(r.enabled);
-            buf.writeDouble(r.position.x);
-            buf.writeDouble(r.position.y);
-            buf.writeDouble(r.position.z);
-            buf.writeInt(r.slices);
-            buf.writeBoolean(r.alternate);
-            buf.writeInt(r.radius);
-            buf.writeBoolean(r.drawLines);
-            buf.writeBoolean(r.drawPlanes);
+        var radialMirrorSettings = message.modifierSettings.radialMirrorSettings();
+        buf.writeBoolean(radialMirrorSettings != null);
+        if (radialMirrorSettings != null) {
+            buf.writeBoolean(radialMirrorSettings.enabled());
+            buf.writeDouble(radialMirrorSettings.position().x);
+            buf.writeDouble(radialMirrorSettings.position().y);
+            buf.writeDouble(radialMirrorSettings.position().z);
+            buf.writeInt(radialMirrorSettings.slices());
+            buf.writeBoolean(radialMirrorSettings.alternate());
+            buf.writeInt(radialMirrorSettings.radius());
+            buf.writeBoolean(radialMirrorSettings.drawLines());
+            buf.writeBoolean(radialMirrorSettings.drawPlanes());
         }
+
+        buf.writeBoolean(message.modifierSettings.quickReplace());
+
+        buf.writeInt(message.modifierSettings.reachUpgrade());
     }
 
     public static ModifierSettingsMessage decode(FriendlyByteBuf buf) {
+
+        //ARRAY
+        var arraySettings = new Array.ArraySettings();
+        if (buf.readBoolean()) {
+            boolean arrayEnabled = buf.readBoolean();
+            var arrayOffset = new BlockPos(buf.readInt(), buf.readInt(), buf.readInt());
+            int arrayCount = buf.readInt();
+            arraySettings = new Array.ArraySettings(arrayEnabled, arrayOffset, arrayCount);
+        }
+
         //MIRROR
-        Mirror.MirrorSettings m = new Mirror.MirrorSettings();
+        var mirrorSettings = new Mirror.MirrorSettings();
         if (buf.readBoolean()) {
             boolean mirrorEnabled = buf.readBoolean();
-            Vec3 mirrorPosition = new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble());
+            var mirrorPosition = new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble());
             boolean mirrorX = buf.readBoolean();
             boolean mirrorY = buf.readBoolean();
             boolean mirrorZ = buf.readBoolean();
             int mirrorRadius = buf.readInt();
             boolean mirrorDrawLines = buf.readBoolean();
             boolean mirrorDrawPlanes = buf.readBoolean();
-            m = new Mirror.MirrorSettings(mirrorEnabled, mirrorPosition, mirrorX, mirrorY, mirrorZ, mirrorRadius,
+            mirrorSettings = new Mirror.MirrorSettings(mirrorEnabled, mirrorPosition, mirrorX, mirrorY, mirrorZ, mirrorRadius,
                     mirrorDrawLines, mirrorDrawPlanes);
         }
 
-        //ARRAY
-        Array.ArraySettings a = new Array.ArraySettings();
+        //RADIAL MIRROR
+        var radialMirrorSettings = new RadialMirror.RadialMirrorSettings();
         if (buf.readBoolean()) {
-            boolean arrayEnabled = buf.readBoolean();
-            BlockPos arrayOffset = new BlockPos(buf.readInt(), buf.readInt(), buf.readInt());
-            int arrayCount = buf.readInt();
-            a = new Array.ArraySettings(arrayEnabled, arrayOffset, arrayCount);
+            boolean radialMirrorEnabled = buf.readBoolean();
+            var radialMirrorPosition = new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble());
+            int radialMirrorSlices = buf.readInt();
+            boolean radialMirrorAlternate = buf.readBoolean();
+            int radialMirrorRadius = buf.readInt();
+            boolean radialMirrorDrawLines = buf.readBoolean();
+            boolean radialMirrorDrawPlanes = buf.readBoolean();
+            radialMirrorSettings = new RadialMirror.RadialMirrorSettings(radialMirrorEnabled, radialMirrorPosition, radialMirrorSlices,
+                    radialMirrorAlternate, radialMirrorRadius, radialMirrorDrawLines, radialMirrorDrawPlanes);
         }
 
         boolean quickReplace = buf.readBoolean();
 
         int reachUpgrade = buf.readInt();
 
-        //RADIAL MIRROR
-        RadialMirror.RadialMirrorSettings r = new RadialMirror.RadialMirrorSettings();
-        if (buf.readBoolean()) {
-            boolean radialMirrorEnabled = buf.readBoolean();
-            Vec3 radialMirrorPosition = new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble());
-            int radialMirrorSlices = buf.readInt();
-            boolean radialMirrorAlternate = buf.readBoolean();
-            int radialMirrorRadius = buf.readInt();
-            boolean radialMirrorDrawLines = buf.readBoolean();
-            boolean radialMirrorDrawPlanes = buf.readBoolean();
-            r = new RadialMirror.RadialMirrorSettings(radialMirrorEnabled, radialMirrorPosition, radialMirrorSlices,
-                    radialMirrorAlternate, radialMirrorRadius, radialMirrorDrawLines, radialMirrorDrawPlanes);
-        }
-
-        ModifierSettings modifierSettings = new ModifierSettings(m, a, r, quickReplace, reachUpgrade);
+        var modifierSettings = new ModifierSettings(arraySettings, mirrorSettings, radialMirrorSettings, quickReplace, reachUpgrade);
         return new ModifierSettingsMessage(modifierSettings);
     }
 
@@ -147,15 +141,8 @@ public class ModifierSettingsMessage implements Message {
         @Override
         public void handleServerSide(MinecraftServer server, ServerPlayer player, ServerGamePacketListenerImpl handler, ModifierSettingsMessage message, PacketSender responseSender) {
             server.execute(() -> {
-                ModifierSettingsManager.sanitize(message.modifierSettings, player);
-                ModifierSettingsManager.setModifierSettings(player, message.modifierSettings);
+                ModifierSettingsManager.setModifierSettings(player, ModifierSettingsManager.sanitize(message.modifierSettings, player));
             });
-//            ctx.get().enqueueWork(() -> {
-//                Player player = EffortlessBuilding.proxy.getPlayerEntityFromContext(ctx);
-//
-//                // Sanitize
-//            });
-//            ctx.get().setPacketHandled(true);
         }
     }
 
@@ -165,8 +152,7 @@ public class ModifierSettingsMessage implements Message {
         @Override
         public void handleClientSide(Minecraft client, LocalPlayer player, ClientPacketListener handler, ModifierSettingsMessage message, PacketSender responseSender) {
             client.execute(() -> {
-                ModifierSettingsManager.sanitize(message.modifierSettings, player);
-                ModifierSettingsManager.setModifierSettings(player, message.modifierSettings);
+                ModifierSettingsManager.setModifierSettings(player, ModifierSettingsManager.sanitize(message.modifierSettings, player));
             });
         }
     }

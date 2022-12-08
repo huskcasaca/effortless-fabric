@@ -17,13 +17,13 @@ public class Array implements Modifier {
         List<BlockPos> coordinates = new ArrayList<>();
 
         //find arraysettings for the player
-        ArraySettings a = ModifierSettingsManager.getModifierSettings(player).getArraySettings();
-        if (!isEnabled(a)) return coordinates;
+        var arraySettings = ModifierSettingsManager.getModifierSettings(player).arraySettings();
+        if (!isEnabled(arraySettings)) return coordinates;
 
-        BlockPos pos = startPos;
-        Vec3i offset = new Vec3i(a.offset.getX(), a.offset.getY(), a.offset.getZ());
+        var pos = startPos;
+        var offset = new Vec3i(arraySettings.offset.getX(), arraySettings.offset.getY(), arraySettings.offset.getZ());
 
-        for (int i = 0; i < a.count; i++) {
+        for (int i = 0; i < arraySettings.count; i++) {
             pos = pos.offset(offset);
             coordinates.add(pos);
         }
@@ -35,11 +35,11 @@ public class Array implements Modifier {
         List<BlockState> blockStates = new ArrayList<>();
 
         //find arraysettings for the player that placed the block
-        ArraySettings a = ModifierSettingsManager.getModifierSettings(player).getArraySettings();
-        if (!isEnabled(a)) return blockStates;
+        var arraySettings = ModifierSettingsManager.getModifierSettings(player).arraySettings();
+        if (!isEnabled(arraySettings)) return blockStates;
 
-        BlockPos pos = startPos;
-        Vec3i offset = new Vec3i(a.offset.getX(), a.offset.getY(), a.offset.getZ());
+        var pos = startPos;
+        var offset = new Vec3i(arraySettings.offset.getX(), arraySettings.offset.getY(), arraySettings.offset.getZ());
 
         //Randomizer bag synergy
 //		AbstractRandomizerBagItem randomizerBagItem = null;
@@ -49,7 +49,7 @@ public class Array implements Modifier {
 //			bagInventory = randomizerBagItem.getBagInventory(itemStack);
 //		}
 
-        for (int i = 0; i < a.count; i++) {
+        for (int i = 0; i < arraySettings.count; i++) {
             pos = pos.offset(offset);
 
             //Randomizer bag synergy
@@ -73,21 +73,17 @@ public class Array implements Modifier {
         return a.offset.getX() != 0 || a.offset.getY() != 0 || a.offset.getZ() != 0;
     }
 
-    public static class ArraySettings {
-        public boolean enabled = false;
-        public BlockPos offset = BlockPos.ZERO;
-        public int count = 5;
+    public record ArraySettings(
+            boolean enabled,
+            Vec3i offset,
+            int count
+    ) {
 
         public ArraySettings() {
+            this(false, BlockPos.ZERO, 5);
         }
 
-        public ArraySettings(boolean enabled, BlockPos offset, int count) {
-            this.enabled = enabled;
-            this.offset = offset;
-            this.count = count;
-        }
-
-        public int getReach() {
+        public int reach() {
             //find largest offset
             int x = Math.abs(offset.getX());
             int y = Math.abs(offset.getY());

@@ -5,7 +5,6 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Matrix4f;
 import dev.huskcasaca.effortless.buildmodifier.ModifierSettingsManager;
 import dev.huskcasaca.effortless.buildmodifier.mirror.Mirror;
-import dev.huskcasaca.effortless.buildmodifier.mirror.RadialMirror;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -26,54 +25,54 @@ public class ModifierRenderer {
 
     public static void render(PoseStack matrixStack, MultiBufferSource.BufferSource renderTypeBuffer, ModifierSettingsManager.ModifierSettings modifierSettings) {
         //Mirror lines and areas
-        Mirror.MirrorSettings m = modifierSettings.getMirrorSettings();
-        if (m != null && m.enabled && (m.mirrorX || m.mirrorY || m.mirrorZ)) {
-            Vec3 pos = m.position.add(epsilon);
-            int radius = m.radius;
+        var m = modifierSettings.mirrorSettings();
+        if (m != null && m.enabled() && (m.mirrorX() || m.mirrorY() || m.mirrorZ())) {
+            Vec3 pos = m.position().add(epsilon);
+            int radius = m.radius();
 
-            if (m.mirrorX) {
+            if (m.mirrorX()) {
                 Vec3 posA = new Vec3(pos.x, pos.y - radius, pos.z - radius);
                 Vec3 posB = new Vec3(pos.x, pos.y + radius, pos.z + radius);
 
-                drawMirrorPlane(matrixStack, renderTypeBuffer, posA, posB, colorX, m.drawLines, m.drawPlanes, true);
+                drawMirrorPlane(matrixStack, renderTypeBuffer, posA, posB, colorX, m.drawLines(), m.drawPlanes(), true);
             }
-            if (m.mirrorY) {
+            if (m.mirrorY()) {
                 Vec3 posA = new Vec3(pos.x - radius, pos.y, pos.z - radius);
                 Vec3 posB = new Vec3(pos.x + radius, pos.y, pos.z + radius);
 
-                drawMirrorPlaneY(matrixStack, renderTypeBuffer, posA, posB, colorY, m.drawLines, m.drawPlanes);
+                drawMirrorPlaneY(matrixStack, renderTypeBuffer, posA, posB, colorY, m.drawLines(), m.drawPlanes());
             }
-            if (m.mirrorZ) {
+            if (m.mirrorZ()) {
                 Vec3 posA = new Vec3(pos.x - radius, pos.y - radius, pos.z);
                 Vec3 posB = new Vec3(pos.x + radius, pos.y + radius, pos.z);
 
-                drawMirrorPlane(matrixStack, renderTypeBuffer, posA, posB, colorZ, m.drawLines, m.drawPlanes, true);
+                drawMirrorPlane(matrixStack, renderTypeBuffer, posA, posB, colorZ, m.drawLines(), m.drawPlanes(), true);
             }
 
             //Draw axis coordinated colors if two or more axes are enabled
             //(If only one is enabled the lines are that planes color)
-            if (m.drawLines && ((m.mirrorX && m.mirrorY) || (m.mirrorX && m.mirrorZ) || (m.mirrorY && m.mirrorZ))) {
+            if (m.drawLines() && ((m.mirrorX() && m.mirrorY()) || (m.mirrorX() && m.mirrorZ()) || (m.mirrorY() && m.mirrorZ()))) {
                 drawMirrorLines(matrixStack, renderTypeBuffer, m);
             }
         }
 
         //Radial mirror lines and areas
-        RadialMirror.RadialMirrorSettings r = modifierSettings.getRadialMirrorSettings();
-        if (r != null && r.enabled) {
-            Vec3 pos = r.position.add(epsilon);
-            int radius = r.radius;
+        var radialMirrorSettings = modifierSettings.radialMirrorSettings();
+        if (radialMirrorSettings != null && radialMirrorSettings.enabled()) {
+            Vec3 pos = radialMirrorSettings.position().add(epsilon);
+            int radius = radialMirrorSettings.radius();
 
-            float angle = 2f * ((float) Math.PI) / r.slices;
+            float angle = 2f * ((float) Math.PI) / radialMirrorSettings.slices();
             Vec3 relStartVec = new Vec3(radius, 0, 0);
-            if (r.slices % 4 == 2) relStartVec = relStartVec.yRot(angle / 2f);
+            if (radialMirrorSettings.slices() % 4 == 2) relStartVec = relStartVec.yRot(angle / 2f);
 
-            for (int i = 0; i < r.slices; i++) {
+            for (int i = 0; i < radialMirrorSettings.slices(); i++) {
                 Vec3 relNewVec = relStartVec.yRot(angle * i);
                 Vec3 newVec = pos.add(relNewVec);
 
                 Vec3 posA = new Vec3(pos.x, pos.y - radius, pos.z);
                 Vec3 posB = new Vec3(newVec.x, pos.y + radius, newVec.z);
-                drawMirrorPlane(matrixStack, renderTypeBuffer, posA, posB, colorRadial, r.drawLines, r.drawPlanes, false);
+                drawMirrorPlane(matrixStack, renderTypeBuffer, posA, posB, colorRadial, radialMirrorSettings.drawLines(), radialMirrorSettings.drawPlanes(), false);
             }
         }
     }
@@ -153,14 +152,14 @@ public class ModifierRenderer {
         VertexConsumer buffer = RenderHandler.beginLines(renderTypeBuffer);
         Matrix4f matrixPos = matrixStack.last().pose();
 
-        Vec3 pos = m.position.add(epsilon);
+        Vec3 pos = m.position().add(epsilon);
 
-        buffer.vertex(matrixPos, (float) pos.x - m.radius, (float) pos.y, (float) pos.z).color(colorX.getRed(), colorX.getGreen(), colorX.getBlue(), lineAlpha).endVertex();
-        buffer.vertex(matrixPos, (float) pos.x + m.radius, (float) pos.y, (float) pos.z).color(colorX.getRed(), colorX.getGreen(), colorX.getBlue(), lineAlpha).endVertex();
-        buffer.vertex(matrixPos, (float) pos.x, (float) pos.y - m.radius, (float) pos.z).color(colorY.getRed(), colorY.getGreen(), colorY.getBlue(), lineAlpha).endVertex();
-        buffer.vertex(matrixPos, (float) pos.x, (float) pos.y + m.radius, (float) pos.z).color(colorY.getRed(), colorY.getGreen(), colorY.getBlue(), lineAlpha).endVertex();
-        buffer.vertex(matrixPos, (float) pos.x, (float) pos.y, (float) pos.z - m.radius).color(colorZ.getRed(), colorZ.getGreen(), colorZ.getBlue(), lineAlpha).endVertex();
-        buffer.vertex(matrixPos, (float) pos.x, (float) pos.y, (float) pos.z + m.radius).color(colorZ.getRed(), colorZ.getGreen(), colorZ.getBlue(), lineAlpha).endVertex();
+        buffer.vertex(matrixPos, (float) pos.x - m.radius(), (float) pos.y, (float) pos.z).color(colorX.getRed(), colorX.getGreen(), colorX.getBlue(), lineAlpha).endVertex();
+        buffer.vertex(matrixPos, (float) pos.x + m.radius(), (float) pos.y, (float) pos.z).color(colorX.getRed(), colorX.getGreen(), colorX.getBlue(), lineAlpha).endVertex();
+        buffer.vertex(matrixPos, (float) pos.x, (float) pos.y - m.radius(), (float) pos.z).color(colorY.getRed(), colorY.getGreen(), colorY.getBlue(), lineAlpha).endVertex();
+        buffer.vertex(matrixPos, (float) pos.x, (float) pos.y + m.radius(), (float) pos.z).color(colorY.getRed(), colorY.getGreen(), colorY.getBlue(), lineAlpha).endVertex();
+        buffer.vertex(matrixPos, (float) pos.x, (float) pos.y, (float) pos.z - m.radius()).color(colorZ.getRed(), colorZ.getGreen(), colorZ.getBlue(), lineAlpha).endVertex();
+        buffer.vertex(matrixPos, (float) pos.x, (float) pos.y, (float) pos.z + m.radius()).color(colorZ.getRed(), colorZ.getGreen(), colorZ.getBlue(), lineAlpha).endVertex();
 
         RenderHandler.endLines(renderTypeBuffer);
     }

@@ -15,7 +15,6 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -30,7 +29,7 @@ public class BuildModifierHandler {
 
     //Called from BuildModes
     public static void onBlockPlaced(Player player, List<BlockPos> startCoordinates, Direction sideHit, Vec3 hitVec, boolean placeStartPos) {
-        Level world = player.level;
+        var world = player.level;
 //		AbstractRandomizerBagItem.renewRandomness();
 
         //Format hitvec to 0.x
@@ -47,7 +46,7 @@ public class BuildModifierHandler {
         //remember previous blockstates for undo
         List<BlockState> previousBlockStates = new ArrayList<>(coordinates.size());
         List<BlockState> newBlockStates = new ArrayList<>(coordinates.size());
-        for (BlockPos coordinate : coordinates) {
+        for (var coordinate : coordinates) {
             previousBlockStates.add(world.getBlockState(coordinate));
         }
 
@@ -61,9 +60,9 @@ public class BuildModifierHandler {
 
             //place blocks
             for (int i = placeStartPos ? 0 : 1; i < coordinates.size(); i++) {
-                BlockPos blockPos = coordinates.get(i);
-                BlockState blockState = blockStates.get(i);
-                ItemStack itemStack = itemStacks.get(i);
+                var blockPos = coordinates.get(i);
+                var blockState = blockStates.get(i);
+                var itemStack = itemStacks.get(i);
 
                 if (world.isLoaded(blockPos)) {
                     //check itemstack empty
@@ -77,7 +76,7 @@ public class BuildModifierHandler {
             }
 
             //find actual new blockstates for undo
-            for (BlockPos coordinate : coordinates) {
+            for (var coordinate : coordinates) {
                 newBlockStates.add(world.getBlockState(coordinate));
             }
         }
@@ -90,23 +89,23 @@ public class BuildModifierHandler {
         //Can happen when e.g. placing one block in yourself
         if (Collections.frequency(newBlockStates, Blocks.AIR.defaultBlockState()) != newBlockStates.size()) {
             //add to undo stack
-            BlockPos firstPos = startCoordinates.get(0);
-            BlockPos secondPos = startCoordinates.get(startCoordinates.size() - 1);
+            var firstPos = startCoordinates.get(0);
+            var secondPos = startCoordinates.get(startCoordinates.size() - 1);
             UndoRedo.addUndo(player, new BlockSet(coordinates, previousBlockStates, newBlockStates, hitVec, firstPos, secondPos));
         }
     }
 
     public static void onBlockBroken(Player player, List<BlockPos> startCoordinates, boolean breakStartPos) {
-        Level world = player.level;
+        var world = player.level;
 
-        List<BlockPos> coordinates = findCoordinates(player, startCoordinates);
+        var coordinates = findCoordinates(player, startCoordinates);
 
         if (coordinates.isEmpty()) return;
 
         //remember previous blockstates for undo
         List<BlockState> previousBlockStates = new ArrayList<>(coordinates.size());
         List<BlockState> newBlockStates = new ArrayList<>(coordinates.size());
-        for (BlockPos coordinate : coordinates) {
+        for (var coordinate : coordinates) {
             previousBlockStates.add(world.getBlockState(coordinate));
         }
 
@@ -126,7 +125,7 @@ public class BuildModifierHandler {
 
             //break all those blocks
             for (int i = breakStartPos ? 0 : 1; i < coordinates.size(); i++) {
-                BlockPos coordinate = coordinates.get(i);
+                var coordinate = coordinates.get(i);
                 if (world.isLoaded(coordinate) && !world.isEmptyBlock(coordinate)) {
                     if (!onlyInstaBreaking || world.getBlockState(coordinate).getDestroySpeed(world, coordinate) == 0f) {
                         SurvivalHelper.breakBlock(world, player, coordinate, false);
@@ -135,7 +134,7 @@ public class BuildModifierHandler {
             }
 
             //find actual new blockstates for undo
-            for (BlockPos coordinate : coordinates) {
+            for (var coordinate : coordinates) {
                 newBlockStates.add(world.getBlockState(coordinate));
             }
         }
@@ -145,9 +144,9 @@ public class BuildModifierHandler {
         if (!breakStartPos) newBlockStates.set(0, Blocks.AIR.defaultBlockState());
 
         //add to undo stack
-        BlockPos firstPos = startCoordinates.get(0);
-        BlockPos secondPos = startCoordinates.get(startCoordinates.size() - 1);
-        Vec3 hitVec = new Vec3(0.5, 0.5, 0.5);
+        var firstPos = startCoordinates.get(0);
+        var secondPos = startCoordinates.get(startCoordinates.size() - 1);
+        var hitVec = new Vec3(0.5, 0.5, 0.5);
         UndoRedo.addUndo(player, new BlockSet(coordinates, previousBlockStates, newBlockStates, hitVec, firstPos, secondPos));
 
     }
@@ -158,13 +157,13 @@ public class BuildModifierHandler {
         coordinates.addAll(posList);
 
         //Find mirror/array/radial mirror coordinates for each blockpos
-        for (BlockPos blockPos : posList) {
+        for (var blockPos : posList) {
             List<BlockPos> arrayCoordinates = Array.findCoordinates(player, blockPos);
             coordinates.addAll(arrayCoordinates);
             coordinates.addAll(Mirror.findCoordinates(player, blockPos));
             coordinates.addAll(RadialMirror.findCoordinates(player, blockPos));
             //get mirror for each array coordinate
-            for (BlockPos coordinate : arrayCoordinates) {
+            for (var coordinate : arrayCoordinates) {
                 coordinates.addAll(Mirror.findCoordinates(player, coordinate));
                 coordinates.addAll(RadialMirror.findCoordinates(player, coordinate));
             }
@@ -197,7 +196,7 @@ public class BuildModifierHandler {
 //		AbstractRandomizerBagItem.resetRandomness();
 
         //Add blocks in posList first
-        for (BlockPos blockPos : posList) {
+        for (var blockPos : posList) {
             if (!(itemStack.getItem() instanceof BlockItem)) itemBlock = CompatHelper.getItemBlockFromStack(itemStack);
             BlockState blockState = getBlockStateFromItem(itemBlock, player, blockPos, facing, hitVec, InteractionHand.MAIN_HAND);
             if (blockState == null) continue;
@@ -206,7 +205,7 @@ public class BuildModifierHandler {
             itemStacks.add(itemBlock);
         }
 
-        for (BlockPos blockPos : posList) {
+        for (var blockPos : posList) {
             BlockState blockState = getBlockStateFromItem(itemBlock, player, blockPos, facing, hitVec, InteractionHand.MAIN_HAND);
             if (blockState == null) continue;
 
@@ -217,8 +216,8 @@ public class BuildModifierHandler {
             //add mirror for each array coordinate
             List<BlockPos> arrayCoordinates = Array.findCoordinates(player, blockPos);
             for (int i = 0; i < arrayCoordinates.size(); i++) {
-                BlockPos coordinate = arrayCoordinates.get(i);
-                BlockState blockState1 = arrayBlockStates.get(i);
+                var coordinate = arrayCoordinates.get(i);
+                var blockState1 = arrayBlockStates.get(i);
                 if (blockState1 == null) continue;
 
                 blockStates.addAll(Mirror.findBlockStates(player, coordinate, blockState1, itemStack, itemStacks));
@@ -239,10 +238,10 @@ public class BuildModifierHandler {
     }
 
     public static boolean isEnabled(ModifierSettingsManager.ModifierSettings modifierSettings, BlockPos startPos) {
-        return Mirror.isEnabled(modifierSettings.getMirrorSettings(), startPos) ||
-                Array.isEnabled(modifierSettings.getArraySettings()) ||
-                RadialMirror.isEnabled(modifierSettings.getRadialMirrorSettings(), startPos) ||
-                modifierSettings.doQuickReplace();
+        return Array.isEnabled(modifierSettings.arraySettings()) ||
+                Mirror.isEnabled(modifierSettings.mirrorSettings(), startPos) ||
+                RadialMirror.isEnabled(modifierSettings.radialMirrorSettings(), startPos) ||
+                modifierSettings.quickReplace();
     }
 
     public static BlockState getBlockStateFromItem(ItemStack itemStack, Player player, BlockPos blockPos, Direction facing, Vec3 hitVec, InteractionHand hand) {

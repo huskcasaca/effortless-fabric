@@ -1,7 +1,7 @@
 package dev.huskcasaca.effortless.buildmodifier;
 
-import dev.huskcasaca.effortless.BuildConfig;
 import dev.huskcasaca.effortless.Effortless;
+import dev.huskcasaca.effortless.config.ConfigManager;
 import dev.huskcasaca.effortless.helper.FixedStack;
 import dev.huskcasaca.effortless.helper.InventoryHelper;
 import dev.huskcasaca.effortless.helper.SurvivalHelper;
@@ -50,10 +50,14 @@ public class UndoRedo {
 
         //If no stack exists, make one
         if (!undoStacks.containsKey(player.getUUID())) {
-            undoStacks.put(player.getUUID(), new FixedStack<>(new BlockSet[BuildConfig.survivalBalancers.undoStackSize]));
+            undoStacks.put(player.getUUID(), new FixedStack<>(new BlockSet[getUndoStackSize(player)]));
         }
 
         undoStacks.get(player.getUUID()).push(blockSet);
+    }
+
+    private static int getUndoStackSize(Player player) {
+        return ConfigManager.getGlobalBuildConfig().getUndoStackSize();
     }
 
     private static void addRedo(Player player, BlockSet blockSet) {
@@ -63,7 +67,7 @@ public class UndoRedo {
 
         //If no stack exists, make one
         if (!redoStacks.containsKey(player.getUUID())) {
-            redoStacks.put(player.getUUID(), new FixedStack<>(new BlockSet[BuildConfig.survivalBalancers.undoStackSize]));
+            redoStacks.put(player.getUUID(), new FixedStack<>(new BlockSet[getUndoStackSize(player)]));
         }
 
         redoStacks.get(player.getUUID()).push(blockSet);

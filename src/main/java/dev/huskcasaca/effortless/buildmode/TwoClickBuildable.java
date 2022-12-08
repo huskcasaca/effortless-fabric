@@ -7,9 +7,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
-import java.util.Dictionary;
 import java.util.List;
-import java.util.UUID;
 
 public abstract class TwoClickBuildable extends MultipleClickBuildable {
 
@@ -17,7 +15,7 @@ public abstract class TwoClickBuildable extends MultipleClickBuildable {
     public List<BlockPos> onRightClick(Player player, BlockPos blockPos, Direction sideHit, Vec3 hitVec, boolean skipRaytrace) {
         List<BlockPos> list = new ArrayList<>();
 
-        Dictionary<UUID, Integer> rightClickTable = player.level.isClientSide ? rightClickClientTable : rightClickServerTable;
+        var rightClickTable = player.level.isClientSide ? rightClickClientTable : rightClickServerTable;
         int rightClickNr = rightClickTable.get(player.getUUID());
 
         rightClickNr++;
@@ -47,15 +45,15 @@ public abstract class TwoClickBuildable extends MultipleClickBuildable {
     @Override
     public List<BlockPos> findCoordinates(Player player, BlockPos blockPos, boolean skipRaytrace) {
         List<BlockPos> list = new ArrayList<>();
-        Dictionary<UUID, Integer> rightClickTable = player.level.isClientSide ? rightClickClientTable : rightClickServerTable;
+        var rightClickTable = player.level.isClientSide ? rightClickClientTable : rightClickServerTable;
         int rightClickNr = rightClickTable.get(player.getUUID());
-        BlockPos firstPos = firstPosTable.get(player.getUUID());
+        var firstPos = firstPosTable.get(player.getUUID());
 
         if (rightClickNr == 0) {
             if (blockPos != null)
                 list.add(blockPos);
         } else {
-            BlockPos secondPos = findSecondPos(player, firstPos, skipRaytrace);
+            var secondPos = findSecondPos(player, firstPos, skipRaytrace);
             if (secondPos == null) return list;
 
             //Limit amount of blocks we can place per row

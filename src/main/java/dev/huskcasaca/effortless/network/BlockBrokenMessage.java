@@ -20,32 +20,20 @@ import net.minecraft.world.phys.Vec3;
 /***
  * Sends a message to the server indicating that a player wants to break a block
  */
-public class BlockBrokenMessage implements Message {
-
-    private final boolean blockHit;
-    private final BlockPos blockPos;
-    private final Direction sideHit;
-    private final Vec3 hitVec;
+public record BlockBrokenMessage(
+        boolean blockHit,
+        BlockPos blockPos,
+        Direction sideHit,
+        Vec3 hitVec
+) implements Message {
 
     public BlockBrokenMessage() {
-        this.blockHit = false;
-        this.blockPos = BlockPos.ZERO;
-        this.sideHit = Direction.UP;
-        this.hitVec = new Vec3(0, 0, 0);
+        // TODO: 17/9/22 use Vec3.ZERO?
+        this(false, BlockPos.ZERO, Direction.UP, new Vec3(0, 0, 0));
     }
 
     public BlockBrokenMessage(BlockHitResult result) {
-        this.blockHit = result.getType() == HitResult.Type.BLOCK;
-        this.blockPos = result.getBlockPos();
-        this.sideHit = result.getDirection();
-        this.hitVec = result.getLocation();
-    }
-
-    public BlockBrokenMessage(boolean blockHit, BlockPos blockPos, Direction sideHit, Vec3 hitVec) {
-        this.blockHit = blockHit;
-        this.blockPos = blockPos;
-        this.sideHit = sideHit;
-        this.hitVec = hitVec;
+        this(result.getType() == HitResult.Type.BLOCK, result.getBlockPos(), result.getDirection(), result.getLocation());
     }
 
     public static void encode(BlockBrokenMessage message, FriendlyByteBuf buf) {
@@ -61,26 +49,10 @@ public class BlockBrokenMessage implements Message {
 
     public static BlockBrokenMessage decode(FriendlyByteBuf buf) {
         boolean blockHit = buf.readBoolean();
-        BlockPos blockPos = new BlockPos(buf.readInt(), buf.readInt(), buf.readInt());
-        Direction sideHit = Direction.from3DDataValue(buf.readInt());
-        Vec3 hitVec = new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble());
+        var blockPos = new BlockPos(buf.readInt(), buf.readInt(), buf.readInt());
+        var sideHit = Direction.from3DDataValue(buf.readInt());
+        var hitVec = new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble());
         return new BlockBrokenMessage(blockHit, blockPos, sideHit, hitVec);
-    }
-
-    public boolean isBlockHit() {
-        return blockHit;
-    }
-
-    public BlockPos getBlockPos() {
-        return blockPos;
-    }
-
-    public Direction getSideHit() {
-        return sideHit;
-    }
-
-    public Vec3 getHitVec() {
-        return hitVec;
     }
 
     public static class Serializer implements MessageSerializer<BlockBrokenMessage> {

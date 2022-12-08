@@ -13,17 +13,15 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 /**
  * Send packet to client to translate and log the containing message
  */
-public class TranslatedLogMessage implements Message {
-    private final String prefix;
-    private final String translationKey;
-    private final String suffix;
-    private final boolean actionBar;
+public record TranslatedLogMessage(
+        String prefix,
+        String translationKey,
+        String suffix,
+        boolean actionBar
+) implements Message {
 
     public TranslatedLogMessage() {
-        prefix = "";
-        translationKey = "";
-        suffix = "";
-        actionBar = false;
+        this("", "", "", false);
     }
 
     public TranslatedLogMessage(String prefix, String translationKey, String suffix, boolean actionBar) {
@@ -42,22 +40,6 @@ public class TranslatedLogMessage implements Message {
 
     public static TranslatedLogMessage decode(FriendlyByteBuf buf) {
         return new TranslatedLogMessage(buf.readUtf(), buf.readUtf(), buf.readUtf(), buf.readBoolean());
-    }
-
-    public String getPrefix() {
-        return prefix;
-    }
-
-    public String getTranslationKey() {
-        return translationKey;
-    }
-
-    public String getSuffix() {
-        return suffix;
-    }
-
-    public boolean isActionBar() {
-        return actionBar;
     }
 
     public static class Serializer implements MessageSerializer<TranslatedLogMessage> {
@@ -80,7 +62,6 @@ public class TranslatedLogMessage implements Message {
         public void handleServerSide(MinecraftServer server, ServerPlayer player, ServerGamePacketListenerImpl handler, TranslatedLogMessage message, PacketSender responseSender) {
 
         }
-
 
     }
 

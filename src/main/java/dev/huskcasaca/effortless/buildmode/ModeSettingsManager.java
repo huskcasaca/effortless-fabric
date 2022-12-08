@@ -19,7 +19,7 @@ public class ModeSettingsManager {
     }
 
     public static String getTranslatedModeOptionName(Player player) {
-        BuildMode mode = ModeSettingsManager.getModeSettings(player).getBuildMode();
+        BuildMode mode = ModeSettingsManager.getModeSettings(player).buildMode();
         if (mode == BuildMode.VANILLA) {
             return I18n.get(mode.getNameKey());
         } else {
@@ -41,13 +41,28 @@ public class ModeSettingsManager {
         ((EffortlessDataProvider) player).setModeSettings(modeSettings);
     }
 
-    public static String sanitize(ModeSettings modeSettings, Player player) {
+    public static void syncMagnetSetting(Player player, boolean enable) {
+        if (player == null) {
+            return;
+        }
+        var modeSettings = getModeSettings(player);
+        modeSettings = new ModeSettingsManager.ModeSettings(modeSettings.buildMode(), enable);
+        ModeSettingsManager.setModeSettings(player, modeSettings);
+        PacketHandler.sendToServer(new ModeSettingsMessage(modeSettings));
+    }
+
+
+    public static String getSanitizeMessage(ModeSettings modeSettings, Player player) {
         int maxReach = ReachHelper.getMaxReach(player);
         String error = "";
 
         //TODO sanitize
 
         return error;
+    }
+
+    public static ModeSettings sanitize(ModeSettings modeSettings, Player player) {
+        return modeSettings;
     }
 
     public static void handleNewPlayer(Player player) {
@@ -62,22 +77,14 @@ public class ModeSettingsManager {
         }
     }
 
-    public static class ModeSettings {
-        private BuildMode buildMode = BuildMode.VANILLA;
+    public record ModeSettings(
+            BuildMode buildMode,
+            boolean enableMagnet
+    ) {
 
         public ModeSettings() {
+            this(BuildMode.VANILLA, false);
         }
 
-        public ModeSettings(BuildMode buildMode) {
-            this.buildMode = buildMode;
-        }
-
-        public BuildMode getBuildMode() {
-            return this.buildMode;
-        }
-
-        public void setBuildMode(BuildMode buildMode) {
-            this.buildMode = buildMode;
-        }
     }
 }

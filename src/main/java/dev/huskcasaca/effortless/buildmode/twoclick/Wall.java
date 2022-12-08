@@ -15,17 +15,17 @@ import java.util.List;
 public class Wall extends TwoClickBuildable {
 
     public static BlockPos findWall(Player player, BlockPos firstPos, boolean skipRaytrace) {
-        Vec3 look = BuildModeHandler.getPlayerLookVec(player);
-        Vec3 start = new Vec3(player.getX(), player.getY() + player.getEyeHeight(), player.getZ());
+        var look = BuildModeHandler.getPlayerLookVec(player);
+        var start = new Vec3(player.getX(), player.getY() + player.getEyeHeight(), player.getZ());
 
         List<Criteria> criteriaList = new ArrayList<>(3);
 
         //X
-        Vec3 xBound = BuildModeHandler.findXBound(firstPos.getX(), start, look);
+        var xBound = BuildModeHandler.findXBound(firstPos.getX(), start, look);
         criteriaList.add(new Criteria(xBound, firstPos, start, look));
 
         //Z
-        Vec3 zBound = BuildModeHandler.findZBound(firstPos.getZ(), start, look);
+        var zBound = BuildModeHandler.findZBound(firstPos.getZ(), start, look);
         criteriaList.add(new Criteria(zBound, firstPos, start, look));
 
         //Remove invalid criteria
@@ -36,7 +36,7 @@ public class Wall extends TwoClickBuildable {
         if (criteriaList.isEmpty()) return null;
 
         //If only 1 is valid, choose that one
-        Criteria selected = criteriaList.get(0);
+        var selected = criteriaList.get(0);
 
         //If multiple are valid, choose based on criteria
         if (criteriaList.size() > 1) {

@@ -26,38 +26,38 @@ public class Mirror implements Modifier {
         List<BlockPos> coordinates = new ArrayList<>();
 
         //find mirrorsettings for the player
-        MirrorSettings m = ModifierSettingsManager.getModifierSettings(player).getMirrorSettings();
-        if (!isEnabled(m, startPos)) return coordinates;
+        var mirrorSettings = ModifierSettingsManager.getModifierSettings(player).mirrorSettings();
+        if (!isEnabled(mirrorSettings, startPos)) return coordinates;
 
-        if (m.mirrorX) coordinateMirrorX(m, startPos, coordinates);
-        if (m.mirrorY) coordinateMirrorY(m, startPos, coordinates);
-        if (m.mirrorZ) coordinateMirrorZ(m, startPos, coordinates);
+        if (mirrorSettings.mirrorX) coordinateMirrorX(mirrorSettings, startPos, coordinates);
+        if (mirrorSettings.mirrorY) coordinateMirrorY(mirrorSettings, startPos, coordinates);
+        if (mirrorSettings.mirrorZ) coordinateMirrorZ(mirrorSettings, startPos, coordinates);
 
         return coordinates;
     }
 
-    private static void coordinateMirrorX(MirrorSettings m, BlockPos oldBlockPos, List<BlockPos> coordinates) {
+    private static void coordinateMirrorX(MirrorSettings mirrorSettings, BlockPos oldBlockPos, List<BlockPos> coordinates) {
         //find mirror position
-        double x = m.position.x + (m.position.x - oldBlockPos.getX() - 0.5);
+        double x = mirrorSettings.position.x + (mirrorSettings.position.x - oldBlockPos.getX() - 0.5);
         BlockPos newBlockPos = new BlockPos(x, oldBlockPos.getY(), oldBlockPos.getZ());
         coordinates.add(newBlockPos);
 
-        if (m.mirrorY) coordinateMirrorY(m, newBlockPos, coordinates);
-        if (m.mirrorZ) coordinateMirrorZ(m, newBlockPos, coordinates);
+        if (mirrorSettings.mirrorY) coordinateMirrorY(mirrorSettings, newBlockPos, coordinates);
+        if (mirrorSettings.mirrorZ) coordinateMirrorZ(mirrorSettings, newBlockPos, coordinates);
     }
 
-    private static void coordinateMirrorY(MirrorSettings m, BlockPos oldBlockPos, List<BlockPos> coordinates) {
+    private static void coordinateMirrorY(MirrorSettings mirrorSettings, BlockPos oldBlockPos, List<BlockPos> coordinates) {
         //find mirror position
-        double y = m.position.y + (m.position.y - oldBlockPos.getY() - 0.5);
+        double y = mirrorSettings.position.y + (mirrorSettings.position.y - oldBlockPos.getY() - 0.5);
         BlockPos newBlockPos = new BlockPos(oldBlockPos.getX(), y, oldBlockPos.getZ());
         coordinates.add(newBlockPos);
 
-        if (m.mirrorZ) coordinateMirrorZ(m, newBlockPos, coordinates);
+        if (mirrorSettings.mirrorZ) coordinateMirrorZ(mirrorSettings, newBlockPos, coordinates);
     }
 
-    private static void coordinateMirrorZ(MirrorSettings m, BlockPos oldBlockPos, List<BlockPos> coordinates) {
+    private static void coordinateMirrorZ(MirrorSettings mirrorSettings, BlockPos oldBlockPos, List<BlockPos> coordinates) {
         //find mirror position
-        double z = m.position.z + (m.position.z - oldBlockPos.getZ() - 0.5);
+        double z = mirrorSettings.position.z + (mirrorSettings.position.z - oldBlockPos.getZ() - 0.5);
         BlockPos newBlockPos = new BlockPos(oldBlockPos.getX(), oldBlockPos.getY(), z);
         coordinates.add(newBlockPos);
     }
@@ -66,8 +66,8 @@ public class Mirror implements Modifier {
         List<BlockState> blockStates = new ArrayList<>();
 
         //find mirrorsettings for the player
-        MirrorSettings m = ModifierSettingsManager.getModifierSettings(player).getMirrorSettings();
-        if (!isEnabled(m, startPos)) return blockStates;
+        MirrorSettings mirrorSettings = ModifierSettingsManager.getModifierSettings(player).mirrorSettings();
+        if (!isEnabled(mirrorSettings, startPos)) return blockStates;
 
         //Randomizer bag synergy
 //		AbstractRandomizerBagItem randomizerBagItem = null;
@@ -77,20 +77,20 @@ public class Mirror implements Modifier {
 //			bagInventory = randomizerBagItem.getBagInventory(itemStack);
 //		}
 
-        if (m.mirrorX)
-            blockStateMirrorX(player, m, startPos, blockState, bagInventory, itemStack, InteractionHand.MAIN_HAND, blockStates, itemStacks);
-        if (m.mirrorY)
-            blockStateMirrorY(player, m, startPos, blockState, bagInventory, itemStack, InteractionHand.MAIN_HAND, blockStates, itemStacks);
-        if (m.mirrorZ)
-            blockStateMirrorZ(player, m, startPos, blockState, bagInventory, itemStack, InteractionHand.MAIN_HAND, blockStates, itemStacks);
+        if (mirrorSettings.mirrorX)
+            blockStateMirrorX(player, mirrorSettings, startPos, blockState, bagInventory, itemStack, InteractionHand.MAIN_HAND, blockStates, itemStacks);
+        if (mirrorSettings.mirrorY)
+            blockStateMirrorY(player, mirrorSettings, startPos, blockState, bagInventory, itemStack, InteractionHand.MAIN_HAND, blockStates, itemStacks);
+        if (mirrorSettings.mirrorZ)
+            blockStateMirrorZ(player, mirrorSettings, startPos, blockState, bagInventory, itemStack, InteractionHand.MAIN_HAND, blockStates, itemStacks);
 
         return blockStates;
     }
 
-    private static void blockStateMirrorX(Player player, MirrorSettings m, BlockPos oldBlockPos, BlockState oldBlockState,
+    private static void blockStateMirrorX(Player player, MirrorSettings mirrorSettings, BlockPos oldBlockPos, BlockState oldBlockState,
                                           Container bagInventory, ItemStack itemStack, InteractionHand hand, List<BlockState> blockStates, List<ItemStack> itemStacks) {
         //find mirror position
-        double x = m.position.x + (m.position.x - oldBlockPos.getX() - 0.5);
+        double x = mirrorSettings.position.x + (mirrorSettings.position.x - oldBlockPos.getX() - 0.5);
         BlockPos newBlockPos = new BlockPos(x, oldBlockPos.getY(), oldBlockPos.getZ());
 
         //Randomizer bag synergy
@@ -106,16 +106,16 @@ public class Mirror implements Modifier {
         blockStates.add(newBlockState);
         itemStacks.add(itemStack);
 
-        if (m.mirrorY)
-            blockStateMirrorY(player, m, newBlockPos, newBlockState, bagInventory, itemStack, hand, blockStates, itemStacks);
-        if (m.mirrorZ)
-            blockStateMirrorZ(player, m, newBlockPos, newBlockState, bagInventory, itemStack, hand, blockStates, itemStacks);
+        if (mirrorSettings.mirrorY)
+            blockStateMirrorY(player, mirrorSettings, newBlockPos, newBlockState, bagInventory, itemStack, hand, blockStates, itemStacks);
+        if (mirrorSettings.mirrorZ)
+            blockStateMirrorZ(player, mirrorSettings, newBlockPos, newBlockState, bagInventory, itemStack, hand, blockStates, itemStacks);
     }
 
-    private static void blockStateMirrorY(Player player, MirrorSettings m, BlockPos oldBlockPos, BlockState oldBlockState,
+    private static void blockStateMirrorY(Player player, MirrorSettings mirrorSettings, BlockPos oldBlockPos, BlockState oldBlockState,
                                           Container bagInventory, ItemStack itemStack, InteractionHand hand, List<BlockState> blockStates, List<ItemStack> itemStacks) {
         //find mirror position
-        double y = m.position.y + (m.position.y - oldBlockPos.getY() - 0.5);
+        double y = mirrorSettings.position.y + (mirrorSettings.position.y - oldBlockPos.getY() - 0.5);
         BlockPos newBlockPos = new BlockPos(oldBlockPos.getX(), y, oldBlockPos.getZ());
 
         //Randomizer bag synergy
@@ -131,14 +131,14 @@ public class Mirror implements Modifier {
         blockStates.add(newBlockState);
         itemStacks.add(itemStack);
 
-        if (m.mirrorZ)
-            blockStateMirrorZ(player, m, newBlockPos, newBlockState, bagInventory, itemStack, hand, blockStates, itemStacks);
+        if (mirrorSettings.mirrorZ)
+            blockStateMirrorZ(player, mirrorSettings, newBlockPos, newBlockState, bagInventory, itemStack, hand, blockStates, itemStacks);
     }
 
-    private static void blockStateMirrorZ(Player player, MirrorSettings m, BlockPos oldBlockPos, BlockState oldBlockState,
+    private static void blockStateMirrorZ(Player player, MirrorSettings mirrorSettings, BlockPos oldBlockPos, BlockState oldBlockState,
                                           Container bagInventory, ItemStack itemStack, InteractionHand hand, List<BlockState> blockStates, List<ItemStack> itemStacks) {
         //find mirror position
-        double z = m.position.z + (m.position.z - oldBlockPos.getZ() - 0.5);
+        double z = mirrorSettings.position.z + (mirrorSettings.position.z - oldBlockPos.getZ() - 0.5);
         BlockPos newBlockPos = new BlockPos(oldBlockPos.getX(), oldBlockPos.getY(), z);
 
         //Randomizer bag synergy
@@ -155,13 +155,14 @@ public class Mirror implements Modifier {
         itemStacks.add(itemStack);
     }
 
-    public static boolean isEnabled(MirrorSettings m, BlockPos startPos) {
-        if (m == null || !m.enabled || (!m.mirrorX && !m.mirrorY && !m.mirrorZ)) return false;
+    public static boolean isEnabled(MirrorSettings mirrorSettings, BlockPos startPos) {
+        if (mirrorSettings == null || !mirrorSettings.enabled || (!mirrorSettings.mirrorX && !mirrorSettings.mirrorY && !mirrorSettings.mirrorZ))
+            return false;
 
         //within mirror distance
-        return !(startPos.getX() + 0.5 < m.position.x - m.radius) && !(startPos.getX() + 0.5 > m.position.x + m.radius) &&
-                !(startPos.getY() + 0.5 < m.position.y - m.radius) && !(startPos.getY() + 0.5 > m.position.y + m.radius) &&
-                !(startPos.getZ() + 0.5 < m.position.z - m.radius) && !(startPos.getZ() + 0.5 > m.position.z + m.radius);
+        return !(startPos.getX() + 0.5 < mirrorSettings.position.x - mirrorSettings.radius) && !(startPos.getX() + 0.5 > mirrorSettings.position.x + mirrorSettings.radius) &&
+                !(startPos.getY() + 0.5 < mirrorSettings.position.y - mirrorSettings.radius) && !(startPos.getY() + 0.5 > mirrorSettings.position.y + mirrorSettings.radius) &&
+                !(startPos.getZ() + 0.5 < mirrorSettings.position.z - mirrorSettings.radius) && !(startPos.getZ() + 0.5 > mirrorSettings.position.z + mirrorSettings.radius);
     }
 
     private static BlockState getVerticalMirror(BlockState blockState) {
@@ -206,28 +207,30 @@ public class Mirror implements Modifier {
         return blockState;
     }
 
-    public static class MirrorSettings {
-        public boolean enabled = false;
-        public Vec3 position = new Vec3(0.5, 64.5, 0.5);
-        public boolean mirrorX = true, mirrorY = false, mirrorZ = false;
-        public int radius = 10;
-        public boolean drawLines = true, drawPlanes = true;
-
+    public record MirrorSettings(
+            boolean enabled,
+            Vec3 position,
+            boolean mirrorX,
+            boolean mirrorY,
+            boolean mirrorZ,
+            int radius,
+            boolean drawLines,
+            boolean drawPlanes
+    ) {
         public MirrorSettings() {
+            this(
+                    false,
+                    new Vec3(0.5, 64.5, 0.5),
+                    true,
+                    false,
+                    false,
+                    10,
+                    true,
+                    true
+            );
         }
 
-        public MirrorSettings(boolean mirrorEnabled, Vec3 position, boolean mirrorX, boolean mirrorY, boolean mirrorZ, int radius, boolean drawLines, boolean drawPlanes) {
-            this.enabled = mirrorEnabled;
-            this.position = position;
-            this.mirrorX = mirrorX;
-            this.mirrorY = mirrorY;
-            this.mirrorZ = mirrorZ;
-            this.radius = radius;
-            this.drawLines = drawLines;
-            this.drawPlanes = drawPlanes;
-        }
-
-        public int getReach() {
+        public int reach() {
             return radius * 2; //Change ModifierSettings#setReachUpgrade too
         }
     }

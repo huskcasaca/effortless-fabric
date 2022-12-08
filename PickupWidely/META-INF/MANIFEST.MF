@@ -1,9 +1,0 @@
-Manifest-Version: 1.0
-Specification-Title: examplemod
-Specification-Vendor: examplemodsareus
-Specification-Version: 1
-Implementation-Title: src_pickupwidely
-Implementation-Version: 1.0
-Implementation-Vendor: examplemodsareus
-Implementation-Timestamp: 2022-08-20T05:39:05+0900
-

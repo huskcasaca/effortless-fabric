@@ -15,10 +15,9 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 /***
  * Sends a message to the client asking to clear the undo and redo stacks.
  */
-public class ClearUndoMessage implements Message {
+public record ClearUndoMessage(
 
-    public ClearUndoMessage() {
-    }
+) implements Message {
 
     public static void encode(ClearUndoMessage message, FriendlyByteBuf buf) {
 

@@ -119,19 +119,12 @@ public class BuildRenderTypes extends RenderType {
         else Effortless.log("secondposUniform is null");
     }
 
-    private class ShaderInfo {
-        float dissolve;
-        Vec3 blockPos;
-        Vec3 firstPos;
-        Vec3 secondPos;
-        boolean red;
-
-        public ShaderInfo(float dissolve, Vec3 blockPos, Vec3 firstPos, Vec3 secondPos, boolean red) {
-            this.dissolve = dissolve;
-            this.blockPos = blockPos;
-            this.firstPos = firstPos;
-            this.secondPos = secondPos;
-            this.red = red;
-        }
+    private record ShaderInfo(
+            float dissolve,
+            Vec3 blockPos,
+            Vec3 firstPos,
+            Vec3 secondPos,
+            boolean red
+    ) {
     }
 }

@@ -15,7 +15,8 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 /**
  * Sends a message to the server indicating that a buildmode needs to be canceled for a player
  */
-public class CancelModeMessage implements Message {
+public record CancelModeMessage(
+) implements Message {
 
     public static void encode(CancelModeMessage message, FriendlyByteBuf buf) {
     }

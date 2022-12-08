@@ -16,16 +16,9 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 /**
  * Shares mode settings (see ModeSettingsManager) between server and client
  */
-public class ModeActionMessage implements Message {
-
-    private BuildAction action;
-
-    public ModeActionMessage() {
-    }
-
-    public ModeActionMessage(BuildAction action) {
-        this.action = action;
-    }
+public record ModeActionMessage(
+        BuildAction action
+) implements Message {
 
     public static void encode(ModeActionMessage message, FriendlyByteBuf buf) {
         buf.writeInt(message.action.ordinal());
@@ -58,7 +51,6 @@ public class ModeActionMessage implements Message {
         }
 
     }
-
 
     @Environment(EnvType.CLIENT)
     public static class ClientHandler implements ClientMessageHandler<ModeActionMessage> {

@@ -22,21 +22,14 @@ import java.util.ArrayList;
 /***
  * Sends a message to the client asking to add a block to the undo stack.
  */
-public class AddUndoMessage implements Message {
-    private final BlockPos coordinate;
-    private final BlockState previousBlockState;
-    private final BlockState newBlockState;
+public record AddUndoMessage(
+        BlockPos coordinate,
+        BlockState previousBlockState,
+        BlockState newBlockState
+) implements Message {
 
     public AddUndoMessage() {
-        coordinate = BlockPos.ZERO;
-        previousBlockState = null;
-        newBlockState = null;
-    }
-
-    public AddUndoMessage(BlockPos coordinate, BlockState previousBlockState, BlockState newBlockState) {
-        this.coordinate = coordinate;
-        this.previousBlockState = previousBlockState;
-        this.newBlockState = newBlockState;
+        this(BlockPos.ZERO, null, null);
     }
 
     public static void encode(AddUndoMessage message, FriendlyByteBuf buf) {
@@ -48,22 +41,10 @@ public class AddUndoMessage implements Message {
     }
 
     public static AddUndoMessage decode(FriendlyByteBuf buf) {
-        BlockPos coordinate = new BlockPos(buf.readInt(), buf.readInt(), buf.readInt());
-        BlockState previousBlockState = Block.stateById(buf.readInt());
-        BlockState newBlockState = Block.stateById(buf.readInt());
+        var coordinate = new BlockPos(buf.readInt(), buf.readInt(), buf.readInt());
+        var previousBlockState = Block.stateById(buf.readInt());
+        var newBlockState = Block.stateById(buf.readInt());
         return new AddUndoMessage(coordinate, previousBlockState, newBlockState);
-    }
-
-    public BlockPos getCoordinate() {
-        return coordinate;
-    }
-
-    public BlockState getPreviousBlockState() {
-        return previousBlockState;
-    }
-
-    public BlockState getNewBlockState() {
-        return newBlockState;
     }
 
     public static class Serializer implements MessageSerializer<AddUndoMessage> {
@@ -84,18 +65,7 @@ public class AddUndoMessage implements Message {
 
         @Override
         public void handleServerSide(MinecraftServer server, ServerPlayer player, ServerGamePacketListenerImpl handler, AddUndoMessage message, PacketSender responseSender) {
-            // TODO: 13/9/22
         }
-//        public static void handle(AddUndoMessage message, Supplier<NetworkEvent.Context> ctx) {
-//            ctx.get().enqueueWork(() -> {
-//                if (ctx.get().getDirection().getReceptionSide() == LogicalSide.CLIENT) {
-//                    //Received clientside
-//                    DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ClientHandler.handle(message, ctx));
-//                }
-//            });
-//            ctx.get().setPacketHandled(true);
-//        }
-
     }
 
     @Environment(EnvType.CLIENT)
@@ -106,17 +76,17 @@ public class AddUndoMessage implements Message {
             client.execute(() -> {
                 if (player != null) {
                     UndoRedo.addUndo(player, new BlockSet(
-                            new ArrayList<BlockPos>() {{
-                                add(message.getCoordinate());
+                            new ArrayList<>() {{
+                                add(message.coordinate());
                             }},
-                            new ArrayList<BlockState>() {{
-                                add(message.getPreviousBlockState());
+                            new ArrayList<>() {{
+                                add(message.previousBlockState());
                             }},
-                            new ArrayList<BlockState>() {{
-                                add(message.getNewBlockState());
+                            new ArrayList<>() {{
+                                add(message.newBlockState());
                             }},
                             new Vec3(0, 0, 0),
-                            message.getCoordinate(), message.getCoordinate()
+                            message.coordinate(), message.coordinate()
                     ));
                 }
             });

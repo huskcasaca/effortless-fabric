@@ -1,6 +1,5 @@
 package dev.huskcasaca.effortless.render;
 
-import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -18,7 +17,6 @@ import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -36,15 +34,15 @@ public class RenderHandler {
 //        if (event.getPhase() != EventPriority.NORMAL || event.getStage() != AFTER_PARTICLES)
 //            return;
 
-        PoseStack matrixStack = poseStack;
-        BufferBuilder bufferBuilder = Tesselator.getInstance().getBuilder();
-        MultiBufferSource.BufferSource renderTypeBuffer = MultiBufferSource.immediate(bufferBuilder);
+        var matrixStack = poseStack;
+        var bufferBuilder = Tesselator.getInstance().getBuilder();
+        var renderTypeBuffer = MultiBufferSource.immediate(bufferBuilder);
 
-        Player player = Minecraft.getInstance().player;
-        ModeSettingsManager.ModeSettings modeSettings = ModeSettingsManager.getModeSettings(player);
-        ModifierSettingsManager.ModifierSettings modifierSettings = ModifierSettingsManager.getModifierSettings(player);
+        var player = Minecraft.getInstance().player;
+        var modeSettings = ModeSettingsManager.getModeSettings(player);
+        var modifierSettings = ModifierSettingsManager.getModifierSettings(player);
 
-        Vec3 projectedView = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
+        var projectedView = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
 
         matrixStack.pushPose();
         matrixStack.translate(-projectedView.x, -projectedView.y, -projectedView.z);
@@ -134,12 +132,12 @@ public class RenderHandler {
 //    public void sendBlockBreakProgress(int breakerId, BlockPos pos, int progress) {
 //        Minecraft mc = Minecraft.getInstance();
 //
-//        ModifierSettingsManager.ModifierSettings modifierSettings = ModifierSettingsManager.getModifierSettings(mc.player);
+//        var modifierSettings = ModifierSettingsManager.getModifierSettings(mc.player);
 //        if (!BuildModifiers.isEnabled(modifierSettings, pos)) return;
 //
 //        List<BlockPos> coordinates = BuildModifiers.findCoordinates(mc.player, pos);
 //        for (int i = 1; i < coordinates.size(); i++) {
-//            BlockPos coordinate = coordinates.get(i);
+//            var coordinate = coordinates.get(i);
 //            if (SurvivalHelper.canBreak(mc.world, mc.player, coordinate)) {
 //                //Send i as entity id because only one block can be broken per id
 //                //Unless i happens to be the player id, then take something else

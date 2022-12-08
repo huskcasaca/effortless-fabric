@@ -18,25 +18,20 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 /**
  * Shares mode settings (see ModeSettingsManager) between server and client
  */
-public class ModeSettingsMessage implements Message {
-
-    private ModeSettings modeSettings;
-
-    public ModeSettingsMessage() {
-    }
-
-    public ModeSettingsMessage(ModeSettings modeSettings) {
-        this.modeSettings = modeSettings;
-    }
+public record ModeSettingsMessage(
+        ModeSettings modeSettings
+) implements Message {
 
     public static void encode(ModeSettingsMessage message, FriendlyByteBuf buf) {
-        buf.writeInt(message.modeSettings.getBuildMode().ordinal());
+        buf.writeInt(message.modeSettings.buildMode().ordinal());
+        buf.writeBoolean(message.modeSettings.enableMagnet());
     }
 
     public static ModeSettingsMessage decode(FriendlyByteBuf buf) {
-        BuildMode buildMode = BuildMode.values()[buf.readInt()];
+        var buildMode = BuildMode.values()[buf.readInt()];
+        boolean enableMagnet = buf.readBoolean();
 
-        return new ModeSettingsMessage(new ModeSettings(buildMode));
+        return new ModeSettingsMessage(new ModeSettings(buildMode, enableMagnet));
     }
 
     public static class Serializer implements MessageSerializer<ModeSettingsMessage> {
@@ -58,8 +53,7 @@ public class ModeSettingsMessage implements Message {
         @Override
         public void handleServerSide(MinecraftServer server, ServerPlayer player, ServerGamePacketListenerImpl handler, ModeSettingsMessage message, PacketSender responseSender) {
             server.execute(() -> {
-                ModeSettingsManager.sanitize(message.modeSettings, player);
-                ModeSettingsManager.setModeSettings(player, message.modeSettings);
+                ModeSettingsManager.setModeSettings(player, ModeSettingsManager.sanitize(message.modeSettings, player));
                 BuildModeHandler.initializeMode(player);
             });
         }
@@ -72,8 +66,7 @@ public class ModeSettingsMessage implements Message {
         @Override
         public void handleClientSide(Minecraft client, LocalPlayer player, ClientPacketListener handler, ModeSettingsMessage message, PacketSender responseSender) {
             client.execute(() -> {
-                ModeSettingsManager.sanitize(message.modeSettings, player);
-                ModeSettingsManager.setModeSettings(player, message.modeSettings);
+                ModeSettingsManager.setModeSettings(player, ModeSettingsManager.sanitize(message.modeSettings, player));
                 BuildModeHandler.initializeMode(player);
             });
         }

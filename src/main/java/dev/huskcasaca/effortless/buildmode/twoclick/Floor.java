@@ -15,13 +15,13 @@ import java.util.List;
 public class Floor extends TwoClickBuildable {
 
     public static BlockPos findFloor(Player player, BlockPos firstPos, boolean skipRaytrace) {
-        Vec3 look = BuildModeHandler.getPlayerLookVec(player);
-        Vec3 start = new Vec3(player.getX(), player.getY() + player.getEyeHeight(), player.getZ());
+        var look = BuildModeHandler.getPlayerLookVec(player);
+        var start = new Vec3(player.getX(), player.getY() + player.getEyeHeight(), player.getZ());
 
         List<Criteria> criteriaList = new ArrayList<>(3);
 
         //Y
-        Vec3 yBound = BuildModeHandler.findYBound(firstPos.getY(), start, look);
+        var yBound = BuildModeHandler.findYBound(firstPos.getY(), start, look);
         criteriaList.add(new Criteria(yBound, start));
 
         //Remove invalid criteria

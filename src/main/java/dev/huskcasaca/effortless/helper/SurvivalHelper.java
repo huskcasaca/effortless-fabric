@@ -1,7 +1,7 @@
 package dev.huskcasaca.effortless.helper;
 
-import dev.huskcasaca.effortless.BuildConfig;
 import dev.huskcasaca.effortless.buildmodifier.ModifierSettingsManager;
+import dev.huskcasaca.effortless.config.ConfigManager;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -24,7 +24,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.pattern.BlockInWorld;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.VoxelShape;
 
 import javax.annotation.Nullable;
 
@@ -213,7 +212,8 @@ public class SurvivalHelper {
 
         BlockState state = world.getBlockState(pos);
 
-        int miningLevel = BuildConfig.survivalBalancers.quickReplaceMiningLevel;
+        int miningLevel = ConfigManager.quickReplaceMiningLevel;
+        // TODO: 19/9/22 remove
         switch (miningLevel) {
             case -1:
                 return !state.requiresCorrectToolForDrops();
@@ -250,8 +250,8 @@ public class SurvivalHelper {
 
     //From World#mayPlace
     private static boolean mayPlace(Level world, Block blockIn, BlockState newBlockState, BlockPos pos, boolean skipCollisionCheck, Direction sidePlacedOn, @Nullable Entity placer) {
-        BlockState iblockstate1 = world.getBlockState(pos);
-        VoxelShape voxelShape = skipCollisionCheck ? null : blockIn.defaultBlockState().getCollisionShape(world, pos);
+        var oldBlockState = world.getBlockState(pos);
+        var voxelShape = skipCollisionCheck ? null : blockIn.defaultBlockState().getCollisionShape(world, pos);
 
         if (voxelShape != null && !world.isUnobstructed(placer, voxelShape)) {
             return false;
@@ -264,22 +264,22 @@ public class SurvivalHelper {
 
         //Check if same block
         //Necessary otherwise extra items will be dropped
-        if (iblockstate1 == newBlockState) {
+        if (oldBlockState == newBlockState) {
             return false;
         }
 
         //TODO 1.14 check what Material.CIRCUITS has become
-        if (iblockstate1.getMaterial() == Material.BUILDABLE_GLASS && blockIn == Blocks.ANVIL) {
+        if (oldBlockState.getMaterial() == Material.BUILDABLE_GLASS && blockIn == Blocks.ANVIL) {
             return true;
         }
 
         //Check quickreplace
-        if (placer instanceof Player && ModifierSettingsManager.getModifierSettings(((Player) placer)).doQuickReplace()) {
+        if (placer instanceof Player && ModifierSettingsManager.getModifierSettings(((Player) placer)).quickReplace()) {
             return true;
         }
 
         //TODO 1.13 replaceable
-        return iblockstate1.getMaterial().isReplaceable() /*&& canPlaceBlockOnSide(world, pos, sidePlacedOn)*/;
+        return oldBlockState.getMaterial().isReplaceable() /*&& canPlaceBlockOnSide(world, pos, sidePlacedOn)*/;
     }
 
 

@@ -71,10 +71,23 @@ public class BuildActionHandler {
                 UndoRedo.redo(player);
                 break;
             case REPLACE:
-                ModifierSettingsManager.ModifierSettings modifierSettings = ModifierSettingsManager.getModifierSettings(player);
-                modifierSettings.setQuickReplace(!modifierSettings.doQuickReplace());
+                var modifierSettings = ModifierSettingsManager.getModifierSettings(player);
+
+                modifierSettings = new ModifierSettingsManager.ModifierSettings(
+                        modifierSettings.arraySettings(), modifierSettings.mirrorSettings(), modifierSettings.radialMirrorSettings(),
+                        !modifierSettings.quickReplace(), modifierSettings.reachUpgrade()
+                );
+                ModifierSettingsManager.setModifierSettings(player, modifierSettings);
+
                 Effortless.log(player, ChatFormatting.GOLD + "Quick Replace " + ChatFormatting.RESET + (
-                        modifierSettings.doQuickReplace() ? "ON" : "OFF"), true);
+                        modifierSettings.quickReplace() ? (ChatFormatting.GREEN + "ON") : (ChatFormatting.RED + "OFF")) + ChatFormatting.RESET, true);
+                break;
+            case MAGNET:
+                var modeSettings = ModeSettingsManager.getModeSettings(player);
+                modeSettings = new ModeSettingsManager.ModeSettings(modeSettings.buildMode(), !modeSettings.enableMagnet());
+                ModeSettingsManager.setModeSettings(player, modeSettings);
+
+                Effortless.log(player, ChatFormatting.GOLD + "Item Magnet " + ChatFormatting.RESET + (modeSettings.enableMagnet() ? (ChatFormatting.GREEN + "ON") : (ChatFormatting.RED + "OFF")) + ChatFormatting.RESET, true);
                 break;
             case OPEN_MODIFIER_SETTINGS:
                 if (player.level.isClientSide)
@@ -84,7 +97,6 @@ public class BuildActionHandler {
                 if (player.level.isClientSide)
                     EffortlessClient.openPlayerSettings();
                 break;
-
             case NORMAL_SPEED:
                 buildSpeed = BuildAction.NORMAL_SPEED;
                 break;

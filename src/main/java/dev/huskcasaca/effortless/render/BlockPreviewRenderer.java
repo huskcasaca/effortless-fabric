@@ -2,7 +2,6 @@ package dev.huskcasaca.effortless.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import dev.huskcasaca.effortless.BuildConfig;
 import dev.huskcasaca.effortless.Effortless;
 import dev.huskcasaca.effortless.EffortlessClient;
 import dev.huskcasaca.effortless.buildmode.BuildMode;
@@ -13,6 +12,8 @@ import dev.huskcasaca.effortless.buildmode.ModeSettingsManager.ModeSettings;
 import dev.huskcasaca.effortless.buildmodifier.BuildModifierHandler;
 import dev.huskcasaca.effortless.buildmodifier.ModifierSettingsManager;
 import dev.huskcasaca.effortless.buildmodifier.ModifierSettingsManager.ModifierSettings;
+import dev.huskcasaca.effortless.config.ConfigManager;
+import dev.huskcasaca.effortless.config.PreviewConfig;
 import dev.huskcasaca.effortless.helper.CompatHelper;
 import dev.huskcasaca.effortless.helper.ReachHelper;
 import dev.huskcasaca.effortless.helper.SurvivalHelper;
@@ -20,9 +21,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundSource;
@@ -54,12 +53,12 @@ public class BlockPreviewRenderer {
 
         //Render placed blocks with dissolve effect
         //Use fancy shader if config allows, otherwise no dissolve
-        if (BuildConfig.visuals.useShaders) {
+        if (PreviewConfig.useShader()) {
             for (int i = 0; i < placedDataList.size(); i++) {
                 PlacedData placed = placedDataList.get(i);
                 if (placed.coordinates != null && !placed.coordinates.isEmpty()) {
 
-                    double totalTime = Mth.clampedLerp(30, 60, placed.firstPos.distSqr(placed.secondPos) / 100.0) * BuildConfig.visuals.dissolveTimeMultiplier;
+                    double totalTime = Mth.clampedLerp(30, 60, placed.firstPos.distSqr(placed.secondPos) / 100.0) * PreviewConfig.shaderDissolveTimeMultiplier();
                     float dissolve = (EffortlessClient.ticksInGame - placed.time) / (float) totalTime;
                     renderBlockPreviews(matrixStack, renderTypeBuffer, placed.coordinates, placed.blockStates, placed.itemStacks, dissolve, placed.firstPos, placed.secondPos, false, placed.breaking);
                 }
@@ -67,13 +66,13 @@ public class BlockPreviewRenderer {
         }
         //Expire
         placedDataList.removeIf(placed -> {
-            double totalTime = Mth.clampedLerp(30, 60, placed.firstPos.distSqr(placed.secondPos) / 100.0) * BuildConfig.visuals.dissolveTimeMultiplier;
+            double totalTime = Mth.clampedLerp(30, 60, placed.firstPos.distSqr(placed.secondPos) / 100.0) * PreviewConfig.shaderDissolveTimeMultiplier();
             return placed.time + totalTime < EffortlessClient.ticksInGame;
         });
 
         //Render block previews
         HitResult lookingAt = EffortlessClient.getLookingAt(player);
-        if (modeSettings.getBuildMode() == BuildMode.VANILLA)
+        if (modeSettings.buildMode() == BuildMode.VANILLA)
             lookingAt = Minecraft.getInstance().hitResult;
 
         ItemStack mainhand = player.getMainHandItem();
@@ -92,12 +91,13 @@ public class BlockPreviewRenderer {
             //TODO 1.13 replaceable
             boolean replaceable = player.level.getBlockState(startPos).getMaterial().isReplaceable();
             boolean becomesDoubleSlab = SurvivalHelper.doesBecomeDoubleSlab(player, startPos, blockLookingAt.getDirection());
-            if (!modifierSettings.doQuickReplace() && !toolInHand && !replaceable && !becomesDoubleSlab) {
+            if (!modifierSettings.quickReplace() && !toolInHand && !replaceable && !becomesDoubleSlab) {
                 startPos = startPos.relative(blockLookingAt.getDirection());
             }
 
             //Get under tall grass and other replaceable blocks
-            if (modifierSettings.doQuickReplace() && !toolInHand && replaceable) {
+            // TODO: 20/9/22 remove
+            if (modifierSettings.quickReplace() && !toolInHand && replaceable) {
                 startPos = startPos.below();
             }
 
@@ -112,7 +112,7 @@ public class BlockPreviewRenderer {
             //Keep blockstate the same for every block in the buildmode
             //So dont rotate blocks when in the middle of placing wall etc.
             if (BuildModeHandler.isActive(player)) {
-                Buildable buildModeInstance = modeSettings.getBuildMode().instance;
+                Buildable buildModeInstance = modeSettings.buildMode().instance;
                 if (buildModeInstance.getSideHit(player) != null) sideHit = buildModeInstance.getSideHit(player);
                 if (buildModeInstance.getHitVec(player) != null) hitVec = buildModeInstance.getHitVec(player);
             }
@@ -123,10 +123,11 @@ public class BlockPreviewRenderer {
                 boolean breaking = BuildModeHandler.currentlyBreakingClient.get(player) != null && BuildModeHandler.currentlyBreakingClient.get(player);
 
                 //get coordinates
-                List<BlockPos> startCoordinates = BuildModeHandler.findCoordinates(player, startPos, breaking || modifierSettings.doQuickReplace());
+                List<BlockPos> startCoordinates = BuildModeHandler.findCoordinates(player, startPos, breaking || modifierSettings.quickReplace());
 
                 //Remember first and last point for the shader
-                BlockPos firstPos = BlockPos.ZERO, secondPos = BlockPos.ZERO;
+                var firstPos = BlockPos.ZERO;
+                var secondPos = BlockPos.ZERO;
                 if (!startCoordinates.isEmpty()) {
                     firstPos = startCoordinates.get(0);
                     secondPos = startCoordinates.get(startCoordinates.size() - 1);
@@ -150,7 +151,7 @@ public class BlockPreviewRenderer {
                 List<BlockState> blockStates = new ArrayList<>();
                 if (breaking) {
                     //Find blockstate of world
-                    for (BlockPos coordinate : newCoordinates) {
+                    for (var coordinate : newCoordinates) {
                         blockStates.add(player.level.getBlockState(coordinate));
                     }
                 } else {
@@ -187,12 +188,12 @@ public class BlockPreviewRenderer {
                     int blockCount;
 
                     //Use fancy shader if config allows, otherwise outlines
-                    if (BuildConfig.visuals.useShaders && newCoordinates.size() < BuildConfig.visuals.shaderThreshold) {
+                    if (PreviewConfig.useShader() && newCoordinates.size() < PreviewConfig.shaderThresholdRounded()) {
                         blockCount = renderBlockPreviews(matrixStack, renderTypeBuffer, newCoordinates, blockStates, itemStacks, 0f, firstPos, secondPos, !breaking, breaking);
                     } else {
                         VertexConsumer buffer = RenderHandler.beginLines(renderTypeBuffer);
 
-                        Vec3 color = new Vec3(1f, 1f, 1f);
+                        var color = new Vec3(1f, 1f, 1f);
                         if (breaking) color = new Vec3(1f, 0f, 0f);
 
                         for (int i = newCoordinates.size() - 1; i >= 0; i--) {
@@ -212,7 +213,7 @@ public class BlockPreviewRenderer {
                         int minX = Integer.MAX_VALUE, maxX = Integer.MIN_VALUE;
                         int minY = Integer.MAX_VALUE, maxY = Integer.MIN_VALUE;
                         int minZ = Integer.MAX_VALUE, maxZ = Integer.MIN_VALUE;
-                        for (BlockPos pos : startCoordinates) {
+                        for (var pos : startCoordinates) {
                             if (pos.getX() < minX) minX = pos.getX();
                             if (pos.getX() > maxX) maxX = pos.getX();
                             if (pos.getY() < minY) minY = pos.getY();
@@ -220,20 +221,23 @@ public class BlockPreviewRenderer {
                             if (pos.getZ() < minZ) minZ = pos.getZ();
                             if (pos.getZ() > maxZ) maxZ = pos.getZ();
                         }
-                        BlockPos dim = new BlockPos(maxX - minX + 1, maxY - minY + 1, maxZ - minZ + 1);
+                        var dim = new BlockPos(maxX - minX + 1, maxY - minY + 1, maxZ - minZ + 1);
 
-                        String dimensions = "(";
+                        String dimensions = " (";
                         if (dim.getX() > 1) dimensions += dim.getX() + "x";
                         if (dim.getZ() > 1) dimensions += dim.getZ() + "x";
                         if (dim.getY() > 1) dimensions += dim.getY() + "x";
                         dimensions = dimensions.substring(0, dimensions.length() - 1);
                         if (dimensions.length() > 1) dimensions += ")";
 
-                        Effortless.log(player, ChatFormatting.GOLD + ModeSettingsManager.getTranslatedModeOptionName(player) + ChatFormatting.RESET + " of " + blockCount + " blocks " + dimensions, true);
+                        Effortless.log(player, ChatFormatting.GOLD + ModeSettingsManager.getTranslatedModeOptionName(player) + ChatFormatting.RESET + " of " + blockCount + " " + (blockCount == 1 ? "block" : "blocks") + dimensions, true);
                     }
+                } else {
+                    Effortless.log(player, ChatFormatting.GOLD + ModeSettingsManager.getTranslatedModeOptionName(player) + ChatFormatting.RESET + " cannot be built", true);
                 }
 
-
+            } else {
+                Effortless.log(player, ChatFormatting.GOLD + ModeSettingsManager.getTranslatedModeOptionName(player) + ChatFormatting.RESET + " is reset ", true);
             }
 
             VertexConsumer buffer = RenderHandler.beginLines(renderTypeBuffer);
@@ -248,9 +252,9 @@ public class BlockPreviewRenderer {
                 //Only render first outline if further than normal reach
                 boolean excludeFirst = objectMouseOver != null && objectMouseOver.getType() == HitResult.Type.BLOCK;
                 for (int i = excludeFirst ? 1 : 0; i < breakCoordinates.size(); i++) {
-                    BlockPos coordinate = breakCoordinates.get(i);
+                    var coordinate = breakCoordinates.get(i);
 
-                    BlockState blockState = player.level.getBlockState(coordinate);
+                    var blockState = player.level.getBlockState(coordinate);
                     if (!blockState.isAir()) {
                         if (SurvivalHelper.canBreak(player.level, player, coordinate) || i == 0) {
                             VoxelShape collisionShape = blockState.getCollisionShape(player.level, coordinate);
@@ -265,31 +269,30 @@ public class BlockPreviewRenderer {
 
     //Whether to draw any block previews or outlines
     public static boolean doRenderBlockPreviews(ModifierSettings modifierSettings, ModeSettings modeSettings, BlockPos startPos) {
-        return modeSettings.getBuildMode() != BuildMode.VANILLA || BuildConfig.visuals.alwaysShowBlockPreview &&
-                (startPos != null && BuildModifierHandler.isEnabled(modifierSettings, startPos));
+        return ConfigManager.getGlobalPreviewConfig().isAlwaysShowBlockPreview() || (modeSettings.buildMode() != BuildMode.VANILLA);
     }
 
     protected static int renderBlockPreviews(PoseStack matrixStack, MultiBufferSource.BufferSource renderTypeBuffer, List<BlockPos> coordinates, List<BlockState> blockStates,
                                              List<ItemStack> itemStacks, float dissolve, BlockPos firstPos,
                                              BlockPos secondPos, boolean checkCanPlace, boolean red) {
-        Player player = Minecraft.getInstance().player;
-        ModifierSettings modifierSettings = ModifierSettingsManager.getModifierSettings(player);
-        BlockRenderDispatcher dispatcher = Minecraft.getInstance().getBlockRenderer();
+        var player = Minecraft.getInstance().player;
+        var modifierSettings = ModifierSettingsManager.getModifierSettings(player);
+        var dispatcher = Minecraft.getInstance().getBlockRenderer();
         int blocksValid = 0;
 
         if (coordinates.isEmpty()) return blocksValid;
 
         for (int i = coordinates.size() - 1; i >= 0; i--) {
-            BlockPos blockPos = coordinates.get(i);
-            BlockState blockState = blockStates.get(i);
-            ItemStack itemstack = itemStacks.isEmpty() ? ItemStack.EMPTY : itemStacks.get(i);
+            var blockPos = coordinates.get(i);
+            var blockState = blockStates.get(i);
+            var itemstack = itemStacks.isEmpty() ? ItemStack.EMPTY : itemStacks.get(i);
             if (CompatHelper.isItemBlockProxy(itemstack))
                 itemstack = CompatHelper.getItemBlockByState(itemstack, blockState);
 
             //Check if can place
             //If check is turned off, check if blockstate is the same (for dissolve effect)
             if ((!checkCanPlace /*&& player.world.getNewBlockState(blockPos) == blockState*/) || //TODO enable (breaks the breaking shader)
-                    SurvivalHelper.canPlace(player.level, player, blockPos, blockState, itemstack, modifierSettings.doQuickReplace(), Direction.UP)) {
+                    SurvivalHelper.canPlace(player.level, player, blockPos, blockState, itemstack, modifierSettings.quickReplace(), Direction.UP)) {
 
                 RenderHandler.renderBlockPreview(matrixStack, renderTypeBuffer, dispatcher, blockPos, blockState, dissolve, firstPos, secondPos, red);
                 blocksValid++;
@@ -304,16 +307,16 @@ public class BlockPreviewRenderer {
 
     public static void onBlocksPlaced(List<BlockPos> coordinates, List<ItemStack> itemStacks, List<BlockState> blockStates,
                                       BlockPos firstPos, BlockPos secondPos) {
-        LocalPlayer player = Minecraft.getInstance().player;
-        ModifierSettings modifierSettings = ModifierSettingsManager.getModifierSettings(player);
-        ModeSettings modeSettings = ModeSettingsManager.getModeSettings(player);
+        var player = Minecraft.getInstance().player;
+        var modifierSettings = ModifierSettingsManager.getModifierSettings(player);
+        var modeSettings = ModeSettingsManager.getModeSettings(player);
 
         //Check if block previews are enabled
         if (doRenderBlockPreviews(modifierSettings, modeSettings, firstPos)) {
 
             //Save current coordinates, blockstates and itemstacks
             if (!coordinates.isEmpty() && blockStates.size() == coordinates.size() &&
-                    coordinates.size() > 1 && coordinates.size() < BuildConfig.visuals.shaderThreshold) {
+                    coordinates.size() > 1 && coordinates.size() < PreviewConfig.shaderThresholdRounded()) {
 
                 placedDataList.add(new PlacedData(EffortlessClient.ticksInGame, coordinates, blockStates,
                         itemStacks, firstPos, secondPos, false));
@@ -328,16 +331,16 @@ public class BlockPreviewRenderer {
 
     public static void onBlocksBroken(List<BlockPos> coordinates, List<ItemStack> itemStacks, List<BlockState> blockStates,
                                       BlockPos firstPos, BlockPos secondPos) {
-        LocalPlayer player = Minecraft.getInstance().player;
-        ModifierSettings modifierSettings = ModifierSettingsManager.getModifierSettings(player);
-        ModeSettings modeSettings = ModeSettingsManager.getModeSettings(player);
+        var player = Minecraft.getInstance().player;
+        var modifierSettings = ModifierSettingsManager.getModifierSettings(player);
+        var modeSettings = ModeSettingsManager.getModeSettings(player);
 
         //Check if block previews are enabled
         if (doRenderBlockPreviews(modifierSettings, modeSettings, firstPos)) {
 
             //Save current coordinates, blockstates and itemstacks
             if (!coordinates.isEmpty() && blockStates.size() == coordinates.size() &&
-                    coordinates.size() > 1 && coordinates.size() < BuildConfig.visuals.shaderThreshold) {
+                    coordinates.size() > 1 && coordinates.size() < PreviewConfig.shaderThresholdRounded()) {
 
                 sortOnDistanceToPlayer(coordinates, player);
 

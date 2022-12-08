@@ -18,15 +18,12 @@ import net.minecraft.world.phys.HitResult;
  * Sends a message to the client asking for its lookat (objectmouseover) data.
  * This is then sent back with a BlockPlacedMessage.
  */
-public class RequestLookAtMessage implements Message {
-    private final boolean placeStartPos;
+public record RequestLookAtMessage(
+        boolean placeStartPos
+) implements Message {
 
     public RequestLookAtMessage() {
-        placeStartPos = false;
-    }
-
-    public RequestLookAtMessage(boolean placeStartPos) {
-        this.placeStartPos = placeStartPos;
+        this(false);
     }
 
     public static void encode(RequestLookAtMessage message, FriendlyByteBuf buf) {
@@ -71,7 +68,7 @@ public class RequestLookAtMessage implements Message {
         public void handleClientSide(Minecraft client, LocalPlayer player, ClientPacketListener handler, RequestLookAtMessage message, PacketSender responseSender) {
             client.execute(() -> {
 //            //Send back your info
-//                Player player = client.player;
+//                var player = client.player;
 //            //Prevent double placing in normal mode with placeStartPos false
 //            //Unless QuickReplace is on, then we do need to place start pos.
                 if (EffortlessClient.previousLookAt.getType() == HitResult.Type.BLOCK) {

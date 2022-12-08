@@ -32,32 +32,32 @@ public class BuildModeHandler {
     public static void onBlockPlacedMessage(Player player, BlockPlacedMessage message) {
 
         //Check if not in the middle of breaking
-        Dictionary<Player, Boolean> currentlyBreaking = player.level.isClientSide ? currentlyBreakingClient : currentlyBreakingServer;
+        var currentlyBreaking = player.level.isClientSide ? currentlyBreakingClient : currentlyBreakingServer;
         if (currentlyBreaking.get(player) != null && currentlyBreaking.get(player)) {
             //Cancel breaking
             initializeMode(player);
             return;
         }
 
-        ModifierSettingsManager.ModifierSettings modifierSettings = ModifierSettingsManager.getModifierSettings(player);
-        ModeSettingsManager.ModeSettings modeSettings = ModeSettingsManager.getModeSettings(player);
-        BuildMode buildMode = modeSettings.getBuildMode();
+        var modifierSettings = ModifierSettingsManager.getModifierSettings(player);
+        var modeSettings = ModeSettingsManager.getModeSettings(player);
+        var buildMode = modeSettings.buildMode();
 
         BlockPos startPos = null;
 
-        if (message.isBlockHit() && message.getBlockPos() != null) {
-            startPos = message.getBlockPos();
+        if (message.blockHit() && message.blockPos() != null) {
+            startPos = message.blockPos();
 
             //Offset in direction of sidehit if not quickreplace and not replaceable
             //TODO 1.13 replaceable
             boolean replaceable = player.level.getBlockState(startPos).getMaterial().isReplaceable();
-            boolean becomesDoubleSlab = SurvivalHelper.doesBecomeDoubleSlab(player, startPos, message.getSideHit());
-            if (!modifierSettings.doQuickReplace() && !replaceable && !becomesDoubleSlab) {
-                startPos = startPos.relative(message.getSideHit());
+            boolean becomesDoubleSlab = SurvivalHelper.doesBecomeDoubleSlab(player, startPos, message.sideHit());
+            if (!modifierSettings.quickReplace() && !replaceable && !becomesDoubleSlab) {
+                startPos = startPos.relative(message.sideHit());
             }
 
             //Get under tall grass and other replaceable blocks
-            if (modifierSettings.doQuickReplace() && replaceable) {
+            if (modifierSettings.quickReplace() && replaceable) {
                 startPos = startPos.below();
             }
 
@@ -71,7 +71,7 @@ public class BuildModeHandler {
 
         //Even when no starting block is found, call buildmode instance
         //We might want to place things in the air
-        List<BlockPos> coordinates = buildMode.instance.onRightClick(player, startPos, message.getSideHit(), message.getHitVec(), modifierSettings.doQuickReplace());
+        List<BlockPos> coordinates = buildMode.instance.onRightClick(player, startPos, message.sideHit(), message.hitVec(), modifierSettings.quickReplace());
 
         if (coordinates.isEmpty()) {
             currentlyBreaking.put(player, false);
@@ -84,13 +84,13 @@ public class BuildModeHandler {
             coordinates = coordinates.subList(0, limit);
         }
 
-        Direction sideHit = buildMode.instance.getSideHit(player);
-        if (sideHit == null) sideHit = message.getSideHit();
+        var sideHit = buildMode.instance.getSideHit(player);
+        if (sideHit == null) sideHit = message.sideHit();
 
-        Vec3 hitVec = buildMode.instance.getHitVec(player);
-        if (hitVec == null) hitVec = message.getHitVec();
+        var hitVec = buildMode.instance.getHitVec(player);
+        if (hitVec == null) hitVec = message.hitVec();
 
-        BuildModifierHandler.onBlockPlaced(player, coordinates, sideHit, hitVec, message.getPlaceStartPos());
+        BuildModifierHandler.onBlockPlaced(player, coordinates, sideHit, hitVec, message.placeStartPos());
 
         //Only works when finishing a buildmode is equal to placing some blocks
         //No intermediate blocks allowed
@@ -100,14 +100,14 @@ public class BuildModeHandler {
 
     //Use a network message to break blocks in the distance using clientside mouse input
     public static void onBlockBrokenMessage(Player player, BlockBrokenMessage message) {
-        BlockPos startPos = message.isBlockHit() ? message.getBlockPos() : null;
+        var startPos = message.blockHit() ? message.blockPos() : null;
         onBlockBroken(player, startPos, true);
     }
 
     public static void onBlockBroken(Player player, BlockPos startPos, boolean breakStartPos) {
 
         //Check if not in the middle of placing
-        Dictionary<Player, Boolean> currentlyBreaking = player.level.isClientSide ? currentlyBreakingClient : currentlyBreakingServer;
+        var currentlyBreaking = player.level.isClientSide ? currentlyBreakingClient : currentlyBreakingServer;
         if (currentlyBreaking.get(player) != null && !currentlyBreaking.get(player)) {
             //Cancel placing
             initializeMode(player);
@@ -122,12 +122,12 @@ public class BuildModeHandler {
             if (startPos == null) return;
         }
 
-        ModifierSettingsManager.ModifierSettings modifierSettings = ModifierSettingsManager.getModifierSettings(player);
-        ModeSettingsManager.ModeSettings modeSettings = ModeSettingsManager.getModeSettings(player);
+        var modifierSettings = ModifierSettingsManager.getModifierSettings(player);
+        var modeSettings = ModeSettingsManager.getModeSettings(player);
 
         //Get coordinates
-        BuildMode buildMode = modeSettings.getBuildMode();
-        List<BlockPos> coordinates = buildMode.instance.onRightClick(player, startPos, Direction.UP, Vec3.ZERO, true);
+        var buildMode = modeSettings.buildMode();
+        var coordinates = buildMode.instance.onRightClick(player, startPos, Direction.UP, Vec3.ZERO, true);
 
         if (coordinates.isEmpty()) {
             currentlyBreaking.put(player, true);
@@ -145,33 +145,36 @@ public class BuildModeHandler {
     public static List<BlockPos> findCoordinates(Player player, BlockPos startPos, boolean skipRaytrace) {
         List<BlockPos> coordinates = new ArrayList<>();
 
-        ModeSettingsManager.ModeSettings modeSettings = ModeSettingsManager.getModeSettings(player);
-        coordinates.addAll(modeSettings.getBuildMode().instance.findCoordinates(player, startPos, skipRaytrace));
+        var modeSettings = ModeSettingsManager.getModeSettings(player);
+        coordinates.addAll(modeSettings.buildMode().instance.findCoordinates(player, startPos, skipRaytrace));
 
         return coordinates;
     }
 
     public static void initializeMode(Player player) {
         //Resetting mode, so not placing or breaking
-        Dictionary<Player, Boolean> currentlyBreaking = player.level.isClientSide ? currentlyBreakingClient : currentlyBreakingServer;
+        if (player == null) {
+            return;
+        }
+        var currentlyBreaking = player.level.isClientSide ? currentlyBreakingClient : currentlyBreakingServer;
         currentlyBreaking.remove(player);
 
-        ModeSettingsManager.getModeSettings(player).getBuildMode().instance.initialize(player);
+        ModeSettingsManager.getModeSettings(player).buildMode().instance.initialize(player);
     }
 
     public static boolean isCurrentlyPlacing(Player player) {
-        Dictionary<Player, Boolean> currentlyBreaking = player.level.isClientSide ? currentlyBreakingClient : currentlyBreakingServer;
+        var currentlyBreaking = player.level.isClientSide ? currentlyBreakingClient : currentlyBreakingServer;
         return currentlyBreaking.get(player) != null && !currentlyBreaking.get(player);
     }
 
     public static boolean isCurrentlyBreaking(Player player) {
-        Dictionary<Player, Boolean> currentlyBreaking = player.level.isClientSide ? currentlyBreakingClient : currentlyBreakingServer;
+        var currentlyBreaking = player.level.isClientSide ? currentlyBreakingClient : currentlyBreakingServer;
         return currentlyBreaking.get(player) != null && currentlyBreaking.get(player);
     }
 
     //Either placing or breaking
     public static boolean isActive(Player player) {
-        Dictionary<Player, Boolean> currentlyBreaking = player.level.isClientSide ? currentlyBreakingClient : currentlyBreakingServer;
+        var currentlyBreaking = player.level.isClientSide ? currentlyBreakingClient : currentlyBreakingServer;
         return currentlyBreaking.get(player) != null;
     }
 

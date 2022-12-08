@@ -1,7 +1,6 @@
 package dev.huskcasaca.effortless.mixin;
 
 import dev.huskcasaca.effortless.EffortlessDataProvider;
-import dev.huskcasaca.effortless.buildmode.BuildMode;
 import dev.huskcasaca.effortless.buildmode.ModeSettingsManager;
 import dev.huskcasaca.effortless.buildmodifier.ModifierSettingsManager;
 import dev.huskcasaca.effortless.buildmodifier.array.Array;
@@ -44,13 +43,13 @@ public class PlayerTagMixin implements EffortlessDataProvider {
 
     @Unique
     private void readModeSettings(CompoundTag tag) {
-        modeSettings = new ModeSettingsManager.ModeSettings(BuildMode.VANILLA);
+        modeSettings = new ModeSettingsManager.ModeSettings();
     }
 
     @Unique
     private void writeModeSettings(CompoundTag tag) {
         if (modeSettings == null) modeSettings = new ModeSettingsManager.ModeSettings();
-        //tag.putInteger("buildMode", modeSettings.getBuildMode().ordinal());
+        //tag.putInteger("buildMode", modeSettings.buildMode().ordinal());
         //TODO add mode settings
     }
 
@@ -58,53 +57,63 @@ public class PlayerTagMixin implements EffortlessDataProvider {
     public void writeModifierSettings(CompoundTag tag) {
         if (modifierSettings == null) modifierSettings = new ModifierSettingsManager.ModifierSettings();
 
-        //MIRROR
-        Mirror.MirrorSettings m = modifierSettings.getMirrorSettings();
-        if (m == null) m = new Mirror.MirrorSettings();
-        tag.putBoolean("mirrorEnabled", m.enabled);
-        tag.putDouble("mirrorPosX", m.position.x);
-        tag.putDouble("mirrorPosY", m.position.y);
-        tag.putDouble("mirrorPosZ", m.position.z);
-        tag.putBoolean("mirrorX", m.mirrorX);
-        tag.putBoolean("mirrorY", m.mirrorY);
-        tag.putBoolean("mirrorZ", m.mirrorZ);
-        tag.putInt("mirrorRadius", m.radius);
-        tag.putBoolean("mirrorDrawLines", m.drawLines);
-        tag.putBoolean("mirrorDrawPlanes", m.drawPlanes);
-
         //ARRAY
-        Array.ArraySettings a = modifierSettings.getArraySettings();
-        if (a == null) a = new Array.ArraySettings();
-        tag.putBoolean("arrayEnabled", a.enabled);
-        tag.putInt("arrayOffsetX", a.offset.getX());
-        tag.putInt("arrayOffsetY", a.offset.getY());
-        tag.putInt("arrayOffsetZ", a.offset.getZ());
-        tag.putInt("arrayCount", a.count);
+        var arraySettings = modifierSettings.arraySettings();
+        if (arraySettings == null) arraySettings = new Array.ArraySettings();
+        tag.putBoolean("arrayEnabled", arraySettings.enabled());
+        tag.putInt("arrayOffsetX", arraySettings.offset().getX());
+        tag.putInt("arrayOffsetY", arraySettings.offset().getY());
+        tag.putInt("arrayOffsetZ", arraySettings.offset().getZ());
+        tag.putInt("arrayCount", arraySettings.count());
 
-        tag.putInt("reachUpgrade", modifierSettings.getReachUpgrade());
-
-        //compound.putBoolean("quickReplace", buildSettings.doQuickReplace()); dont save quickreplace
+        //MIRROR
+        var mirrorSettings = modifierSettings.mirrorSettings();
+        if (mirrorSettings == null) mirrorSettings = new Mirror.MirrorSettings();
+        tag.putBoolean("mirrorEnabled", mirrorSettings.enabled());
+        tag.putDouble("mirrorPosX", mirrorSettings.position().x);
+        tag.putDouble("mirrorPosY", mirrorSettings.position().y);
+        tag.putDouble("mirrorPosZ", mirrorSettings.position().z);
+        tag.putBoolean("mirrorX", mirrorSettings.mirrorX());
+        tag.putBoolean("mirrorY", mirrorSettings.mirrorY());
+        tag.putBoolean("mirrorZ", mirrorSettings.mirrorZ());
+        tag.putInt("mirrorRadius", mirrorSettings.radius());
+        tag.putBoolean("mirrorDrawLines", mirrorSettings.drawLines());
+        tag.putBoolean("mirrorDrawPlanes", mirrorSettings.drawPlanes());
 
         //RADIAL MIRROR
-        RadialMirror.RadialMirrorSettings r = modifierSettings.getRadialMirrorSettings();
-        if (r == null) r = new RadialMirror.RadialMirrorSettings();
-        tag.putBoolean("radialMirrorEnabled", r.enabled);
-        tag.putDouble("radialMirrorPosX", r.position.x);
-        tag.putDouble("radialMirrorPosY", r.position.y);
-        tag.putDouble("radialMirrorPosZ", r.position.z);
-        tag.putInt("radialMirrorSlices", r.slices);
-        tag.putBoolean("radialMirrorAlternate", r.alternate);
-        tag.putInt("radialMirrorRadius", r.radius);
-        tag.putBoolean("radialMirrorDrawLines", r.drawLines);
-        tag.putBoolean("radialMirrorDrawPlanes", r.drawPlanes);
+        var radialMirrorSettings = modifierSettings.radialMirrorSettings();
+        if (radialMirrorSettings == null) radialMirrorSettings = new RadialMirror.RadialMirrorSettings();
+        tag.putBoolean("radialMirrorEnabled", radialMirrorSettings.enabled());
+        tag.putDouble("radialMirrorPosX", radialMirrorSettings.position().x);
+        tag.putDouble("radialMirrorPosY", radialMirrorSettings.position().y);
+        tag.putDouble("radialMirrorPosZ", radialMirrorSettings.position().z);
+        tag.putInt("radialMirrorSlices", radialMirrorSettings.slices());
+        tag.putBoolean("radialMirrorAlternate", radialMirrorSettings.alternate());
+        tag.putInt("radialMirrorRadius", radialMirrorSettings.radius());
+        tag.putBoolean("radialMirrorDrawLines", radialMirrorSettings.drawLines());
+        tag.putBoolean("radialMirrorDrawPlanes", radialMirrorSettings.drawPlanes());
+
+        tag.putInt("reachUpgrade", modifierSettings.reachUpgrade());
+
+        //compound.putBoolean("quickReplace", buildSettings.quickReplace()); dont save quickreplace
+
     }
 
     @Unique
     public void readModifierSettings(CompoundTag tag) {
 
+        //ARRAY
+        boolean arrayEnabled = tag.getBoolean("arrayEnabled");
+        var arrayOffset = new BlockPos(
+                tag.getInt("arrayOffsetX"),
+                tag.getInt("arrayOffsetY"),
+                tag.getInt("arrayOffsetZ"));
+        int arrayCount = tag.getInt("arrayCount");
+        var arraySettings = new Array.ArraySettings(arrayEnabled, arrayOffset, arrayCount);
+
         //MIRROR
         boolean mirrorEnabled = tag.getBoolean("mirrorEnabled");
-        Vec3 mirrorPosition = new Vec3(
+        var mirrorPosition = new Vec3(
                 tag.getDouble("mirrorPosX"),
                 tag.getDouble("mirrorPosY"),
                 tag.getDouble("mirrorPosZ"));
@@ -114,16 +123,7 @@ public class PlayerTagMixin implements EffortlessDataProvider {
         int mirrorRadius = tag.getInt("mirrorRadius");
         boolean mirrorDrawLines = tag.getBoolean("mirrorDrawLines");
         boolean mirrorDrawPlanes = tag.getBoolean("mirrorDrawPlanes");
-        Mirror.MirrorSettings mirrorSettings = new Mirror.MirrorSettings(mirrorEnabled, mirrorPosition, mirrorX, mirrorY, mirrorZ, mirrorRadius, mirrorDrawLines, mirrorDrawPlanes);
-
-        //ARRAY
-        boolean arrayEnabled = tag.getBoolean("arrayEnabled");
-        BlockPos arrayOffset = new BlockPos(
-                tag.getInt("arrayOffsetX"),
-                tag.getInt("arrayOffsetY"),
-                tag.getInt("arrayOffsetZ"));
-        int arrayCount = tag.getInt("arrayCount");
-        Array.ArraySettings arraySettings = new Array.ArraySettings(arrayEnabled, arrayOffset, arrayCount);
+        var mirrorSettings = new Mirror.MirrorSettings(mirrorEnabled, mirrorPosition, mirrorX, mirrorY, mirrorZ, mirrorRadius, mirrorDrawLines, mirrorDrawPlanes);
 
         int reachUpgrade = tag.getInt("reachUpgrade");
 
@@ -131,7 +131,7 @@ public class PlayerTagMixin implements EffortlessDataProvider {
 
         //RADIAL MIRROR
         boolean radialMirrorEnabled = tag.getBoolean("radialMirrorEnabled");
-        Vec3 radialMirrorPosition = new Vec3(
+        var radialMirrorPosition = new Vec3(
                 tag.getDouble("radialMirrorPosX"),
                 tag.getDouble("radialMirrorPosY"),
                 tag.getDouble("radialMirrorPosZ"));
@@ -140,10 +140,10 @@ public class PlayerTagMixin implements EffortlessDataProvider {
         int radialMirrorRadius = tag.getInt("radialMirrorRadius");
         boolean radialMirrorDrawLines = tag.getBoolean("radialMirrorDrawLines");
         boolean radialMirrorDrawPlanes = tag.getBoolean("radialMirrorDrawPlanes");
-        RadialMirror.RadialMirrorSettings radialMirrorSettings = new RadialMirror.RadialMirrorSettings(radialMirrorEnabled, radialMirrorPosition,
+        var radialMirrorSettings = new RadialMirror.RadialMirrorSettings(radialMirrorEnabled, radialMirrorPosition,
                 radialMirrorSlices, radialMirrorAlternate, radialMirrorRadius, radialMirrorDrawLines, radialMirrorDrawPlanes);
 
-        modifierSettings = new ModifierSettingsManager.ModifierSettings(mirrorSettings, arraySettings, radialMirrorSettings, false, reachUpgrade);
+        modifierSettings = new ModifierSettingsManager.ModifierSettings(arraySettings, mirrorSettings, radialMirrorSettings, false, reachUpgrade);
     }
 
 

@@ -13,17 +13,17 @@ public abstract class ThreeClickBuildable extends MultipleClickBuildable {
 
     //Finds height after floor has been chosen in buildmodes with 3 clicks
     public static BlockPos findHeight(Player player, BlockPos secondPos, boolean skipRaytrace) {
-        Vec3 look = BuildModeHandler.getPlayerLookVec(player);
-        Vec3 start = new Vec3(player.getX(), player.getY() + player.getEyeHeight(), player.getZ());
+        var look = BuildModeHandler.getPlayerLookVec(player);
+        var start = new Vec3(player.getX(), player.getY() + player.getEyeHeight(), player.getZ());
 
         List<HeightCriteria> criteriaList = new ArrayList<>(3);
 
         //X
-        Vec3 xBound = BuildModeHandler.findXBound(secondPos.getX(), start, look);
+        var xBound = BuildModeHandler.findXBound(secondPos.getX(), start, look);
         criteriaList.add(new HeightCriteria(xBound, secondPos, start));
 
         //Z
-        Vec3 zBound = BuildModeHandler.findZBound(secondPos.getZ(), start, look);
+        var zBound = BuildModeHandler.findZBound(secondPos.getZ(), start, look);
         criteriaList.add(new HeightCriteria(zBound, secondPos, start));
 
         //Remove invalid criteria
@@ -34,7 +34,7 @@ public abstract class ThreeClickBuildable extends MultipleClickBuildable {
         if (criteriaList.isEmpty()) return null;
 
         //If only 1 is valid, choose that one
-        HeightCriteria selected = criteriaList.get(0);
+        var selected = criteriaList.get(0);
 
         //If multiple are valid, choose based on criteria
         if (criteriaList.size() > 1) {
@@ -65,7 +65,7 @@ public abstract class ThreeClickBuildable extends MultipleClickBuildable {
     public List<BlockPos> onRightClick(Player player, BlockPos blockPos, Direction sideHit, Vec3 hitVec, boolean skipRaytrace) {
         List<BlockPos> list = new ArrayList<>();
 
-        Dictionary<UUID, Integer> rightClickTable = player.level.isClientSide ? rightClickClientTable : rightClickServerTable;
+        var rightClickTable = player.level.isClientSide ? rightClickClientTable : rightClickServerTable;
         int rightClickNr = rightClickTable.get(player.getUUID());
         rightClickNr++;
         rightClickTable.put(player.getUUID(), rightClickNr);
@@ -84,8 +84,8 @@ public abstract class ThreeClickBuildable extends MultipleClickBuildable {
             //Keep list empty, dont place any blocks yet
         } else if (rightClickNr == 2) {
             //Second click, find other floor point
-            BlockPos firstPos = firstPosTable.get(player.getUUID());
-            BlockPos secondPos = findSecondPos(player, firstPos, true);
+            var firstPos = firstPosTable.get(player.getUUID());
+            var secondPos = findSecondPos(player, firstPos, true);
 
             if (secondPos == null) {
                 rightClickTable.put(player.getUUID(), 1);
@@ -106,16 +106,16 @@ public abstract class ThreeClickBuildable extends MultipleClickBuildable {
     @Override
     public List<BlockPos> findCoordinates(Player player, BlockPos blockPos, boolean skipRaytrace) {
         List<BlockPos> list = new ArrayList<>();
-        Dictionary<UUID, Integer> rightClickTable = player.level.isClientSide ? rightClickClientTable : rightClickServerTable;
+        var rightClickTable = player.level.isClientSide ? rightClickClientTable : rightClickServerTable;
         int rightClickNr = rightClickTable.get(player.getUUID());
 
         if (rightClickNr == 0) {
             if (blockPos != null)
                 list.add(blockPos);
         } else if (rightClickNr == 1) {
-            BlockPos firstPos = firstPosTable.get(player.getUUID());
+            var firstPos = firstPosTable.get(player.getUUID());
 
-            BlockPos secondPos = findSecondPos(player, firstPos, true);
+            var secondPos = findSecondPos(player, firstPos, true);
             if (secondPos == null) return list;
 
             //Limit amount of blocks you can place per row
@@ -137,10 +137,10 @@ public abstract class ThreeClickBuildable extends MultipleClickBuildable {
             list.addAll(getIntermediateBlocks(player, x1, y1, z1, x2, y2, z2));
 
         } else {
-            BlockPos firstPos = firstPosTable.get(player.getUUID());
-            BlockPos secondPos = secondPosTable.get(player.getUUID());
+            var firstPos = firstPosTable.get(player.getUUID());
+            var secondPos = secondPosTable.get(player.getUUID());
 
-            BlockPos thirdPos = findThirdPos(player, firstPos, secondPos, skipRaytrace);
+            var thirdPos = findThirdPos(player, firstPos, secondPos, skipRaytrace);
             if (thirdPos == null) return list;
 
             //Limit amount of blocks you can place per row

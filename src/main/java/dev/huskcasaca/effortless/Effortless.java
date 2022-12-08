@@ -5,6 +5,9 @@ import dev.huskcasaca.effortless.buildmode.BuildModeHandler;
 import dev.huskcasaca.effortless.buildmode.ModeSettingsManager;
 import dev.huskcasaca.effortless.buildmodifier.ModifierSettingsManager;
 import dev.huskcasaca.effortless.buildmodifier.UndoRedo;
+import dev.huskcasaca.effortless.buildmodifier.array.Array;
+import dev.huskcasaca.effortless.buildmodifier.mirror.Mirror;
+import dev.huskcasaca.effortless.buildmodifier.mirror.RadialMirror;
 import dev.huskcasaca.effortless.helper.ReachHelper;
 import dev.huskcasaca.effortless.network.AddUndoMessage;
 import dev.huskcasaca.effortless.network.ClearUndoMessage;
@@ -40,12 +43,12 @@ public class Effortless implements ModInitializer {
 
         //Cancel event if necessary
 //        ServerPlayer player = ((ServerPlayer) event.getEntity());
-        BuildMode buildMode = ModeSettingsManager.getModeSettings(player).getBuildMode();
-        ModifierSettingsManager.ModifierSettings modifierSettings = ModifierSettingsManager.getModifierSettings(player);
+        var buildMode = ModeSettingsManager.getModeSettings(player).buildMode();
+        var modifierSettings = ModifierSettingsManager.getModifierSettings(player);
 
         if (buildMode != BuildMode.VANILLA) {
             return false;
-        } else if (modifierSettings.doQuickReplace()) {
+        } else if (modifierSettings.quickReplace()) {
             //Cancel event and send message if QuickReplace
             PacketHandler.sendToClient(new RequestLookAtMessage(true), (ServerPlayer) player);
 //            PacketHandler.sendToClient(new AddUndoMessage(pos, event.getBlockSnapshot().getReplacedBlock(), state), (ServerPlayer)  player);
@@ -74,7 +77,7 @@ public class Effortless implements ModInitializer {
 
         //Cancel event if necessary
         //If cant break far then dont cancel event ever
-        BuildMode buildMode = ModeSettingsManager.getModeSettings(player).getBuildMode();
+        var buildMode = ModeSettingsManager.getModeSettings(player).buildMode();
         if (buildMode != BuildMode.VANILLA && ReachHelper.canBreakFar(player)) {
             return false;
         } else {
@@ -90,7 +93,8 @@ public class Effortless implements ModInitializer {
             return true;
         }
     }
-//
+
+    //
     public static void onPlayerLogin(ServerPlayer player) {
         ModifierSettingsManager.handleNewPlayer(player);
         ModeSettingsManager.handleNewPlayer(player);
@@ -111,15 +115,48 @@ public class Effortless implements ModInitializer {
         if (player.getCommandSenderWorld().isClientSide) return;
 
         //Set build mode to normal
-        ModeSettingsManager.ModeSettings modeSettings = ModeSettingsManager.getModeSettings(player);
-        modeSettings.setBuildMode(BuildMode.VANILLA);
+        var modeSettings = ModeSettingsManager.getModeSettings(player);
+        modeSettings = new ModeSettingsManager.ModeSettings(
+                BuildMode.VANILLA,
+                modeSettings.enableMagnet()
+        );
         ModeSettingsManager.setModeSettings(player, modeSettings);
 
         //Disable modifiers
-        ModifierSettingsManager.ModifierSettings modifierSettings = ModifierSettingsManager.getModifierSettings(player);
-        modifierSettings.getMirrorSettings().enabled = false;
-        modifierSettings.getRadialMirrorSettings().enabled = false;
-        modifierSettings.getArraySettings().enabled = false;
+        var modifierSettings = ModifierSettingsManager.getModifierSettings(player);
+        var arraySettings = modifierSettings.arraySettings();
+        arraySettings = new Array.ArraySettings(
+                false,
+                arraySettings.offset(),
+                arraySettings.count()
+        );
+        var mirrorSettings = modifierSettings.mirrorSettings();
+        mirrorSettings = new Mirror.MirrorSettings(
+                false,
+                mirrorSettings.position(),
+                mirrorSettings.mirrorX(),
+                mirrorSettings.mirrorY(),
+                mirrorSettings.mirrorZ(),
+                mirrorSettings.radius(),
+                mirrorSettings.drawLines(),
+                mirrorSettings.drawPlanes()
+        );
+        var radialMirrorSettings = modifierSettings.radialMirrorSettings();
+        radialMirrorSettings = new RadialMirror.RadialMirrorSettings(
+                false,
+                radialMirrorSettings.position(),
+                radialMirrorSettings.slices(),
+                radialMirrorSettings.alternate(),
+                radialMirrorSettings.radius(),
+                radialMirrorSettings.drawLines(),
+                radialMirrorSettings.drawPlanes()
+        );
+        modifierSettings = new ModifierSettingsManager.ModifierSettings(
+                arraySettings, mirrorSettings,
+                radialMirrorSettings,
+                modifierSettings.quickReplace(),
+                modifierSettings.reachUpgrade()
+        );
         ModifierSettingsManager.setModifierSettings(player, modifierSettings);
 
         ModifierSettingsManager.handleNewPlayer(player);

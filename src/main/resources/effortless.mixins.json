@@ -8,6 +8,7 @@
   "mixins": [
     "KeyMappingAccessor",
     "PlayerEventMixin",
+    "PlayerPickupMixin",
     "PlayerTagMixin",
     "ScreenRenderablesAccessor",
     "ScreenRenderHeaderAccessor",

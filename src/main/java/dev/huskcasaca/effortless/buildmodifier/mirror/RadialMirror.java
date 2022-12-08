@@ -20,29 +20,29 @@ public class RadialMirror implements Modifier {
         List<BlockPos> coordinates = new ArrayList<>();
 
         //find radial mirror settings for the player
-        RadialMirrorSettings r = ModifierSettingsManager.getModifierSettings(player).getRadialMirrorSettings();
-        if (!isEnabled(r, startPos)) return coordinates;
+        var radialMirrorSettings = ModifierSettingsManager.getModifierSettings(player).radialMirrorSettings();
+        if (!isEnabled(radialMirrorSettings, startPos)) return coordinates;
 
         //get angle between slices
-        double sliceAngle = 2 * Math.PI / r.slices;
+        double sliceAngle = 2 * Math.PI / radialMirrorSettings.slices;
 
-        Vec3 startVec = new Vec3(startPos.getX() + 0.5f, startPos.getY() + 0.5f, startPos.getZ() + 0.5f);
-        Vec3 relStartVec = startVec.subtract(r.position);
+        var startVec = new Vec3(startPos.getX() + 0.5f, startPos.getY() + 0.5f, startPos.getZ() + 0.5f);
+        var relStartVec = startVec.subtract(radialMirrorSettings.position);
 
         double startAngleToCenter = Mth.atan2(relStartVec.x, relStartVec.z);
         if (startAngleToCenter < 0) startAngleToCenter += Math.PI;
         double startAngleInSlice = startAngleToCenter % sliceAngle;
 
-        for (int i = 1; i < r.slices; i++) {
+        for (int i = 1; i < radialMirrorSettings.slices; i++) {
             double curAngle = sliceAngle * i;
 
             //alternate mirroring of slices
-            if (r.alternate && i % 2 == 1) {
+            if (radialMirrorSettings.alternate && i % 2 == 1) {
                 curAngle = curAngle - startAngleInSlice + (sliceAngle - startAngleInSlice);
             }
 
             Vec3 relNewVec = relStartVec.yRot((float) curAngle);
-            BlockPos newBlockPos = new BlockPos(r.position.add(relNewVec));
+            BlockPos newBlockPos = new BlockPos(radialMirrorSettings.position.add(relNewVec));
             if (!coordinates.contains(newBlockPos) && !newBlockPos.equals(startPos)) coordinates.add(newBlockPos);
         }
 
@@ -54,15 +54,15 @@ public class RadialMirror implements Modifier {
         List<BlockPos> coordinates = new ArrayList<>(); //to keep track of duplicates
 
         //find radial mirror settings for the player that placed the block
-        RadialMirrorSettings r = ModifierSettingsManager.getModifierSettings(player).getRadialMirrorSettings();
-        if (!isEnabled(r, startPos)) return blockStates;
+        var radialMirrorSettings = ModifierSettingsManager.getModifierSettings(player).radialMirrorSettings();
+        if (!isEnabled(radialMirrorSettings, startPos)) return blockStates;
 
 
         //get angle between slices
-        double sliceAngle = 2 * Math.PI / r.slices;
+        double sliceAngle = 2 * Math.PI / radialMirrorSettings.slices;
 
-        Vec3 startVec = new Vec3(startPos.getX() + 0.5f, startPos.getY() + 0.5f, startPos.getZ() + 0.5f);
-        Vec3 relStartVec = startVec.subtract(r.position);
+        var startVec = new Vec3(startPos.getX() + 0.5f, startPos.getY() + 0.5f, startPos.getZ() + 0.5f);
+        var relStartVec = startVec.subtract(radialMirrorSettings.position);
 
         double startAngleToCenter = Mth.atan2(relStartVec.x, relStartVec.z);
         double startAngleToCenterMod = startAngleToCenter < 0 ? startAngleToCenter + Math.PI : startAngleToCenter;
@@ -80,17 +80,17 @@ public class RadialMirror implements Modifier {
 //		}
 
         BlockState newBlockState;
-        for (int i = 1; i < r.slices; i++) {
+        for (int i = 1; i < radialMirrorSettings.slices; i++) {
             newBlockState = blockState;
             double curAngle = sliceAngle * i;
 
             //alternate mirroring of slices
-            if (r.alternate && i % 2 == 1) {
+            if (radialMirrorSettings.alternate && i % 2 == 1) {
                 curAngle = curAngle - startAngleInSlice + (sliceAngle - startAngleInSlice);
             }
 
             Vec3 relNewVec = relStartVec.yRot((float) curAngle);
-            BlockPos newBlockPos = new BlockPos(r.position.add(relNewVec));
+            BlockPos newBlockPos = new BlockPos(radialMirrorSettings.position.add(relNewVec));
             if (coordinates.contains(newBlockPos) || newBlockPos.equals(startPos)) continue; //filter out duplicates
             coordinates.add(newBlockPos);
 
@@ -104,7 +104,7 @@ public class RadialMirror implements Modifier {
 //			}
 
             //rotate
-            newBlockState = rotateBlockState(player, startPos, relNewVec, newBlockState, r.alternate && i % 2 == 1);
+            newBlockState = rotateBlockState(player, startPos, relNewVec, newBlockState, radialMirrorSettings.alternate && i % 2 == 1);
 
             blockStates.add(newBlockState);
             itemStacks.add(itemStack);
@@ -156,35 +156,28 @@ public class RadialMirror implements Modifier {
         return newBlockState;
     }
 
-    public static boolean isEnabled(RadialMirrorSettings r, BlockPos startPos) {
-        if (r == null || !r.enabled) return false;
+    public static boolean isEnabled(RadialMirrorSettings radialMirrorSettings, BlockPos startPos) {
+        if (radialMirrorSettings == null || !radialMirrorSettings.enabled) return false;
 
-        return !(new Vec3(startPos.getX() + 0.5, startPos.getY() + 0.5, startPos.getZ() + 0.5).subtract(r.position).lengthSqr() >
-                r.radius * r.radius);
+        return !(new Vec3(startPos.getX() + 0.5, startPos.getY() + 0.5, startPos.getZ() + 0.5).subtract(radialMirrorSettings.position).lengthSqr() >
+                radialMirrorSettings.radius * radialMirrorSettings.radius);
     }
 
-    public static class RadialMirrorSettings {
-        public boolean enabled = false;
-        public Vec3 position = new Vec3(0.5, 64.5, 0.5);
-        public int slices = 4;
-        public boolean alternate = false;
-        public int radius = 20;
-        public boolean drawLines = true, drawPlanes = false;
+    public record RadialMirrorSettings(
+            boolean enabled,
+            Vec3 position,
+            int slices,
+            boolean alternate,
+            int radius,
+            boolean drawLines,
+            boolean drawPlanes
+    ) {
 
         public RadialMirrorSettings() {
+            this(false, new Vec3(0.5, 64.5, 0.5), 4, false, 20, true, false);
         }
 
-        public RadialMirrorSettings(boolean enabled, Vec3 position, int slices, boolean alternate, int radius, boolean drawLines, boolean drawPlanes) {
-            this.enabled = enabled;
-            this.position = position;
-            this.slices = slices;
-            this.alternate = alternate;
-            this.radius = radius;
-            this.drawLines = drawLines;
-            this.drawPlanes = drawPlanes;
-        }
-
-        public int getReach() {
+        public int reach() {
             return radius * 2;
         }
     }
