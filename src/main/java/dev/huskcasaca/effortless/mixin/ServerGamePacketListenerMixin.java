@@ -45,16 +45,19 @@ public abstract class ServerGamePacketListenerMixin implements ServerEffortlessP
         ci.cancel();
     }
 
-    @Inject(method = "handleCustomPayload", at = @At("HEAD"))
+    @Inject(method = "handleCustomPayload", at = @At("HEAD"), cancellable = true)
     void handleCustomPayload(ServerboundCustomPayloadPacket serverboundCustomPayloadPacket, CallbackInfo ci) {
         ResourceLocation resourceLocation = serverboundCustomPayloadPacket.getIdentifier();
         FriendlyByteBuf friendlyByteBuf = null;
+        var deserializer = Packets.getDeserializer(resourceLocation);
+        if (deserializer == null) {
+            return;
+        } else {
+            ci.cancel();
+        }
         try {
             friendlyByteBuf = serverboundCustomPayloadPacket.getData();
-            var deserializer = Packets.getDeserializer(resourceLocation);
-            if (deserializer != null) {
-                deserializer.apply(friendlyByteBuf).handle(this);
-            }
+            deserializer.apply(friendlyByteBuf).handle(this);
         } finally {
             if (friendlyByteBuf != null) {
 //                friendlyByteBuf.release();
@@ -64,46 +67,36 @@ public abstract class ServerGamePacketListenerMixin implements ServerEffortlessP
 
     @Override
     public void handle(ServerboundPlayerBreakBlockPacket packet) {
-        server.execute(() -> {
-            BuildModeHandler.onBlockBrokenPacketReceived(player, packet);
-        });
+        BuildModeHandler.onBlockBrokenPacketReceived(player, packet);
     }
 
     @Override
     public void handle(ServerboundPlayerBuildActionPacket packet) {
-        server.execute(() -> {
-            BuildActionHandler.performAction(player, packet.action());
-        });
+        BuildActionHandler.performAction(player, packet.action());
     }
 
     @Override
     public void handle(ServerboundPlayerPlaceBlockPacket packet) {
-        server.execute(() -> BuildModeHandler.onBlockPlacedPacketReceived(player, packet));
+        BuildModeHandler.onBlockPlacedPacketReceived(player, packet);
         // TODO: 18/11/22  //Nod RenderHandler to do the dissolve shader effect
         //            client.execute(() -> BlockPreviewRenderer.onBlocksPlaced());
     }
 
     @Override
     public void handle(ServerboundPlayerSetBuildModePacket packet) {
-        server.execute(() -> {
-            BuildModeHelper.setModeSettings(player, BuildModeHelper.sanitize(packet.modeSettings(), player));
-            BuildModeHandler.initializeMode(player);
-        });
+        BuildModeHelper.setModeSettings(player, BuildModeHelper.sanitize(packet.modeSettings(), player));
+        BuildModeHandler.initializeMode(player);
     }
 
     @Override
     public void handle(ServerboundPlayerSetBuildModifierPacket packet) {
-        server.execute(() -> {
-            BuildModifierHelper.setModifierSettings(player, BuildModifierHelper.sanitize(packet.modifierSettings(), player));
-        });
+        BuildModifierHelper.setModifierSettings(player, BuildModifierHelper.sanitize(packet.modifierSettings(), player));
     }
 
     @Override
     public void handle(ServerboundPlayerSetBuildReachPacket packet) {
-        server.execute(() -> {
-            ReachHelper.setReachSettings(player, ReachHelper.sanitize(packet.reachSettings(), player));
-            BuildModeHandler.initializeMode(player);
-        });
+        ReachHelper.setReachSettings(player, ReachHelper.sanitize(packet.reachSettings(), player));
+        BuildModeHandler.initializeMode(player);
     }
 
 }

@@ -1,6 +1,5 @@
 package dev.huskcasaca.effortless.mixin;
 
-import dev.huskcasaca.effortless.Effortless;
 import dev.huskcasaca.effortless.EffortlessClient;
 import dev.huskcasaca.effortless.buildreach.ReachHelper;
 import dev.huskcasaca.effortless.buildmode.BuildModeHandler;
@@ -13,6 +12,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.PacketUtils;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.game.ServerboundCustomPayloadPacket;
 import net.minecraft.resources.ResourceLocation;
@@ -44,7 +45,7 @@ public abstract class ClientGamePacketListenerMixin implements ClientPlayerPacke
 
     @Inject(method = "handleCustomPayload", at = @At("HEAD"), cancellable = true)
     private void handleCustomPayload(ClientboundCustomPayloadPacket clientboundCustomPayloadPacket, CallbackInfo ci) {
-//        PacketUtils.ensureRunningOnSameThread(clientboundCustomPayloadPacket, this, this.minecraft);
+        PacketUtils.ensureRunningOnSameThread(clientboundCustomPayloadPacket, (ClientGamePacketListener) this, this.minecraft);
         ResourceLocation resourceLocation = clientboundCustomPayloadPacket.getIdentifier();
         var deserializer = Packets.getDeserializer(resourceLocation);
         if (deserializer == null) {
@@ -58,48 +59,40 @@ public abstract class ClientGamePacketListenerMixin implements ClientPlayerPacke
             deserializer.apply(friendlyByteBuf).handle(this);
         } finally {
             if (friendlyByteBuf != null) {
-//                friendlyByteBuf.release();
+                friendlyByteBuf.release();
             }
         }
     }
 
     @Override
     public void handle(ClientboundPlayerBuildModePacket packet) {
-        minecraft.execute(() -> {
-            BuildModeHelper.setModeSettings(minecraft.player, BuildModeHelper.sanitize(packet.modeSettings(), minecraft.player));
-            BuildModeHandler.initializeMode(minecraft.player);
-        });
+        BuildModeHelper.setModeSettings(minecraft.player, BuildModeHelper.sanitize(packet.modeSettings(), minecraft.player));
+        BuildModeHandler.initializeMode(minecraft.player);
     }
 
     @Override
     public void handle(ClientboundPlayerBuildModifierPacket packet) {
-        minecraft.execute(() -> {
-            BuildModifierHelper.setModifierSettings(minecraft.player, BuildModifierHelper.sanitize(packet.modifierSettings(), minecraft.player));
-        });
+        BuildModifierHelper.setModifierSettings(minecraft.player, BuildModifierHelper.sanitize(packet.modifierSettings(), minecraft.player));
     }
 
     @Override
     public void handle(ClientboundPlayerReachPacket packet) {
 
-        minecraft.execute(() -> {
-            ReachHelper.setReachSettings(minecraft.player, ReachHelper.sanitize(packet.reachSettings(), minecraft.player));
-            BuildModeHandler.initializeMode(minecraft.player);
-        });
+        ReachHelper.setReachSettings(minecraft.player, ReachHelper.sanitize(packet.reachSettings(), minecraft.player));
+        BuildModeHandler.initializeMode(minecraft.player);
     }
 
     @Override
     public void handle(ClientboundPlayerRequestLookAtPacket packet) {
-        minecraft.execute(() -> {
 //            //Send back your info
 //                var player = client.player;
 //            //Prevent double placing in normal mode with placeStartPos false
 //            //Unless QuickReplace is on, then we do need to place start pos.
-            if (EffortlessClient.previousLookAt.getType() == HitResult.Type.BLOCK) {
-                Packets.sendToServer(new ServerboundPlayerPlaceBlockPacket((BlockHitResult) EffortlessClient.previousLookAt, packet.placeStartPos()));
-            } else {
-                Packets.sendToServer(new ServerboundPlayerPlaceBlockPacket());
-            }
-        });
+        if (EffortlessClient.previousLookAt.getType() == HitResult.Type.BLOCK) {
+            Packets.sendToServer(new ServerboundPlayerPlaceBlockPacket((BlockHitResult) EffortlessClient.previousLookAt, packet.placeStartPos()));
+        } else {
+            Packets.sendToServer(new ServerboundPlayerPlaceBlockPacket());
+        }
     }
 
 }
