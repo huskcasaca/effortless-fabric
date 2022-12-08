@@ -11,7 +11,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -43,7 +43,7 @@ public class RadialMirrorSettingsPane extends ExpandableScrollEntry {
     }
 
     @Override
-    public void init(List<Renderable> renderables) {
+    public void init(List<Widget> renderables) {
         super.init(renderables);
 
         int y = top - 2;
@@ -180,7 +180,7 @@ public class RadialMirrorSettingsPane extends ExpandableScrollEntry {
 
         buttonRadialMirrorEnabled.render(ms, mouseX, mouseY, partialTicks);
         if (buttonRadialMirrorEnabled.isChecked()) {
-            buttonRadialMirrorEnabled.setY(y);
+            buttonRadialMirrorEnabled.y = y;
             font.draw(ms, "Radial mirror enabled", left + offset, y + 2, 0xFFFFFF);
 
             var positionOffsetX0 = left + Dimen.SECTION_OFFSET_X0;
@@ -207,19 +207,19 @@ public class RadialMirrorSettingsPane extends ExpandableScrollEntry {
             font.draw(ms, "Slices", positionOffsetX1, positionOffsetY1, 0xFFFFFF);
             textRadialMirrorSlices.y = positionOffsetY1 + componentOffsetY;
 
-            buttonCurrentPosition.setY(positionOffsetY2 - 6);
-            buttonToggleOdd.setY(positionOffsetY2 - 6);
-            buttonDrawLines.setY(positionOffsetY2 - 6);
-            buttonDrawPlanes.setY(positionOffsetY2 - 6);
+            buttonCurrentPosition.y = positionOffsetY2 - 6;
+            buttonToggleOdd.y = positionOffsetY2 - 6;
+            buttonDrawLines.y = positionOffsetY2 - 6;
+            buttonDrawPlanes.y = positionOffsetY2 - 6;
 
-            buttonRadialMirrorAlternate.setY(positionOffsetY3);
+            buttonRadialMirrorAlternate.y = positionOffsetY3;
 
             radialMirrorButtonList.forEach(button -> button.render(ms, mouseX, mouseY, partialTicks));
             radialMirrorIconButtonList.forEach(button -> button.render(ms, mouseX, mouseY, partialTicks));
             radialMirrorNumberFieldList
                     .forEach(numberField -> numberField.drawNumberField(ms, mouseX, mouseY, partialTicks));
         } else {
-            buttonRadialMirrorEnabled.setY(y);
+            buttonRadialMirrorEnabled.y = y;
             font.draw(ms, "Radial mirror disabled", left + offset, y + 2, 0x999999);
         }
 

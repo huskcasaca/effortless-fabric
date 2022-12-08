@@ -8,7 +8,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.util.Mth;
@@ -395,7 +395,7 @@ public class ScrollPane extends Slot {
     }
 
     //PASSTHROUGHS
-    public void init(List<Renderable> renderables) {
+    public void init(List<Widget> renderables) {
         for (IScrollEntry entry : this.listEntries) {
             entry.init(renderables);
         }
@@ -433,7 +433,7 @@ public class ScrollPane extends Slot {
     }
 
     public interface IScrollEntry {
-        void init(List<Renderable> renderables);
+        void init(List<Widget> renderables);
 
         void updateScreen();
 

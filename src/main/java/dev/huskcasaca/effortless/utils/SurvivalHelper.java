@@ -249,9 +249,7 @@ public class SurvivalHelper {
         } else {
             //Adventure mode
             BlockInWorld blockinworld = new BlockInWorld(world, pos, false);
-            return false;
-            // FIXME: 20/11/22
-//            return stack.hasAdventureModePlaceTagForBlock(world.registryAccess().registryOrThrow(Registry.BLOCK_REGISTRY), blockinworld);
+            return stack.hasAdventureModePlaceTagForBlock(world.registryAccess().registryOrThrow(Registry.BLOCK_REGISTRY), blockinworld);
         }
     }
 

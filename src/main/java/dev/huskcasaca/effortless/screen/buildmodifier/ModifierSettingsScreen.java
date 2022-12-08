@@ -60,7 +60,7 @@ public class ModifierSettingsScreen extends Screen {
             if (player != null) {
                 player.closeContainer();
             }
-        }, Button.DEFAULT_NARRATION);
+        });
         addRenderableOnly(buttonDone);
     }
 
