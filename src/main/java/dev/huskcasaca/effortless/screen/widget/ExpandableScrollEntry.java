@@ -6,7 +6,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.components.Widget;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.Screen;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -31,7 +31,7 @@ public abstract class ExpandableScrollEntry implements ScrollPane.IScrollEntry {
     }
 
     @Override
-    public void init(List<Widget> renderables) {
+    public void init(List<Renderable> renderables) {
         left = scrollPane.getWidth() / 2 - 140;
         right = scrollPane.getWidth() / 2 + 140;
         top = scrollPane.getHeight() / 2 - 100;

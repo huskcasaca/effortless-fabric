@@ -4,6 +4,7 @@ import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.ResourceProvider;
 
 import java.io.IOException;
 import java.util.function.Consumer;
@@ -18,7 +19,7 @@ public class ClientReloadShadersEvent {
 
     @FunctionalInterface
     public interface ShaderRegister {
-        void onRegisterShader(ResourceManager manager, ShadersSink sink) throws IOException;
+        void onRegisterShader(ResourceProvider manager, ShadersSink sink) throws IOException;
 
         @FunctionalInterface
         interface ShadersSink {

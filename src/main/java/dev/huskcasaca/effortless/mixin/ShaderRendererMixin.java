@@ -6,6 +6,7 @@ import dev.huskcasaca.effortless.event.ClientReloadShadersEvent;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.ResourceProvider;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -20,9 +21,9 @@ import java.util.function.Consumer;
 public abstract class ShaderRendererMixin {
 
     @Inject(method = "reloadShaders", at = @At(value = "INVOKE", target = "Ljava/util/List;add(Ljava/lang/Object;)Z", ordinal = 0), locals = LocalCapture.CAPTURE_FAILEXCEPTION)
-    public void reloadShaders(ResourceManager resourceManager, CallbackInfo ci, List<Program> programs, List<Pair<ShaderInstance, Consumer<ShaderInstance>>> shaders) throws IOException {
+    public void reloadShaders(ResourceProvider resourceProvider, CallbackInfo ci, List<Program> programs, List<Pair<ShaderInstance, Consumer<ShaderInstance>>> shaders) throws IOException {
         ClientReloadShadersEvent.REGISTER_SHADER.invoker().onRegisterShader(
-                resourceManager,
+                resourceProvider,
                 (shader, callback) -> shaders.add(Pair.of(shader, callback))
         );
     }

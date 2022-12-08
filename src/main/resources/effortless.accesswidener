@@ -1,7 +1,7 @@
 accessWidener v2 named
 
 accessible method net/minecraft/client/gui/screens/Screen addRenderableWidget (Lnet/minecraft/client/gui/components/events/GuiEventListener;)Lnet/minecraft/client/gui/components/events/GuiEventListener;
-accessible method net/minecraft/client/gui/screens/Screen addRenderableOnly (Lnet/minecraft/client/gui/components/Widget;)Lnet/minecraft/client/gui/components/Widget;
+accessible method net/minecraft/client/gui/screens/Screen addRenderableOnly (Lnet/minecraft/client/gui/components/Renderable;)Lnet/minecraft/client/gui/components/Renderable;
 accessible method net/minecraft/client/gui/screens/Screen addWidget (Lnet/minecraft/client/gui/components/events/GuiEventListener;)Lnet/minecraft/client/gui/components/events/GuiEventListener;
 accessible field net/minecraft/client/gui/screens/Screen narratables Ljava/util/List;
 accessible field net/minecraft/client/gui/screens/Screen renderables Ljava/util/List;
@@ -15,3 +15,6 @@ transitive-accessible class net/minecraft/client/renderer/RenderType$OutlineProp
 transitive-accessible method net/minecraft/world/item/BlockItem getPlacementState (Lnet/minecraft/world/item/context/BlockPlaceContext;)Lnet/minecraft/world/level/block/state/BlockState;
 transitive-accessible field net/minecraft/client/gui/components/AbstractSelectionList renderHeader Z
 transitive-accessible field net/minecraft/client/KeyMapping key Lcom/mojang/blaze3d/platform/InputConstants$Key;
+
+transitive-accessible field net/minecraft/client/gui/components/Button DEFAULT_NARRATION Lnet/minecraft/client/gui/components/Button$CreateNarration;
+transitive-accessible method net/minecraft/client/gui/components/Button <init> (IIIILnet/minecraft/network/chat/Component;Lnet/minecraft/client/gui/components/Button$OnPress;Lnet/minecraft/client/gui/components/Button$CreateNarration;)V

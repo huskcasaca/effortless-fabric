@@ -13,7 +13,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.client.gui.components.Widget;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.TextComponent;
@@ -37,7 +37,7 @@ public class ArraySettingsPane extends ExpandableScrollEntry {
     }
 
     @Override
-    public void init(List<Widget> renderables) {
+    public void init(List<Renderable> renderables) {
         super.init(renderables);
 
         int y = top;
@@ -96,7 +96,7 @@ public class ArraySettingsPane extends ExpandableScrollEntry {
 
         buttonArrayEnabled.render(ms, mouseX, mouseY, partialTicks);
         if (buttonArrayEnabled.isChecked()) {
-            buttonArrayEnabled.y = yy;
+            buttonArrayEnabled.setY(yy);
             font.draw(ms, "Array enabled", left + offset, yy + 2, 0xFFFFFF);
 
             var positionOffsetX0 = left + 8;
@@ -128,7 +128,7 @@ public class ArraySettingsPane extends ExpandableScrollEntry {
 
             arrayNumberFieldList.forEach(numberField -> numberField.drawNumberField(ms, mouseX, mouseY, partialTicks));
         } else {
-            buttonArrayEnabled.y = yy;
+            buttonArrayEnabled.setY(yy);
             font.draw(ms, "Array disabled", left + offset, yy + 2, 0x999999);
         }
 

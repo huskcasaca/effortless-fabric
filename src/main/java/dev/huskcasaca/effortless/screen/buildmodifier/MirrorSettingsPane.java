@@ -11,7 +11,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.Widget;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -43,7 +43,7 @@ public class MirrorSettingsPane extends ExpandableScrollEntry {
     }
 
     @Override
-    public void init(List<Widget> renderables) {
+    public void init(List<Renderable> renderables) {
         super.init(renderables);
 
         int y = top - 2;
@@ -183,7 +183,7 @@ public class MirrorSettingsPane extends ExpandableScrollEntry {
 
         buttonMirrorEnabled.render(ms, mouseX, mouseY, partialTicks);
         if (buttonMirrorEnabled.isChecked()) {
-            buttonMirrorEnabled.y = y;
+            buttonMirrorEnabled.setY(y);
             font.draw(ms, "Mirror enabled", left + offset, y + 2, 0xFFFFFF);
 
             var positionOffsetX0 = left + Dimen.SECTION_OFFSET_X0;
@@ -209,20 +209,20 @@ public class MirrorSettingsPane extends ExpandableScrollEntry {
 
 
             font.draw(ms, "Axis", positionOffsetX1, positionOffsetY1, 0xFFFFFF);
-            buttonMirrorX.y = positionOffsetY1 - 2;
-            buttonMirrorY.y = positionOffsetY1 - 2;
-            buttonMirrorZ.y = positionOffsetY1 - 2;
+            buttonMirrorX.setY(positionOffsetY1 - 2);
+            buttonMirrorY.setY(positionOffsetY1 - 2);
+            buttonMirrorZ.setY(positionOffsetY1 - 2);
 
-            buttonCurrentPosition.y = positionOffsetY2 - 6;
-            buttonToggleOdd.y = positionOffsetY2 - 6;
-            buttonDrawLines.y = positionOffsetY2 - 6;
-            buttonDrawPlanes.y = positionOffsetY2 - 6;
+            buttonCurrentPosition.setY(positionOffsetY2 - 6);
+            buttonToggleOdd.setY(positionOffsetY2 - 6);
+            buttonDrawLines.setY(positionOffsetY2 - 6);
+            buttonDrawPlanes.setY(positionOffsetY2 - 6);
 
             mirrorButtonList.forEach(button -> button.render(ms, mouseX, mouseY, partialTicks));
             mirrorIconButtonList.forEach(button -> button.render(ms, mouseX, mouseY, partialTicks));
             mirrorNumberFieldList.forEach(numberField -> numberField.drawNumberField(ms, mouseX, mouseY, partialTicks));
         } else {
-            buttonMirrorEnabled.y = y;
+            buttonMirrorEnabled.setY(y);
             font.draw(ms, "Mirror disabled", left + offset, y + 2, 0x999999);
         }
 
