@@ -13,5 +13,4 @@ public interface ClientPlayerPacketListener extends PacketListener {
     void handle(ClientboundPlayerRequestLookAtPacket packet);
 
 
-
 }

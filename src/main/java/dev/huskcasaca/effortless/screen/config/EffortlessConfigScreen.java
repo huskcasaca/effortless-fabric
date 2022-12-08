@@ -66,72 +66,23 @@ public class EffortlessConfigScreen {
 
         final var entryBuilder = builder.entryBuilder();
 
-        final var buildSubCat = entryBuilder.startSubCategory(new TranslatableComponent("effortless.settings.category.config.build.title"));
         final var previewSubCat = entryBuilder.startSubCategory(new TranslatableComponent("effortless.settings.category.config.preview.title"));
 
-//        final var maxReachDistance = new SliderEntryData("max_reach", defaults.getBuildConfig().getMaxReachDistance(), config.getBuildConfig().getMaxReachDistance(), BuildConfig.MIN_MAX_REACH_DISTANCE, BuildConfig.MAX_MAX_REACH_DISTANCE, config.getBuildConfig()::setMaxReachDistance);
-//        final var maxBlockPlacePerAxis = new SliderEntryData("max_block_axis", defaults.getBuildConfig().getMaxBlockPlacePerAxis(), config.getBuildConfig().getMaxBlockPlacePerAxis(), BuildConfig.MIN_MAX_BLOCK_PLACE_PER_AXIS, BuildConfig.MAX_MAX_BLOCK_PLACE_PER_AXIS, config.getBuildConfig()::setMaxBlockPlacePerAxis);
-//        final var maxBlockPlaceAtOnce = new IntegerEntryData("max_block_total", defaults.getBuildConfig().getMaxBlockPlaceAtOnce(), config.getBuildConfig().getMaxBlockPlaceAtOnce(), BuildConfig.MIN_MAX_BLOCK_PLACE_AT_ONCE, BuildConfig.MAX_MAX_BLOCK_PLACE_AT_ONCE, config.getBuildConfig()::setMaxBlockPlaceAtOnce);
-//        final var isCanBreakFar = new BooleanEntryData("far_reach", defaults.getBuildConfig().isCanBreakFar(), config.getBuildConfig().isCanBreakFar(), config.getBuildConfig()::setCanBreakFar);
-//        final var enableUndo = new BooleanEntryData("undo", defaults.getBuildConfig().isEnableUndo(), config.getBuildConfig().isEnableUndo(), config.getBuildConfig()::setEnableUndo);
-//        final var undoStackSize = new SliderEntryData("undo_stack_size", defaults.getBuildConfig().getUndoStackSize(), config.getBuildConfig().getUndoStackSize(), BuildConfig.MIN_UNDO_STACK_SIZE, BuildConfig.MAX_UNDO_STACK_SIZE, config.getBuildConfig()::setUndoStackSize);
-//
-//        buildSubCat.add(
-//                entryBuilder.startIntSlider(Component.translatable(maxReachDistance.getTitleKey()), maxReachDistance.currentValue, maxReachDistance.minValue, maxReachDistance.maxValue)
-//                        .setTooltip(Component.translatable(maxReachDistance.getTooltipKey()))
-//                        .setDefaultValue(maxReachDistance.defaultValue)
-//                        .setSaveConsumer(maxReachDistance.saveConsumer)
-//                        .setTextGetter((integer) -> Component.literal(integer <= 0 ? "Disabled" : integer + " " + (integer <= 1 ? "block" : "blocks")))
-//                        .build()
-//        );
-//        buildSubCat.add(
-//                entryBuilder.startIntSlider(Component.translatable(maxBlockPlacePerAxis.getTitleKey()), maxBlockPlacePerAxis.currentValue, maxBlockPlacePerAxis.minValue, maxBlockPlacePerAxis.maxValue)
-//                        .setTooltip(Component.translatable(maxBlockPlacePerAxis.getTooltipKey()))
-//                        .setDefaultValue(maxBlockPlacePerAxis.defaultValue)
-//                        .setSaveConsumer(maxBlockPlacePerAxis.saveConsumer)
-//                        .setTextGetter((integer) -> Component.literal(integer <= 0 ? "Disabled" : integer + " " + (integer <= 1 ? "block" : "blocks")))
-//                        .build()
-//        );
-//        buildSubCat.add(
-//                entryBuilder.startIntSlider(Component.translatable(maxBlockPlaceAtOnce.getTitleKey()), maxBlockPlaceAtOnce.currentValue, maxBlockPlaceAtOnce.minValue, maxBlockPlaceAtOnce.maxValue)
-//                        .setTooltip(Component.translatable(maxBlockPlaceAtOnce.getTooltipKey()))
-//                        .setDefaultValue(maxBlockPlaceAtOnce.defaultValue)
-//                        .setSaveConsumer((integer) -> {
-//                            int rounded = Math.toIntExact(Math.round(integer / 1000.0));
-//                            config.getBuildConfig().setMaxBlockPlaceAtOnce(rounded * 1000);
-//                        })
-//                        .setTextGetter((integer) -> {
-//                            // round double
-//                            int rounded = Math.toIntExact(Math.round(integer / 1000.0));
-//                            return Component.literal(integer <= rounded ? "Disabled" : rounded * 1000 + " blocks");
-//                        })
-//                        .build()
-//        );
-//        buildSubCat.add(isCanBreakFar.build(entryBuilder));
-//        buildSubCat.add(
-//                entryBuilder.startBooleanToggle(Component.translatable(enableUndo.getTitleKey()), enableUndo.currentValue)
-//                        .setTooltip(Component.translatable(enableUndo.getTooltipKey()))
-//                        .setDefaultValue(enableUndo.defaultValue)
-//                        .setSaveConsumer(enableUndo.saveConsumer)
-//                        .setYesNoTextSupplier(yesNoTextSupplier)
-//                        .build()
-//        );
-//        buildSubCat.add(
-//                entryBuilder.startIntSlider(Component.translatable(undoStackSize.getTitleKey()), undoStackSize.currentValue, undoStackSize.minValue, undoStackSize.maxValue)
-//                        .setTooltip(Component.translatable(undoStackSize.getTooltipKey()))
-//                        .setDefaultValue(undoStackSize.defaultValue)
-//                        .setSaveConsumer(undoStackSize.saveConsumer)
-//                        .setTextGetter((integer) -> Component.literal((integer <= 0 ? "Disabled" : (integer + " " + (integer <= 1 ? "step" : "steps")))))
-//                        .build()
-//        );
-
-
         final var alwaysShowBlockPreview = new BooleanEntryData("always_show_block_preview", defaults.getPreviewConfig().isAlwaysShowBlockPreview(), config.getPreviewConfig().isAlwaysShowBlockPreview(), config.getPreviewConfig()::setAlwaysShowBlockPreview);
+        final var showBuildInfo = new BooleanEntryData("show_build_info", defaults.getPreviewConfig().isShowBuildInfo(), config.getPreviewConfig().isShowBuildInfo(), config.getPreviewConfig()::setShowBuildInfo);
         final var useShaders = new BooleanEntryData("use_shaders", defaults.getPreviewConfig().isUseShaders(), config.getPreviewConfig().isUseShaders(), config.getPreviewConfig()::setUseShaders);
         final var shaderThreshold = new SliderEntryData("shader_threshold", defaults.getPreviewConfig().getShaderThreshold(), config.getPreviewConfig().getShaderThreshold(), PreviewConfig.MIN_SHADER_THRESHOLD, PreviewConfig.MAX_SHADER_THRESHOLD, config.getPreviewConfig()::setShaderThreshold);
         final var dissolveTimeMultiplier = new SliderEntryData("shader_dissolve_time_multiplier", defaults.getPreviewConfig().getShaderDissolveTimeMultiplier(), config.getPreviewConfig().getShaderDissolveTimeMultiplier(), PreviewConfig.MIN_SHADER_DISSOLVE_TIME_MULTIPLIER, PreviewConfig.MAX_SHADER_DISSOLVE_TIME_MULTIPLIER, config.getPreviewConfig()::setShaderDissolveTimeMultiplier);
 
 
+        previewSubCat.add(
+                entryBuilder.startBooleanToggle(new TranslatableComponent(showBuildInfo.getTitleKey()), showBuildInfo.currentValue)
+                        .setTooltip(new TranslatableComponent(showBuildInfo.getTooltipKey()))
+                        .setDefaultValue(showBuildInfo.defaultValue)
+                        .setSaveConsumer(showBuildInfo.saveConsumer)
+                        .setYesNoTextSupplier(yesNoTextSupplier)
+                        .build()
+        );
         previewSubCat.add(
                 entryBuilder.startBooleanToggle(new TranslatableComponent(alwaysShowBlockPreview.getTitleKey()), alwaysShowBlockPreview.currentValue)
                         .setTooltip(new TranslatableComponent(alwaysShowBlockPreview.getTooltipKey()))
@@ -179,10 +130,6 @@ public class EffortlessConfigScreen {
                         .setTextGetter((integer) -> new TextComponent(integer / 10.0 + "x"))
                         .build()
         );
-
-//        var buildSubEntry = buildSubCat.build();
-//        buildSubEntry.setExpanded(true);
-//        configCategory.addEntry(buildSubEntry);
 
         var previewSubEntry = previewSubCat.build();
         previewSubEntry.setExpanded(true);

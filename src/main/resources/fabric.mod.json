@@ -13,7 +13,7 @@
     "issues": "https://github.com/huskcasaca/effortless-fabric/issues",
     "sources": "https://github.com/huskcasaca/effortless-fabric"
   },
-  "license": "GNU Lesser General Public License version 3 (LGPLv3)",
+  "license": "LGPLv3",
   "icon": "assets/effortless/icon.png",
   "environment": "*",
   "entrypoints": {

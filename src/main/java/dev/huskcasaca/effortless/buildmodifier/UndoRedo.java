@@ -1,11 +1,11 @@
 package dev.huskcasaca.effortless.buildmodifier;
 
 import dev.huskcasaca.effortless.Effortless;
+import dev.huskcasaca.effortless.render.BlockPreviewRenderer;
 import dev.huskcasaca.effortless.buildreach.ReachHelper;
 import dev.huskcasaca.effortless.utils.FixedStack;
 import dev.huskcasaca.effortless.utils.InventoryHelper;
 import dev.huskcasaca.effortless.utils.SurvivalHelper;
-import dev.huskcasaca.effortless.render.BlockPreviewRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -31,10 +31,11 @@ public class UndoRedo {
     public static boolean isUndoEnabled(Player player) {
         return ReachHelper.getReachSettings(player).enableUndo();
     }
+
     //add to undo stack
     public static void addUndo(Player player, BlockSet blockSet) {
         if (!isUndoEnabled(player)) return;
-        
+
         Map<UUID, FixedStack<BlockSet>> undoStacks = player.level.isClientSide ? undoStacksClient : undoStacksServer;
 
         //Assert coordinates is as long as previous and new blockstate lists
@@ -102,7 +103,7 @@ public class UndoRedo {
         List<ItemStack> itemStacks = findItemStacksInInventory(player, previousBlockStates);
 
         if (player.level.isClientSide) {
-            BlockPreviewRenderer.onBlocksBroken(coordinates, itemStacks, newBlockStates, blockSet.secondPos(), blockSet.firstPos());
+            BlockPreviewRenderer.getInstance().onBlocksBroken(coordinates, itemStacks, newBlockStates, blockSet.secondPos(), blockSet.firstPos());
         } else {
             //break all those blocks, reset to what they were
             for (int i = 0; i < coordinates.size(); i++) {
@@ -163,7 +164,7 @@ public class UndoRedo {
         List<ItemStack> itemStacks = findItemStacksInInventory(player, newBlockStates);
 
         if (player.level.isClientSide) {
-            BlockPreviewRenderer.onBlocksPlaced(coordinates, itemStacks, newBlockStates, blockSet.firstPos(), blockSet.secondPos());
+            BlockPreviewRenderer.getInstance().onBlocksPlaced(coordinates, itemStacks, newBlockStates, blockSet.firstPos(), blockSet.secondPos());
         } else {
             //place blocks
             for (int i = 0; i < coordinates.size(); i++) {

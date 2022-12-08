@@ -1,6 +1,7 @@
 package dev.huskcasaca.effortless.buildmodifier;
 
-import dev.huskcasaca.effortless.EffortlessDataProvider;
+import dev.huskcasaca.effortless.entity.player.EffortlessDataProvider;
+import dev.huskcasaca.effortless.render.BlockPreviewRenderer;
 import dev.huskcasaca.effortless.buildmodifier.array.Array;
 import dev.huskcasaca.effortless.buildmodifier.mirror.Mirror;
 import dev.huskcasaca.effortless.buildmodifier.mirror.RadialMirror;
@@ -8,10 +9,8 @@ import dev.huskcasaca.effortless.entity.player.ModifierSettings;
 import dev.huskcasaca.effortless.utils.CompatHelper;
 import dev.huskcasaca.effortless.utils.InventoryHelper;
 import dev.huskcasaca.effortless.utils.SurvivalHelper;
-import dev.huskcasaca.effortless.mixin.BlockItemAccessor;
 import dev.huskcasaca.effortless.network.Packets;
 import dev.huskcasaca.effortless.network.protocol.player.ClientboundPlayerBuildModifierPacket;
-import dev.huskcasaca.effortless.render.BlockPreviewRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
@@ -59,7 +58,7 @@ public class BuildModifierHandler {
 
         if (world.isClientSide) {
 
-            BlockPreviewRenderer.onBlocksPlaced();
+            BlockPreviewRenderer.getInstance().onBlocksPlaced();
 
             newBlockStates = blockStates;
 
@@ -117,7 +116,7 @@ public class BuildModifierHandler {
         }
 
         if (world.isClientSide) {
-            BlockPreviewRenderer.onBlocksBroken();
+            BlockPreviewRenderer.getInstance().onBlocksBroken();
 
             //list of air blockstates
             for (int i = 0; i < coordinates.size(); i++) {
@@ -250,7 +249,7 @@ public class BuildModifierHandler {
         return Array.isEnabled(modifierSettings.arraySettings()) ||
                 Mirror.isEnabled(modifierSettings.mirrorSettings(), startPos) ||
                 RadialMirror.isEnabled(modifierSettings.radialMirrorSettings(), startPos) ||
-                modifierSettings.quickReplace();
+                modifierSettings.enableQuickReplace();
     }
 
     public static BlockState getBlockStateFromItem(ItemStack itemStack, Player player, BlockPos blockPos, Direction facing, Vec3 hitVec, InteractionHand hand) {
@@ -259,7 +258,8 @@ public class BuildModifierHandler {
         var item = itemStack.getItem();
 
         if (item instanceof BlockItem) {
-            return ((BlockItemAccessor) Item.byBlock(((BlockItem) item).getBlock())).callGetPlacementState(new BlockPlaceContext(player, hand, itemStack, hitresult));
+            // FIXME: 23/11/22
+            return ((BlockItem) Item.byBlock(((BlockItem) item).getBlock())).getPlacementState(new BlockPlaceContext(player, hand, itemStack, hitresult));
         } else {
             return Block.byItem(item).getStateForPlacement(new BlockPlaceContext(new UseOnContext(player, hand, new BlockHitResult(hitVec, facing, blockPos, false))));
         }

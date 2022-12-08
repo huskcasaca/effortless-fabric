@@ -1,4 +1,4 @@
-package dev.huskcasaca.effortless;
+package dev.huskcasaca.effortless.entity.player;
 
 import dev.huskcasaca.effortless.entity.player.ModeSettings;
 import dev.huskcasaca.effortless.entity.player.ModifierSettings;

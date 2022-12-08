@@ -8,7 +8,6 @@ import dev.huskcasaca.effortless.buildmode.*;
 import dev.huskcasaca.effortless.buildmodifier.BuildModifierHelper;
 import dev.huskcasaca.effortless.control.Keys;
 import dev.huskcasaca.effortless.entity.player.ModeSettings;
-import dev.huskcasaca.effortless.mixin.KeyMappingAccessor;
 import dev.huskcasaca.effortless.network.Packets;
 import dev.huskcasaca.effortless.network.protocol.player.ServerboundPlayerBuildActionPacket;
 import dev.huskcasaca.effortless.network.protocol.player.ServerboundPlayerSetBuildModePacket;
@@ -46,23 +45,23 @@ import static dev.huskcasaca.effortless.buildmode.BuildActionHandler.*;
 @MethodsReturnNonnullByDefault
 public class RadialMenuScreen extends Screen {
 
-    public static final RadialMenuScreen instance = new RadialMenuScreen();
-    private final Vector4f radialButtonColor = new Vector4f(0f, 0f, 0f, .5f);
-    private final Vector4f sideButtonColor = new Vector4f(.5f, .5f, .5f, .5f);
-    private final Vector4f highlightColor = new Vector4f(.6f, .8f, 1f, .6f);
-    private final Vector4f selectedColor = new Vector4f(0f, .5f, 1f, .5f);
-    private final Vector4f highlightSelectedColor = new Vector4f(0.2f, .7f, 1f, .7f);
-    private final int whiteTextColor = 0xffffffff;
-    private final int watermarkTextColor = 0x88888888;
-    private final int descriptionTextColor = 0xdd888888;
-    private final int optionTextColor = 0xeeeeeeff;
-    private final double ringInnerEdge = 38;
-    private final double ringOuterEdge = 75;
-    private final double categoryLineOuterEdge = 42;
-    private final double textDistance = 90;
-    private final double buttonDistance = 120;
-    private final float fadeSpeed = 0.3f;
-    private final int descriptionHeight = 100;
+    private static final RadialMenuScreen INSTANCE = new RadialMenuScreen();
+    private static final Vector4f radialButtonColor = new Vector4f(0f, 0f, 0f, .5f);
+    private static final Vector4f sideButtonColor = new Vector4f(.5f, .5f, .5f, .5f);
+    private static final Vector4f highlightColor = new Vector4f(.6f, .8f, 1f, .6f);
+    private static final Vector4f selectedColor = new Vector4f(0f, .5f, 1f, .5f);
+    private static final Vector4f highlightSelectedColor = new Vector4f(0.2f, .7f, 1f, .7f);
+    private static final int whiteTextColor = 0xffffffff;
+    private static final int watermarkTextColor = 0x88888888;
+    private static final int descriptionTextColor = 0xdd888888;
+    private static final int optionTextColor = 0xeeeeeeff;
+    private static final double ringInnerEdge = 38;
+    private static final double ringOuterEdge = 75;
+    private static final double categoryLineOuterEdge = 42;
+    private static final double textDistance = 90;
+    private static final double buttonDistance = 120;
+    private static final float fadeSpeed = 0.3f;
+    private static final int descriptionHeight = 100;
     public BuildMode switchTo = null;
     public BuildAction doAction = null;
     public boolean performedActionUsingMouse;
@@ -73,6 +72,10 @@ public class RadialMenuScreen extends Screen {
 
     public RadialMenuScreen() {
         super(new TranslatableComponent("effortless.screen.radial_menu"));
+    }
+
+    public static RadialMenuScreen getInstance() {
+        return INSTANCE;
     }
 
     public static void playRadialMenuSound() {
@@ -161,12 +164,12 @@ public class RadialMenuScreen extends Screen {
         int baseY = -13;
         int buttonOffset = 26;
 
-        buttons.add(new MenuButton(BuildAction.UNDO,     -buttonDistance - buttonOffset * 1, baseY + buttonOffset * 0, Direction.WEST));
-        buttons.add(new MenuButton(BuildAction.REDO,     -buttonDistance - buttonOffset * 0, baseY + buttonOffset * 0, Direction.EAST));
-        buttons.add(new MenuButton(BuildAction.MAGNET,   -buttonDistance - buttonOffset * 1, baseY + buttonOffset * 1, Direction.WEST));
-        buttons.add(new MenuButton(BuildAction.REPLACE,  -buttonDistance - buttonOffset * 0, baseY + buttonOffset * 1, Direction.EAST));
-        buttons.add(new MenuButton(BuildAction.MODIFIER, -buttonDistance - buttonOffset * 1, baseY + buttonOffset * 2, Direction.WEST));
-        buttons.add(new MenuButton(BuildAction.SETTINGS, -buttonDistance - buttonOffset * 0, baseY + buttonOffset * 2, Direction.EAST));
+        buttons.add(new MenuButton(BuildAction.UNDO, -buttonDistance - buttonOffset, baseY + 0, Direction.WEST));
+        buttons.add(new MenuButton(BuildAction.REDO, -buttonDistance - 0, baseY + 0, Direction.EAST));
+        buttons.add(new MenuButton(BuildAction.MODIFIER, -buttonDistance - buttonOffset, baseY + buttonOffset, Direction.WEST));
+        buttons.add(new MenuButton(BuildAction.REPLACE, -buttonDistance - 0, baseY + buttonOffset, Direction.EAST));
+//        buttons.add(new MenuButton(BuildAction.MODIFIER,      -buttonDistance - buttonOffset * 1, baseY + buttonOffset * 2, Direction.WEST));
+//        buttons.add(new MenuButton(BuildAction.SETTINGS,      -buttonDistance - buttonOffset * 0, baseY + buttonOffset * 2, Direction.EAST));
 //        OPEN_PLAYER_SETTINGS
 
         //Add buildmode dependent options
@@ -349,7 +352,7 @@ public class RadialMenuScreen extends Screen {
         }
 
         String credits = I18n.get("effortless.credits");
-        font.drawShadow(ms, credits, width - font.width(credits) - 4, height - 10, watermarkTextColor);
+        font.drawShadow(ms, credits, width - font.width(credits) - 10, height - 15, watermarkTextColor);
 
         //Draw buildmode text
         for (final MenuRegion menuRegion : modes) {
@@ -421,14 +424,14 @@ public class RadialMenuScreen extends Screen {
 
     private String findKeybind(MenuButton button, BuildMode currentBuildMode) {
         Keys keybindingIndex = null;
-        if (button.action == BuildAction.REPLACE) keybindingIndex = Keys.TOGGLE_QUICK_REPLACE;
+        if (button.action == BuildAction.REPLACE) keybindingIndex = Keys.TOGGLE_REPLACE;
         if (button.action == BuildAction.MODIFIER) keybindingIndex = Keys.MODIFIER_MENU;
 
         if (keybindingIndex == null) {
             return "";
         }
 
-        return ((KeyMappingAccessor) keybindingIndex.getKeyMapping()).getKey().getName();
+        return keybindingIndex.getKeyMapping().key.getName();
 
 //        if (currentBuildMode.options.length > 0) {
 //            //Add (ctrl) to first two actions of first option
@@ -490,8 +493,7 @@ public class RadialMenuScreen extends Screen {
                         Effortless.log(player, "Redo", true);
                     }
                     case REPLACE -> {
-                        Effortless.log(player, ChatFormatting.GOLD + "Replace " + ChatFormatting.RESET + (
-                                modifierSettings.quickReplace() ? (ChatFormatting.GREEN + "ON") : (ChatFormatting.RED + "OFF")) + ChatFormatting.RESET, true);
+                        Effortless.log(player, ChatFormatting.GOLD + "Replace " + ChatFormatting.RESET + (modifierSettings.enableReplace() ? (modifierSettings.enableQuickReplace() ? (ChatFormatting.GREEN + "QUICK") : (ChatFormatting.GREEN + "ON")) : (ChatFormatting.RED + "OFF")) + ChatFormatting.RESET, true);
                     }
                     case MAGNET -> {
                         Effortless.log(player, ChatFormatting.GOLD + "Item Magnet " + ChatFormatting.RESET + (modeSettings.enableMagnet() ? (ChatFormatting.GREEN + "ON") : (ChatFormatting.RED + "OFF")) + ChatFormatting.RESET, true);

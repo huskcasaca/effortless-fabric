@@ -17,11 +17,11 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @Environment(EnvType.CLIENT)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class FixedCheckbox extends Button {
+public class Checkbox extends Button {
     private final int boxWidth;
     private boolean isChecked;
 
-    public FixedCheckbox(int xPos, int yPos, String displayString, boolean isChecked) {
+    public Checkbox(int xPos, int yPos, String displayString, boolean isChecked) {
         super(xPos, yPos, Minecraft.getInstance().font.width(displayString) + 2 + 11, 11, new TextComponent(displayString), b -> {
         });
         this.isChecked = isChecked;

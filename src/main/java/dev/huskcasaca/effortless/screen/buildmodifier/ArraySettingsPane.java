@@ -6,7 +6,7 @@ import dev.huskcasaca.effortless.buildmodifier.BuildModifierHelper;
 import dev.huskcasaca.effortless.buildmodifier.array.Array;
 import dev.huskcasaca.effortless.buildreach.ReachHelper;
 import dev.huskcasaca.effortless.screen.widget.ExpandableScrollEntry;
-import dev.huskcasaca.effortless.screen.widget.FixedCheckbox;
+import dev.huskcasaca.effortless.screen.widget.Checkbox;
 import dev.huskcasaca.effortless.screen.widget.NumberField;
 import dev.huskcasaca.effortless.screen.widget.ScrollPane;
 import net.fabricmc.api.EnvType;
@@ -29,7 +29,7 @@ public class ArraySettingsPane extends ExpandableScrollEntry {
 
     protected List<NumberField> arrayNumberFieldList = new ArrayList<>();
 
-    private FixedCheckbox buttonArrayEnabled;
+    private Checkbox buttonArrayEnabled;
     private NumberField textArrayOffsetX, textArrayOffsetY, textArrayOffsetZ, textArrayCount;
 
     public ArraySettingsPane(ScrollPane scrollPane) {
@@ -41,7 +41,7 @@ public class ArraySettingsPane extends ExpandableScrollEntry {
         super.init(renderables);
 
         int y = top;
-        buttonArrayEnabled = new FixedCheckbox(left - 15 + 8, y, "", false) {
+        buttonArrayEnabled = new Checkbox(left - 15 + 8, y, "", false) {
             @Override
             public void onClick(double mouseX, double mouseY) {
                 super.onClick(mouseX, mouseY);
@@ -51,23 +51,22 @@ public class ArraySettingsPane extends ExpandableScrollEntry {
         renderables.add(buttonArrayEnabled);
 
         y = top + 20;
-        textArrayOffsetX = new NumberField(font, renderables, left + 70, y, 50, 18);
+        textArrayOffsetX = new NumberField(font, renderables, left + 60, y, 90, 18);
         textArrayOffsetX.setNumber(0);
         textArrayOffsetX.setTooltip(new TextComponent("How much each copy is shifted."));
         arrayNumberFieldList.add(textArrayOffsetX);
 
-        textArrayOffsetY = new NumberField(font, renderables, left + 140, y, 50, 18);
+        textArrayOffsetY = new NumberField(font, renderables, left + 60, y + 24, 90, 18);
         textArrayOffsetY.setNumber(0);
         textArrayOffsetY.setTooltip(new TextComponent("How much each copy is shifted."));
         arrayNumberFieldList.add(textArrayOffsetY);
 
-        textArrayOffsetZ = new NumberField(font, renderables, left + 210, y, 50, 18);
+        textArrayOffsetZ = new NumberField(font, renderables, left + 60, y + 24 * 2, 90, 18);
         textArrayOffsetZ.setNumber(0);
         textArrayOffsetZ.setTooltip(new TextComponent("How much each copy is shifted."));
         arrayNumberFieldList.add(textArrayOffsetZ);
 
-        y = top + 50;
-        textArrayCount = new NumberField(font, renderables, left + 55, y, 50, 18);
+        textArrayCount = new NumberField(font, renderables, left + 200, y, 80, 18);
         textArrayCount.setNumber(5);
         textArrayCount.setTooltip(new TextComponent("How many copies should be made."));
         arrayNumberFieldList.add(textArrayCount);
@@ -100,24 +99,32 @@ public class ArraySettingsPane extends ExpandableScrollEntry {
             buttonArrayEnabled.y = yy;
             font.draw(ms, "Array enabled", left + offset, yy + 2, 0xFFFFFF);
 
-            yy = y + 20;
-            font.draw(ms, "Offset", left + offset, yy + 5, 0xFFFFFF);
-            font.draw(ms, "X", left + 50 + offset, yy + 5, 0xFFFFFF);
-            textArrayOffsetX.y = yy;
-            font.draw(ms, "Y", left + 120 + offset, yy + 5, 0xFFFFFF);
-            textArrayOffsetY.y = yy;
-            font.draw(ms, "Z", left + 190 + offset, yy + 5, 0xFFFFFF);
-            textArrayOffsetZ.y = yy;
+            var positionOffsetX0 = left + 8;
+            var positionOffsetX1 = left + 160;
+            var positionOffsetY0 = y + 24;
+            var positionOffsetY1 = y + 24 * 2;
 
-            yy = y + 50;
-            font.draw(ms, "Count", left + offset, yy + 5, 0xFFFFFF);
-            textArrayCount.y = yy;
+            var textOffsetX = 40;
+            var componentOffsetX = 15;
+            var componentOffsetY = -5;
+
+            font.draw(ms, "Offset", positionOffsetX0, positionOffsetY0, 0xFFFFFF);
+            font.draw(ms, "X", positionOffsetX0 + textOffsetX, positionOffsetY0, 0xFFFFFF);
+            font.draw(ms, "Y", positionOffsetX0 + textOffsetX, positionOffsetY0 + 24, 0xFFFFFF);
+            font.draw(ms, "Z", positionOffsetX0 + textOffsetX, positionOffsetY0 + 24 * 2, 0xFFFFFF);
+            textArrayOffsetX.y = positionOffsetY0 + componentOffsetY;
+            textArrayOffsetY.y = positionOffsetY0 + componentOffsetY + 24;
+            textArrayOffsetZ.y = positionOffsetY0 + componentOffsetY + 24 * 2;
+
+            font.draw(ms, "Count", positionOffsetX1, positionOffsetY0, 0xFFFFFF);
+            textArrayCount.y = positionOffsetY0 + componentOffsetY;
 
             int currentReach = Math.max(-1, getArrayReach());
             int maxReach = ReachHelper.getMaxReachDistance(mc.player);
-            ChatFormatting reachColor = isCurrentReachValid(currentReach, maxReach) ? ChatFormatting.GRAY : ChatFormatting.RED;
-            String reachText = "Reach: " + reachColor + currentReach + ChatFormatting.GRAY + "/" + ChatFormatting.GRAY + maxReach;
-            font.draw(ms, reachText, left + 176 + offset, yy + 5, 0xFFFFFF);
+            var reachColor = isCurrentReachValid(currentReach, maxReach) ? ChatFormatting.GRAY : ChatFormatting.RED;
+            var reachText = "Reach  " + reachColor + currentReach + ChatFormatting.GRAY + "/" + ChatFormatting.GRAY + maxReach;
+
+            font.draw(ms, reachText, positionOffsetX1, positionOffsetY1, 0xFFFFFF);
 
             arrayNumberFieldList.forEach(numberField -> numberField.drawNumberField(ms, mouseX, mouseY, partialTicks));
         } else {
@@ -183,7 +190,7 @@ public class ArraySettingsPane extends ExpandableScrollEntry {
 
     @Override
     protected int getExpandedHeight() {
-        return 80;
+        return 96;
     }
 
     private int getArrayReach() {

@@ -42,7 +42,7 @@ public class ScrollPane extends Slot {
         return listEntries.get(index);
     }
 
-    public void AddListEntry(IScrollEntry listEntry) {
+    public void addListEntry(IScrollEntry listEntry) {
         listEntries.add(listEntry);
     }
 

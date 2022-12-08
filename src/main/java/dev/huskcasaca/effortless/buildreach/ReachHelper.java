@@ -1,10 +1,11 @@
 package dev.huskcasaca.effortless.buildreach;
 
 import dev.huskcasaca.effortless.Effortless;
-import dev.huskcasaca.effortless.EffortlessDataProvider;
+import dev.huskcasaca.effortless.entity.player.EffortlessDataProvider;
 import dev.huskcasaca.effortless.entity.player.ReachSettings;
 import dev.huskcasaca.effortless.network.Packets;
 import dev.huskcasaca.effortless.network.protocol.player.ClientboundPlayerReachPacket;
+import dev.huskcasaca.effortless.network.protocol.player.ServerboundPlayerSetBuildReachPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
@@ -55,9 +56,10 @@ public class ReachHelper {
 
     public static void handleNewPlayer(ServerPlayer player) {
         if (!player.level.isClientSide) {
-            Packets.sendToClient(new ClientboundPlayerReachPacket(((EffortlessDataProvider) player).getReachSettings()), (ServerPlayer) player);
+            Packets.sendToClient(new ClientboundPlayerReachPacket(((EffortlessDataProvider) player).getReachSettings()), player);
         }
     }
+
     public static int getMaxReachDistance(Player player) {
         return getReachSettings(player).maxReachDistance();
     }
@@ -73,9 +75,6 @@ public class ReachHelper {
                 reachSettings.undoStackSize()
         );
         setReachSettings(player, reachSettings);
-        if (player instanceof ServerPlayer) {
-            Packets.sendToClient(new ClientboundPlayerReachPacket(reachSettings), (ServerPlayer) player);
-        }
     }
 
     public static int getPlacementReach(Player player) {
@@ -97,9 +96,6 @@ public class ReachHelper {
                 reachSettings.undoStackSize()
         );
         setReachSettings(player, reachSettings);
-        if (player instanceof ServerPlayer) {
-            Packets.sendToClient(new ClientboundPlayerReachPacket(reachSettings), (ServerPlayer) player);
-        }
     }
 
     public static int getMaxBlockPlaceAtOnce(Player player) {
@@ -117,9 +113,6 @@ public class ReachHelper {
                 reachSettings.undoStackSize()
         );
         setReachSettings(player, reachSettings);
-        if (player instanceof ServerPlayer) {
-            Packets.sendToClient(new ClientboundPlayerReachPacket(reachSettings), (ServerPlayer) player);
-        }
     }
 
     public static boolean canBreakFar(Player player) {
@@ -137,9 +130,6 @@ public class ReachHelper {
                 reachSettings.undoStackSize()
         );
         setReachSettings(player, reachSettings);
-        if (player instanceof ServerPlayer) {
-            Packets.sendToClient(new ClientboundPlayerReachPacket(reachSettings), (ServerPlayer) player);
-        }
     }
 
     public static boolean enableUndo(Player player) {
@@ -157,9 +147,6 @@ public class ReachHelper {
                 reachSettings.undoStackSize()
         );
         setReachSettings(player, reachSettings);
-        if (player instanceof ServerPlayer) {
-            Packets.sendToClient(new ClientboundPlayerReachPacket(reachSettings), (ServerPlayer) player);
-        }
     }
 
     public static int getUndoStackSize(Player player) {
@@ -177,8 +164,13 @@ public class ReachHelper {
                 undoStackSize
         );
         setReachSettings(player, reachSettings);
+    }
+
+    public static void sync(Player player) {
         if (player instanceof ServerPlayer) {
-            Packets.sendToClient(new ClientboundPlayerReachPacket(reachSettings), (ServerPlayer) player);
+            Packets.sendToClient(new ClientboundPlayerReachPacket(getReachSettings(player)), (ServerPlayer) player);
+        } else {
+            Packets.sendToServer(new ServerboundPlayerSetBuildReachPacket(getReachSettings(player)));
         }
     }
 

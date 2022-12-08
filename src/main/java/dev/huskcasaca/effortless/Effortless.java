@@ -1,7 +1,6 @@
 package dev.huskcasaca.effortless;
 
 import dev.huskcasaca.effortless.buildmodifier.BuildModifierHandler;
-import dev.huskcasaca.effortless.command.SettingsCommand;
 import dev.huskcasaca.effortless.entity.player.ModeSettings;
 import dev.huskcasaca.effortless.buildreach.ReachHelper;
 import dev.huskcasaca.effortless.buildmode.BuildMode;
@@ -47,7 +46,7 @@ public class Effortless implements ModInitializer {
 
         if (buildMode == BuildMode.DISABLE) {
             return false;
-        } else if (modifierSettings.quickReplace()) {
+        } else if (modifierSettings.enableQuickReplace()) {
             //Cancel event and send message if QuickReplace
             Packets.sendToClient(new ClientboundPlayerRequestLookAtPacket(true), (ServerPlayer) player);
 //            Packets.sendToClient(new AddUndoMessage(pos, event.getBlockSnapshot().getReplacedBlock(), state), (ServerPlayer)  player);
@@ -162,7 +161,5 @@ public class Effortless implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        ServerPlayerEvents.COPY_FROM.register(Effortless::onPlayerClone);
-        CommandRegistrationCallback.EVENT.register(SettingsCommand::register);
     }
 }

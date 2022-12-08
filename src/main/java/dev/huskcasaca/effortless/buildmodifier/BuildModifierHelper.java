@@ -1,12 +1,19 @@
 package dev.huskcasaca.effortless.buildmodifier;
 
 import dev.huskcasaca.effortless.Effortless;
-import dev.huskcasaca.effortless.EffortlessDataProvider;
+import dev.huskcasaca.effortless.entity.player.EffortlessDataProvider;
 import dev.huskcasaca.effortless.buildmodifier.array.Array;
 import dev.huskcasaca.effortless.buildmodifier.mirror.Mirror;
 import dev.huskcasaca.effortless.buildmodifier.mirror.RadialMirror;
 import dev.huskcasaca.effortless.entity.player.ModifierSettings;
 import dev.huskcasaca.effortless.buildreach.ReachHelper;
+import dev.huskcasaca.effortless.network.Packets;
+import dev.huskcasaca.effortless.network.protocol.player.ClientboundPlayerBuildModifierPacket;
+import dev.huskcasaca.effortless.network.protocol.player.ServerboundPlayerSetBuildModifierPacket;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
 public class BuildModifierHelper {
@@ -24,6 +31,46 @@ public class BuildModifierHelper {
         }
         ((EffortlessDataProvider) player).setModifierSettings(modifierSettings);
 
+    }
+
+    public static boolean isReplace(Player player) {
+        return getModifierSettings(player).enableReplace();
+    }
+
+    public static boolean isQuickReplace(Player player) {
+        return getModifierSettings(player).enableQuickReplace();
+    }
+
+    public static ReplaceMode getReplaceMode(Player player) {
+        return getModifierSettings(player).replaceMode();
+    }
+
+
+    public static void setReplaceMode(Player player, ReplaceMode mode) {
+        ModifierSettings modifierSettings = getModifierSettings(player);
+        modifierSettings = new ModifierSettings(modifierSettings.arraySettings(), modifierSettings.mirrorSettings(), modifierSettings.radialMirrorSettings(), mode);
+        BuildModifierHelper.setModifierSettings(player, modifierSettings);
+        setModifierSettings(player, modifierSettings);
+    }
+
+    public static void cycleReplaceMode(Player player) {
+        ModifierSettings modifierSettings = getModifierSettings(player);
+        modifierSettings = new ModifierSettings(modifierSettings.arraySettings(), modifierSettings.mirrorSettings(), modifierSettings.radialMirrorSettings(), ReplaceMode.values()[(modifierSettings.replaceMode().ordinal() + 1) % ReplaceMode.values().length]);
+        BuildModifierHelper.setModifierSettings(player, modifierSettings);
+        setModifierSettings(player, modifierSettings);
+    }
+
+    public static void sync(Player player) {
+        if (player instanceof ServerPlayer) {
+            Packets.sendToClient(new ClientboundPlayerBuildModifierPacket(getModifierSettings(player)), (ServerPlayer) player);
+        } else {
+            Packets.sendToServer(new ServerboundPlayerSetBuildModifierPacket(getModifierSettings(player)));
+        }
+    }
+
+    public static Component getReplaceModeName(Player player) {
+        var modifierSettings = getModifierSettings(player);
+        return new TextComponent(ChatFormatting.GOLD + "Replace " + ChatFormatting.RESET + (modifierSettings.enableReplace() ? (modifierSettings.enableQuickReplace() ? (ChatFormatting.GREEN + "QUICK") : (ChatFormatting.GREEN + "ON")) : (ChatFormatting.RED + "OFF")) + ChatFormatting.RESET);
     }
 
     public static String getSanitizeMessage(ModifierSettings modifierSettings, Player player) {
@@ -129,13 +176,13 @@ public class BuildModifierHelper {
         );
 
         //Other
-        boolean quickReplace = modifierSettings.quickReplace();
+        var replaceMode = modifierSettings.replaceMode();
 
         return new ModifierSettings(
                 arraySettings,
                 mirrorSettings,
                 radialMirrorSettings,
-                quickReplace
+                replaceMode
         );
     }
 

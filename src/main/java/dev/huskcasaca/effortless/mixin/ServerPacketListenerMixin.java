@@ -1,5 +1,6 @@
 package dev.huskcasaca.effortless.mixin;
 
+import dev.huskcasaca.effortless.Effortless;
 import dev.huskcasaca.effortless.buildreach.ReachHelper;
 import dev.huskcasaca.effortless.buildmode.BuildActionHandler;
 import dev.huskcasaca.effortless.buildmode.BuildModeHandler;
@@ -26,14 +27,19 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(ServerGamePacketListenerImpl.class)
-public abstract class ServerGamePacketListenerMixin implements ServerEffortlessPacketListener {
+import java.util.Objects;
 
-    @Shadow public ServerPlayer player;
+@Mixin(ServerGamePacketListenerImpl.class)
+public abstract class ServerPacketListenerMixin implements ServerEffortlessPacketListener {
+
+    @Shadow
+    public ServerPlayer player;
 
     @Shadow public abstract void send(Packet<?> packet, @Nullable GenericFutureListener<? extends Future<? super Void>> genericFutureListener);
 
-    @Shadow @Final private MinecraftServer server;
+    @Shadow
+    @Final
+    private MinecraftServer server;
 
     @Inject(method = "send(Lnet/minecraft/network/protocol/Packet;Lio/netty/util/concurrent/GenericFutureListener;)V", at = @At("HEAD"), cancellable = true)
     private void send(Packet<?> packet, GenericFutureListener<? extends Future<? super Void>> genericFutureListener, CallbackInfo ci) {
@@ -49,19 +55,16 @@ public abstract class ServerGamePacketListenerMixin implements ServerEffortlessP
     void handleCustomPayload(ServerboundCustomPayloadPacket serverboundCustomPayloadPacket, CallbackInfo ci) {
         ResourceLocation resourceLocation = serverboundCustomPayloadPacket.getIdentifier();
         FriendlyByteBuf friendlyByteBuf = null;
-        var deserializer = Packets.getDeserializer(resourceLocation);
-        if (deserializer == null) {
-            return;
-        } else {
-            ci.cancel();
-        }
-        try {
-            friendlyByteBuf = serverboundCustomPayloadPacket.getData();
-            deserializer.apply(friendlyByteBuf).handle(this);
-        } finally {
-            if (friendlyByteBuf != null) {
+        if (Objects.equals(resourceLocation.getNamespace(), Effortless.MOD_ID)) {
+            try {
+                friendlyByteBuf = serverboundCustomPayloadPacket.getData();
+                Packets.getDeserializer(resourceLocation).apply(friendlyByteBuf).handle(this);
+            } finally {
+                if (friendlyByteBuf != null) {
 //                friendlyByteBuf.release();
+                }
             }
+            ci.cancel();
         }
     }
 

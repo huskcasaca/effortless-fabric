@@ -12,7 +12,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(PlayerList.class)
-public class PlayerEventMixin {
+public abstract class PlayerEventMixin {
+
     @Inject(method = "placeNewPlayer", at = @At("RETURN"))
     private void onPlayerLogin(Connection connection, ServerPlayer serverPlayer, CallbackInfo ci) {
         Effortless.onPlayerLogin(serverPlayer);
@@ -27,6 +28,5 @@ public class PlayerEventMixin {
     private void onPlayerRespawn(ServerPlayer serverPlayer, boolean bl, CallbackInfoReturnable<ServerPlayer> cir) {
         Effortless.onPlayerRespawn(serverPlayer);
     }
-
 
 }

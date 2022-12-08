@@ -5,8 +5,6 @@ import dev.huskcasaca.effortless.Effortless;
 import dev.huskcasaca.effortless.control.Keys;
 import dev.huskcasaca.effortless.entity.player.ModifierSettings;
 import dev.huskcasaca.effortless.buildmodifier.BuildModifierHelper;
-import dev.huskcasaca.effortless.mixin.KeyMappingAccessor;
-import dev.huskcasaca.effortless.mixin.ScreenRenderablesAccessor;
 import dev.huskcasaca.effortless.network.Packets;
 import dev.huskcasaca.effortless.network.protocol.player.ServerboundPlayerSetBuildModifierPacket;
 import dev.huskcasaca.effortless.screen.widget.ScrollPane;
@@ -28,7 +26,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public class ModifierSettingsScreen extends Screen {
 
     private ScrollPane scrollPane;
-    private Button buttonClose;
+    private Button buttonDone;
 
     private MirrorSettingsPane mirrorSettingsPane;
     private ArraySettingsPane arraySettingsPane;
@@ -44,26 +42,26 @@ public class ModifierSettingsScreen extends Screen {
 
         scrollPane = new ScrollPane(this, font, 8, height - 30);
 
-        mirrorSettingsPane = new MirrorSettingsPane(scrollPane);
-        scrollPane.AddListEntry(mirrorSettingsPane);
-
         arraySettingsPane = new ArraySettingsPane(scrollPane);
-        scrollPane.AddListEntry(arraySettingsPane);
+        scrollPane.addListEntry(arraySettingsPane);
+
+        mirrorSettingsPane = new MirrorSettingsPane(scrollPane);
+        scrollPane.addListEntry(mirrorSettingsPane);
 
         radialMirrorSettingsPane = new RadialMirrorSettingsPane(scrollPane);
-        scrollPane.AddListEntry(radialMirrorSettingsPane);
+        scrollPane.addListEntry(radialMirrorSettingsPane);
 
-        scrollPane.init(((ScreenRenderablesAccessor) this).getRenderables());
+        scrollPane.init(this.renderables);
 
         //Close button
         int y = height - 26;
-        buttonClose = new Button(width / 2 - 100, y, 200, 20, new TextComponent("Close"), (button) -> {
-            Player player = Minecraft.getInstance().player;
+        buttonDone = new Button(width / 2 - 100, y, 200, 20, new TextComponent("Done"), (button) -> {
+            var player = Minecraft.getInstance().player;
             if (player != null) {
                 player.closeContainer();
             }
         });
-        addRenderableOnly(buttonClose);
+        addRenderableOnly(buttonDone);
     }
 
     @Override
@@ -82,7 +80,7 @@ public class ModifierSettingsScreen extends Screen {
 
         scrollPane.render(ms, mouseX, mouseY, partialTicks);
 
-        buttonClose.render(ms, mouseX, mouseY, partialTicks);
+        buttonDone.render(ms, mouseX, mouseY, partialTicks);
 
         scrollPane.drawTooltip(ms, this, mouseX, mouseY);
     }
@@ -97,7 +95,7 @@ public class ModifierSettingsScreen extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int p_96553_, int p_96554_) {
-        if (keyCode == ((KeyMappingAccessor) Keys.MODIFIER_MENU.getKeyMapping()).getKey().getValue()) {
+        if (keyCode == Keys.MODIFIER_MENU.getKeyMapping().key.getValue()) {
             return true;
         }
         return super.keyPressed(keyCode, p_96553_, p_96554_);
@@ -106,7 +104,7 @@ public class ModifierSettingsScreen extends Screen {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
         super.mouseClicked(mouseX, mouseY, mouseButton);
-        ((ScreenRenderablesAccessor) this).getRenderables().forEach(renderable -> {
+        renderables.forEach(renderable -> {
             if (renderable instanceof Button button) {
                 button.mouseClicked(mouseX, mouseY, mouseButton);
             }
@@ -142,7 +140,7 @@ public class ModifierSettingsScreen extends Screen {
 
         var modifierSettings = BuildModifierHelper.getModifierSettings(minecraft.player);
 
-        modifierSettings = new ModifierSettings(arraySettings, mirrorSettings, radialMirrorSettings, modifierSettings.quickReplace());
+        modifierSettings = new ModifierSettings(arraySettings, mirrorSettings, radialMirrorSettings, modifierSettings.replaceMode());
 
         //Sanitize
         String error = BuildModifierHelper.getSanitizeMessage(modifierSettings, minecraft.player);

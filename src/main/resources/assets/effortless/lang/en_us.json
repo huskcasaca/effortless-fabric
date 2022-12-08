@@ -21,6 +21,8 @@
   "effortless.settings.undo.tooltip": "",
   "effortless.settings.undo_stack_size.title": "Undo/Redo Stack Size",
   "effortless.settings.undo_stack_size.tooltip": "",
+  "effortless.settings.show_build_info.title": "Show Build Info",
+  "effortless.settings.show_build_info.tooltip": "Show current build mode, build modifier and replace mode on your screen",
   "effortless.settings.always_show_block_preview.title": "Always Show Block Preview",
   "effortless.settings.always_show_block_preview.tooltip": "Show a block preview if you have a block in hand even in vanilla build mode",
   "effortless.settings.use_shaders.title": "Use Shaders",
@@ -39,7 +41,7 @@
   "key.effortless.modifier_menu.desc": "Open Modifier Menu",
   "key.effortless.undo.desc": "Place/Break Undo",
   "key.effortless.redo.desc": "Place/Break Redo",
-  "key.effortless.toggle_quick_replace.desc": "Toggle Quick Replace",
+  "key.effortless.toggle_replace.desc": "Toggle Quick Replace",
   "key.effortless.toggle_alt_place.desc": "Toggle Alternative Placement",
   "effortless.mode.disable": "Disable",
   "effortless.mode.vanilla": "Vanilla",
@@ -109,5 +111,6 @@
   "commands.effortless.enable_undo.success": "Set enableUndo of %s to %s",
   "commands.effortless.enable_undo.failure": "Failed to set enableUndo of %s",
   "commands.effortless.undo_stack_size.success": "Set undoStackSize of %s to %s",
-  "commands.effortless.undo_stack_size.failure": "Failed to set undoStackSize of %s"
+  "commands.effortless.undo_stack_size.failure": "Failed to set undoStackSize of %s",
+  "commands.reserved": "NIE"
 }

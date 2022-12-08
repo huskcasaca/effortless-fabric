@@ -12,7 +12,7 @@ import dev.huskcasaca.effortless.buildmode.twoclick.Wall;
 
 public enum BuildMode {
     DISABLE("disable", new Disable(), BuildCategory.BASIC),
-//    VANILLA("vanilla", new Vanilla(), BuildCategory.BASIC),
+    //    VANILLA("vanilla", new Vanilla(), BuildCategory.BASIC),
     SINGLE("single", new Single(), BuildCategory.BASIC /*, BuildOption.BUILD_SPEED*/),
 
     LINE("line", new Line(), BuildCategory.BASIC /*, OptionEnum.THICKNESS*/),
@@ -43,6 +43,23 @@ public enum BuildMode {
 
     public String getNameKey() {
         return Effortless.MOD_ID + ".mode." + name;
+    }
+
+    public String getCommandName() {
+        return switch (this) {
+            case DISABLE -> "disabled";
+            case SINGLE -> "single";
+            case LINE -> "line";
+            case WALL -> "wall";
+            case FLOOR -> "floor";
+            case CUBE -> "cube";
+            case DIAGONAL_LINE -> "diagonalLine";
+            case DIAGONAL_WALL -> "diagonalWall";
+            case SLOPE_FLOOR -> "slopeFloor";
+            case CIRCLE -> "circle";
+            case CYLINDER -> "cylinder";
+            case SPHERE -> "sphere";
+        };
     }
 
     public String getDescriptionKey() {

@@ -1,7 +1,7 @@
 package dev.huskcasaca.effortless.buildmode;
 
 import dev.huskcasaca.effortless.Effortless;
-import dev.huskcasaca.effortless.EffortlessDataProvider;
+import dev.huskcasaca.effortless.entity.player.EffortlessDataProvider;
 import dev.huskcasaca.effortless.buildmodifier.BuildModifierHandler;
 import dev.huskcasaca.effortless.buildmodifier.BuildModifierHelper;
 import dev.huskcasaca.effortless.buildreach.ReachHelper;
@@ -56,12 +56,12 @@ public class BuildModeHandler {
             //TODO 1.13 replaceable
             boolean replaceable = player.level.getBlockState(startPos).getMaterial().isReplaceable();
             boolean becomesDoubleSlab = SurvivalHelper.doesBecomeDoubleSlab(player, startPos, packet.sideHit());
-            if (!modifierSettings.quickReplace() && !replaceable && !becomesDoubleSlab) {
+            if (!modifierSettings.enableQuickReplace() && !replaceable && !becomesDoubleSlab) {
                 startPos = startPos.relative(packet.sideHit());
             }
 
             //Get under tall grass and other replaceable blocks
-            if (modifierSettings.quickReplace() && replaceable) {
+            if (modifierSettings.enableQuickReplace() && replaceable) {
                 startPos = startPos.below();
             }
 
@@ -75,7 +75,7 @@ public class BuildModeHandler {
 
         //Even when no starting block is found, call buildmode instance
         //We might want to place things in the air
-        List<BlockPos> coordinates = buildMode.instance.onRightClick(player, startPos, packet.sideHit(), packet.hitVec(), modifierSettings.quickReplace());
+        List<BlockPos> coordinates = buildMode.instance.onRightClick(player, startPos, packet.sideHit(), packet.hitVec(), modifierSettings.enableQuickReplace());
 
         if (coordinates.isEmpty()) {
             currentlyBreaking.put(player, false);
@@ -252,6 +252,6 @@ public class BuildModeHandler {
 
     public static void handleNewPlayer(ServerPlayer player) {
         //Makes sure player has mode settings (if it doesnt it will create it)
-        Packets.sendToClient(new ClientboundPlayerBuildModePacket(((EffortlessDataProvider) player).getModeSettings()), (ServerPlayer) player);
+        Packets.sendToClient(new ClientboundPlayerBuildModePacket(((EffortlessDataProvider) player).getModeSettings()), player);
     }
 }

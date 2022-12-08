@@ -1,12 +1,14 @@
 package dev.huskcasaca.effortless.buildmode;
 
 import dev.huskcasaca.effortless.Effortless;
-import dev.huskcasaca.effortless.EffortlessDataProvider;
+import dev.huskcasaca.effortless.entity.player.EffortlessDataProvider;
 import dev.huskcasaca.effortless.entity.player.ModeSettings;
 import dev.huskcasaca.effortless.buildreach.ReachHelper;
 import dev.huskcasaca.effortless.network.Packets;
+import dev.huskcasaca.effortless.network.protocol.player.ClientboundPlayerBuildModePacket;
 import dev.huskcasaca.effortless.network.protocol.player.ServerboundPlayerSetBuildModePacket;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
 public class BuildModeHelper {
@@ -39,15 +41,34 @@ public class BuildModeHelper {
         ((EffortlessDataProvider) player).setModeSettings(modeSettings);
     }
 
-    public static void syncMagnetSetting(Player player, boolean enable) {
-        if (player == null) {
-            return;
-        }
-        var modeSettings = getModeSettings(player);
-        modeSettings = new ModeSettings(modeSettings.buildMode(), enable);
-        BuildModeHelper.setModeSettings(player, modeSettings);
-        Packets.sendToServer(new ServerboundPlayerSetBuildModePacket(modeSettings));
+    public static BuildMode getBuildMode(Player player) {
+        return getModeSettings(player).buildMode();
     }
+
+    public static void setBuildMode(Player player, BuildMode mode) {
+        ModeSettings modeSettings = getModeSettings(player);
+        modeSettings = new ModeSettings(mode, modeSettings.enableMagnet());
+        setModeSettings(player, modeSettings);
+    }
+
+    public static void sync(Player player) {
+        if (player instanceof ServerPlayer) {
+            Packets.sendToClient(new ClientboundPlayerBuildModePacket(getModeSettings(player)), (ServerPlayer) player);
+        } else {
+            Packets.sendToServer(new ServerboundPlayerSetBuildModePacket(getModeSettings(player)));
+        }
+    }
+
+    public static boolean isEnableMagnet(Player player) {
+        return getModeSettings(player).enableMagnet();
+    }
+
+    public static void setEnableMagnet(Player player, boolean enableMagnet) {
+        ModeSettings modeSettings = getModeSettings(player);
+        modeSettings = new ModeSettings(modeSettings.buildMode(), enableMagnet);
+        setModeSettings(player, modeSettings);
+    }
+
 
     public static String getSanitizeMessage(ModeSettings modeSettings, Player player) {
         int maxReach = ReachHelper.getMaxReachDistance(player);

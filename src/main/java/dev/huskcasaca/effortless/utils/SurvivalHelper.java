@@ -55,7 +55,7 @@ public class SurvivalHelper {
 
 
         //More manual with ItemBlock#placeBlockAt
-        if (true || canPlace(world, player, pos, blockState, itemstack, skipCollisionCheck, facing.getOpposite())) {
+        if (canPlace(world, player, pos, blockState, itemstack, skipCollisionCheck, facing.getOpposite())) {
             //Drop existing block
             dropBlock(world, player, pos);
 
@@ -189,8 +189,11 @@ public class SurvivalHelper {
      * @return Whether the player may place the block at pos with itemstack
      */
     public static boolean canPlace(Level world, Player player, BlockPos pos, BlockState newBlockState, ItemStack itemStack, boolean skipCollisionCheck, Direction sidePlacedOn) {
-
-        if (true) return true;
+        if (BuildModifierHelper.isReplace(player)) {
+            if (true) return true;
+        } else {
+            return world.getBlockState(pos).isAir();
+        }
         //Check if itemstack is correct
         if (!(itemStack.getItem() instanceof BlockItem) || Block.byItem(itemStack.getItem()) != newBlockState.getBlock()) {
 //            Effortless.log(player, "Cannot (re)place block", true);
@@ -276,7 +279,7 @@ public class SurvivalHelper {
         }
 
         //Check quickreplace
-        if (placer instanceof Player && BuildModifierHelper.getModifierSettings(((Player) placer)).quickReplace()) {
+        if (placer instanceof Player && BuildModifierHelper.getModifierSettings(((Player) placer)).enableQuickReplace()) {
             return true;
         }
 

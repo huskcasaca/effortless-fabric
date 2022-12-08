@@ -1,6 +1,7 @@
 package dev.huskcasaca.effortless.mixin;
 
-import dev.huskcasaca.effortless.EffortlessDataProvider;
+import dev.huskcasaca.effortless.entity.player.EffortlessDataProvider;
+import dev.huskcasaca.effortless.buildmodifier.ReplaceMode;
 import dev.huskcasaca.effortless.entity.player.ModeSettings;
 import dev.huskcasaca.effortless.entity.player.ModifierSettings;
 import dev.huskcasaca.effortless.entity.player.ReachSettings;
@@ -19,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Player.class)
-public class PlayerTagMixin implements EffortlessDataProvider {
+public abstract class PlayerTagMixin implements EffortlessDataProvider {
 
     @Unique
     private ModeSettings modeSettings = null;
@@ -135,7 +136,7 @@ public class PlayerTagMixin implements EffortlessDataProvider {
         tag.putBoolean("radialMirrorDrawLines", radialMirrorSettings.drawLines());
         tag.putBoolean("radialMirrorDrawPlanes", radialMirrorSettings.drawPlanes());
 
-        //compound.putBoolean("quickReplace", buildSettings.quickReplace()); dont save quickreplace
+        tag.putBoolean("enableQuickReplace", modifierSettings.enableQuickReplace()); // dont save quickreplace
 
     }
 
@@ -165,7 +166,7 @@ public class PlayerTagMixin implements EffortlessDataProvider {
         boolean mirrorDrawPlanes = tag.getBoolean("mirrorDrawPlanes");
         var mirrorSettings = new Mirror.MirrorSettings(mirrorEnabled, mirrorPosition, mirrorX, mirrorY, mirrorZ, mirrorRadius, mirrorDrawLines, mirrorDrawPlanes);
 
-        //boolean quickReplace = compound.getBoolean("quickReplace"); //dont load quickreplace
+        //boolean enableQuickReplace = compound.getBoolean("enableQuickReplace"); //dont load quickreplace
 
         //RADIAL MIRROR
         boolean radialMirrorEnabled = tag.getBoolean("radialMirrorEnabled");
@@ -181,7 +182,7 @@ public class PlayerTagMixin implements EffortlessDataProvider {
         var radialMirrorSettings = new RadialMirror.RadialMirrorSettings(radialMirrorEnabled, radialMirrorPosition,
                 radialMirrorSlices, radialMirrorAlternate, radialMirrorRadius, radialMirrorDrawLines, radialMirrorDrawPlanes);
 
-        modifierSettings = new ModifierSettings(arraySettings, mirrorSettings, radialMirrorSettings, false);
+        modifierSettings = new ModifierSettings(arraySettings, mirrorSettings, radialMirrorSettings, ReplaceMode.DISABLED);
     }
 
 

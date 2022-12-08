@@ -173,7 +173,7 @@ public class RadialMirror implements Modifier {
     ) {
 
         public RadialMirrorSettings() {
-            this(false, new Vec3(0.5, 64.5, 0.5), 4, false, 20, true, false);
+            this(false, new Vec3(0.5, 64.5, 0.5), 3, false, 16, true, true);
         }
 
         public int reach() {

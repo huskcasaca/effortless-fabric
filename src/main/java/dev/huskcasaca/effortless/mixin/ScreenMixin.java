@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Minecraft.class)
-public class ScreenMixin {
+public abstract class ScreenMixin {
 
     @Inject(method = "setScreen", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/BufferUploader;reset()V", shift = At.Shift.NONE), cancellable = true)
     private void onScreenOpening(@Nullable Screen screen, CallbackInfo ci) {

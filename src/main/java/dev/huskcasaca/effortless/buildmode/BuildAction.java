@@ -38,6 +38,32 @@ public enum BuildAction {
         this.name = name;
     }
 
+    public String getCommandName() {
+        return switch (this) {
+            case UNDO -> "undo";
+            case REDO -> "redo";
+            case REPLACE -> "replace";
+            case MAGNET -> "magnet";
+            case MODIFIER -> "modifier";
+            case OPEN_PLAYER_SETTINGS -> "openPlayerSettings";
+            case SETTINGS -> "settings";
+            case NORMAL_SPEED -> "normalSpeed";
+            case FAST_SPEED -> "fastSpeed";
+            case FULL -> "full";
+            case HOLLOW -> "hollow";
+            case CUBE_FULL -> "cubeFull";
+            case CUBE_HOLLOW -> "cubeHollow";
+            case CUBE_SKELETON -> "cubeSkeleton";
+            case SHORT_EDGE -> "shortEdge";
+            case LONG_EDGE -> "longEdge";
+            case THICKNESS_1 -> "thickness1";
+            case THICKNESS_3 -> "thickness3";
+            case THICKNESS_5 -> "thickness5";
+            case CIRCLE_START_CORNER -> "circleStartCorner";
+            case CIRCLE_START_CENTER -> "circleStartCenter";
+        };
+    }
+
     public String getNameKey() {
         // TODO: 15/9/22 use ResourceLocation
         return Effortless.MOD_ID + ".action." + name;

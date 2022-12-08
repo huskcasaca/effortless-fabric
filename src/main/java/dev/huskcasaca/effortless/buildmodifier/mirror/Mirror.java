@@ -217,6 +217,7 @@ public class Mirror implements Modifier {
             boolean drawLines,
             boolean drawPlanes
     ) {
+
         public MirrorSettings() {
             this(
                     false,
@@ -224,10 +225,22 @@ public class Mirror implements Modifier {
                     true,
                     false,
                     false,
-                    10,
+                    16,
                     true,
                     true
             );
+        }
+
+
+        public List<Direction.Axis> getMirrorAxis() {
+            var directions = new ArrayList<Direction.Axis>();
+
+            if (mirrorX) directions.add(Direction.Axis.X);
+            if (mirrorY) directions.add(Direction.Axis.Y);
+            if (mirrorZ) directions.add(Direction.Axis.Z);
+
+
+            return directions;
         }
 
         public int reach() {

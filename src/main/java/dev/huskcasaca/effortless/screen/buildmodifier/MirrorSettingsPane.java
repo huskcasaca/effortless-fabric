@@ -34,7 +34,7 @@ public class MirrorSettingsPane extends ExpandableScrollEntry {
     protected List<NumberField> mirrorNumberFieldList = new ArrayList<>();
 
     private NumberField textMirrorPosX, textMirrorPosY, textMirrorPosZ, textMirrorRadius;
-    private FixedCheckbox buttonMirrorEnabled, buttonMirrorX, buttonMirrorY, buttonMirrorZ;
+    private Checkbox buttonMirrorEnabled, buttonMirrorX, buttonMirrorY, buttonMirrorZ;
     private IconButton buttonCurrentPosition, buttonToggleOdd, buttonDrawPlanes, buttonDrawLines;
     private boolean drawPlanes, drawLines, toggleOdd;
 
@@ -47,7 +47,7 @@ public class MirrorSettingsPane extends ExpandableScrollEntry {
         super.init(renderables);
 
         int y = top - 2;
-        buttonMirrorEnabled = new FixedCheckbox(left - 15 + 8, y, "", false) {
+        buttonMirrorEnabled = new Checkbox(left - 15 + 8, y, "", false) {
             @Override
             public void onClick(double mouseX, double mouseY) {
                 super.onClick(mouseX, mouseY);
@@ -56,35 +56,35 @@ public class MirrorSettingsPane extends ExpandableScrollEntry {
         };
         renderables.add(buttonMirrorEnabled);
 
-        y = top + 18;
-        textMirrorPosX = new NumberField(font, renderables, left + 58, y, 62, 18);
+        y = top + 20;
+        textMirrorPosX = new NumberField(font, renderables, left + Dimen.BUTTON_OFFSET_X0, y, 90, 18);
         textMirrorPosX.setNumber(0);
         textMirrorPosX.setTooltip(
                 Arrays.asList(new TextComponent("The position of the mirror."), new TextComponent("For odd numbered builds add 0.5.").withStyle(ChatFormatting.GRAY)));
         mirrorNumberFieldList.add(textMirrorPosX);
 
-        textMirrorPosY = new NumberField(font, renderables, left + 138, y, 62, 18);
+        textMirrorPosY = new NumberField(font, renderables, left + Dimen.BUTTON_OFFSET_X0, y + Dimen.BUTTON_VERTICAL_OFFSET, 90, 18);
         textMirrorPosY.setNumber(64);
         textMirrorPosY.setTooltip(Arrays.asList(new TextComponent("The position of the mirror."), new TextComponent("For odd numbered builds add 0.5.").withStyle(ChatFormatting.GRAY)));
         mirrorNumberFieldList.add(textMirrorPosY);
 
-        textMirrorPosZ = new NumberField(font, renderables, left + 218, y, 62, 18);
+        textMirrorPosZ = new NumberField(font, renderables, left + Dimen.BUTTON_OFFSET_X0, y + Dimen.BUTTON_VERTICAL_OFFSET * 2, 90, 18);
         textMirrorPosZ.setNumber(0);
         textMirrorPosZ.setTooltip(Arrays.asList(new TextComponent("The position of the mirror."), new TextComponent("For odd numbered builds add 0.5.").withStyle(ChatFormatting.GRAY)));
         mirrorNumberFieldList.add(textMirrorPosZ);
 
         y = top + 50;
-        buttonMirrorX = new FixedCheckbox(left + 60, y, " X", true);
+        buttonMirrorX = new Checkbox(left + Dimen.BUTTON_OFFSET_X1 - 10, y, " X", true);
         mirrorButtonList.add(buttonMirrorX);
 
-        buttonMirrorY = new FixedCheckbox(left + 100, y, " Y", false);
+        buttonMirrorY = new Checkbox(left + Dimen.BUTTON_OFFSET_X1 - 10 + 32, y, " Y", false);
         mirrorButtonList.add(buttonMirrorY);
 
-        buttonMirrorZ = new FixedCheckbox(left + 140, y, " Z", false);
+        buttonMirrorZ = new Checkbox(left + Dimen.BUTTON_OFFSET_X1 - 10 + 32 * 2, y, " Z", false);
         mirrorButtonList.add(buttonMirrorZ);
 
         y = top + 47;
-        textMirrorRadius = new NumberField(font, renderables, left + 218, y, 62, 18);
+        textMirrorRadius = new NumberField(font, renderables, left + Dimen.BUTTON_OFFSET_X1, y, 80, 18);
         textMirrorRadius.setNumber(50);
         //TODO change to diameter (remove /2)
         textMirrorRadius.setTooltip(Arrays.asList(new TextComponent("How far the mirror reaches in any direction."),
@@ -93,7 +93,7 @@ public class MirrorSettingsPane extends ExpandableScrollEntry {
         mirrorNumberFieldList.add(textMirrorRadius);
 
         y = top + 72;
-        buttonCurrentPosition = new IconButton(left + 5, y, 0, 0, BUILDING_ICONS, button -> {
+        buttonCurrentPosition = new IconButton(left + Dimen.SECTION_OFFSET_X1, y, 0, 0, BUILDING_ICONS, button -> {
             var pos = new Vec3(Math.floor(mc.player.getX()) + 0.5, Math.floor(mc.player.getY()) + 0.5, Math.floor(mc.player.getZ()) + 0.5);
             textMirrorPosX.setNumber(pos.x);
             textMirrorPosY.setNumber(pos.y);
@@ -102,7 +102,7 @@ public class MirrorSettingsPane extends ExpandableScrollEntry {
         buttonCurrentPosition.setTooltip(new TextComponent("Set mirror position to current player position"));
         mirrorIconButtonList.add(buttonCurrentPosition);
 
-        buttonToggleOdd = new IconButton(left + 35, y, 0, 20, BUILDING_ICONS, button -> {
+        buttonToggleOdd = new IconButton(left + Dimen.SECTION_OFFSET_X1 + 24, y, 0, 20, BUILDING_ICONS, button -> {
             toggleOdd = !toggleOdd;
             buttonToggleOdd.setUseAlternateIcon(toggleOdd);
             if (toggleOdd) {
@@ -120,7 +120,7 @@ public class MirrorSettingsPane extends ExpandableScrollEntry {
         buttonToggleOdd.setTooltip(Arrays.asList(new TextComponent("Set mirror position to middle of block"), new TextComponent("for odd numbered builds")));
         mirrorIconButtonList.add(buttonToggleOdd);
 
-        buttonDrawLines = new IconButton(left + 65, y, 0, 40, BUILDING_ICONS, button -> {
+        buttonDrawLines = new IconButton(left + Dimen.SECTION_OFFSET_X1 + 24 * 2, y, 0, 40, BUILDING_ICONS, button -> {
             drawLines = !drawLines;
             buttonDrawLines.setUseAlternateIcon(drawLines);
             buttonDrawLines.setTooltip(new TextComponent(drawLines ? "Hide lines" : "Show lines"));
@@ -128,7 +128,7 @@ public class MirrorSettingsPane extends ExpandableScrollEntry {
         buttonDrawLines.setTooltip(new TextComponent("Show lines"));
         mirrorIconButtonList.add(buttonDrawLines);
 
-        buttonDrawPlanes = new IconButton(left + 95, y, 0, 60, BUILDING_ICONS, button -> {
+        buttonDrawPlanes = new IconButton(left + Dimen.SECTION_OFFSET_X1 + 24 * 3, y, 0, 60, BUILDING_ICONS, button -> {
             drawPlanes = !drawPlanes;
             buttonDrawPlanes.setUseAlternateIcon(drawPlanes);
             buttonDrawPlanes.setTooltip(new TextComponent(drawPlanes ? "Hide area" : "Show area"));
@@ -138,17 +138,17 @@ public class MirrorSettingsPane extends ExpandableScrollEntry {
 
         var modifierSettings = BuildModifierHelper.getModifierSettings(mc.player);
         if (modifierSettings != null) {
-            var m = modifierSettings.mirrorSettings();
-            buttonMirrorEnabled.setIsChecked(m.enabled());
-            textMirrorPosX.setNumber(m.position().x);
-            textMirrorPosY.setNumber(m.position().y);
-            textMirrorPosZ.setNumber(m.position().z);
-            buttonMirrorX.setIsChecked(m.mirrorX());
-            buttonMirrorY.setIsChecked(m.mirrorY());
-            buttonMirrorZ.setIsChecked(m.mirrorZ());
-            textMirrorRadius.setNumber(m.radius());
-            drawLines = m.drawLines();
-            drawPlanes = m.drawPlanes();
+            var mirrorSettings = modifierSettings.mirrorSettings();
+            buttonMirrorEnabled.setIsChecked(mirrorSettings.enabled());
+            textMirrorPosX.setNumber(mirrorSettings.position().x);
+            textMirrorPosY.setNumber(mirrorSettings.position().y);
+            textMirrorPosZ.setNumber(mirrorSettings.position().z);
+            buttonMirrorX.setIsChecked(mirrorSettings.mirrorX());
+            buttonMirrorY.setIsChecked(mirrorSettings.mirrorY());
+            buttonMirrorZ.setIsChecked(mirrorSettings.mirrorZ());
+            textMirrorRadius.setNumber(mirrorSettings.radius());
+            drawLines = mirrorSettings.drawLines();
+            drawPlanes = mirrorSettings.drawPlanes();
             buttonDrawLines.setUseAlternateIcon(drawLines);
             buttonDrawPlanes.setUseAlternateIcon(drawPlanes);
             buttonDrawLines.setTooltip(new TextComponent(drawLines ? "Hide lines" : "Show lines"));
@@ -179,43 +179,51 @@ public class MirrorSettingsPane extends ExpandableScrollEntry {
     public void drawEntry(PoseStack ms, int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY,
                           boolean isSelected, float partialTicks) {
 
-        int yy = y;
         int offset = 8;
 
         buttonMirrorEnabled.render(ms, mouseX, mouseY, partialTicks);
         if (buttonMirrorEnabled.isChecked()) {
-            buttonMirrorEnabled.y = yy;
-            font.draw(ms, "Mirror enabled", left + offset, yy + 2, 0xFFFFFF);
+            buttonMirrorEnabled.y = y;
+            font.draw(ms, "Mirror enabled", left + offset, y + 2, 0xFFFFFF);
 
-            yy = y + 18;
-            font.draw(ms, "Position", left + offset, yy + 5, 0xFFFFFF);
-            font.draw(ms, "X", left + 40 + offset, yy + 5, 0xFFFFFF);
-            textMirrorPosX.y = yy;
-            font.draw(ms, "Y", left + 120 + offset, yy + 5, 0xFFFFFF);
-            textMirrorPosY.y = yy;
-            font.draw(ms, "Z", left + 200 + offset, yy + 5, 0xFFFFFF);
-            textMirrorPosZ.y = yy;
+            var positionOffsetX0 = left + Dimen.SECTION_OFFSET_X0;
+            var positionOffsetX1 = left + Dimen.SECTION_OFFSET_X1;
+            var positionOffsetY0 = y + 24;
+            var positionOffsetY1 = y + 24 * 2;
+            var positionOffsetY2 = y + 24 * 3;
 
-            yy = y + 50;
-            font.draw(ms, "Direction", left + offset, yy + 2, 0xFFFFFF);
-            buttonMirrorX.y = yy;
-            buttonMirrorY.y = yy;
-            buttonMirrorZ.y = yy;
-            font.draw(ms, "Radius", left + 176 + offset, yy + 2, 0xFFFFFF);
-            textMirrorRadius.y = yy - 3;
+            var textOffsetX = 40;
+            var componentOffsetY = -5;
 
-            yy = y + 72;
-            buttonCurrentPosition.y = yy;
-            buttonToggleOdd.y = yy;
-            buttonDrawLines.y = yy;
-            buttonDrawPlanes.y = yy;
+            font.draw(ms, "Position", positionOffsetX0, positionOffsetY0, 0xFFFFFF);
+            font.draw(ms, "X", positionOffsetX0 + textOffsetX, positionOffsetY0, 0xFFFFFF);
+            font.draw(ms, "Y", positionOffsetX0 + textOffsetX, positionOffsetY1, 0xFFFFFF);
+            font.draw(ms, "Z", positionOffsetX0 + textOffsetX, positionOffsetY2, 0xFFFFFF);
+            textMirrorPosX.y = positionOffsetY0 + componentOffsetY;
+            textMirrorPosY.y = positionOffsetY1 + componentOffsetY;
+            textMirrorPosZ.y = positionOffsetY2 + componentOffsetY;
+
+
+            font.draw(ms, "Radius", positionOffsetX1, positionOffsetY0, 0xFFFFFF);
+            textMirrorRadius.y = positionOffsetY0 + componentOffsetY;
+
+
+            font.draw(ms, "Axis", positionOffsetX1, positionOffsetY1, 0xFFFFFF);
+            buttonMirrorX.y = positionOffsetY1 - 2;
+            buttonMirrorY.y = positionOffsetY1 - 2;
+            buttonMirrorZ.y = positionOffsetY1 - 2;
+
+            buttonCurrentPosition.y = positionOffsetY2 - 6;
+            buttonToggleOdd.y = positionOffsetY2 - 6;
+            buttonDrawLines.y = positionOffsetY2 - 6;
+            buttonDrawPlanes.y = positionOffsetY2 - 6;
 
             mirrorButtonList.forEach(button -> button.render(ms, mouseX, mouseY, partialTicks));
             mirrorIconButtonList.forEach(button -> button.render(ms, mouseX, mouseY, partialTicks));
             mirrorNumberFieldList.forEach(numberField -> numberField.drawNumberField(ms, mouseX, mouseY, partialTicks));
         } else {
-            buttonMirrorEnabled.y = yy;
-            font.draw(ms, "Mirror disabled", left + offset, yy + 2, 0x999999);
+            buttonMirrorEnabled.y = y;
+            font.draw(ms, "Mirror disabled", left + offset, y + 2, 0x999999);
         }
 
     }
@@ -282,6 +290,6 @@ public class MirrorSettingsPane extends ExpandableScrollEntry {
 
     @Override
     protected int getExpandedHeight() {
-        return 100;
+        return 96;
     }
 }

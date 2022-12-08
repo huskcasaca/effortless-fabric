@@ -17,10 +17,9 @@ import java.util.List;
 import java.util.function.Consumer;
 
 @Mixin(value = GameRenderer.class, priority = 1100)
-public class ShaderRendererMixin {
+public abstract class ShaderRendererMixin {
 
-    @Inject(method = "reloadShaders",
-            at = @At(value = "INVOKE", target = "Ljava/util/List;add(Ljava/lang/Object;)Z", ordinal = 0), locals = LocalCapture.CAPTURE_FAILEXCEPTION)
+    @Inject(method = "reloadShaders", at = @At(value = "INVOKE", target = "Ljava/util/List;add(Ljava/lang/Object;)Z", ordinal = 0), locals = LocalCapture.CAPTURE_FAILEXCEPTION)
     public void reloadShaders(ResourceManager resourceManager, CallbackInfo ci, List<Program> programs, List<Pair<ShaderInstance, Consumer<ShaderInstance>>> shaders) throws IOException {
         ClientReloadShadersEvent.REGISTER_SHADER.invoker().onRegisterShader(
                 resourceManager,

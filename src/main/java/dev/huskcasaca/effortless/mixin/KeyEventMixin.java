@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(KeyboardHandler.class)
 @Environment(EnvType.CLIENT)
-public class KeyEventMixin {
+public abstract class KeyEventMixin {
 
     @Shadow
     @Final

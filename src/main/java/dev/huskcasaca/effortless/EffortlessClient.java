@@ -91,16 +91,16 @@ public class EffortlessClient implements ClientModInitializer {
 //        //QuickReplace toggle
 //        if (keyBindings[1].consumeClick()) {
 //            var modifierSettings = ModifierSettingsManager.getModifierSettings(player);
-//            modifierSettings.setQuickReplace(!modifierSettings.quickReplace());
+//            modifierSettings.setQuickReplace(!modifierSettings.enableQuickReplace());
 //            Effortless.log(player, ChatFormatting.GOLD + "Replace " + ChatFormatting.RESET + (
-//                    modifierSettings.quickReplace() ? "ON" : "OFF"));
+//                    modifierSettings.enableQuickReplace() ? "ON" : "OFF"));
 //            Packets.sendToServer(new ModifierSettingsMessage(modifierSettings));
 //        }
 
         //Radial menu
         if (Keys.SHOW_RADIAL_MENU.isDown()) {
-            if (!RadialMenuScreen.instance.isVisible()) {
-                Minecraft.getInstance().setScreen(RadialMenuScreen.instance);
+            if (!RadialMenuScreen.getInstance().isVisible()) {
+                Minecraft.getInstance().setScreen(RadialMenuScreen.getInstance());
             }
 //            if (ReachHelper.getMaxReachDistance(player) > 0) {
 //            } else {

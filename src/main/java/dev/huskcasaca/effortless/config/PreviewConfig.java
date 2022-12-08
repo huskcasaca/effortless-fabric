@@ -13,6 +13,8 @@ public class PreviewConfig extends Config {
     public static final int MAX_SHADER_THRESHOLD = 100_000;
 
     @Expose
+    private boolean showBuildInfo = true;
+    @Expose
     private boolean alwaysShowBlockPreview = false;
     @Expose
     private boolean useShaders = true;
@@ -31,6 +33,14 @@ public class PreviewConfig extends Config {
 
     public static boolean useShader() {
         return ConfigManager.getGlobalPreviewConfig().isUseShaders();
+    }
+
+    public boolean isShowBuildInfo() {
+        return showBuildInfo;
+    }
+
+    public void setShowBuildInfo(boolean showBuildInfo) {
+        this.showBuildInfo = showBuildInfo;
     }
 
     public boolean isAlwaysShowBlockPreview() {

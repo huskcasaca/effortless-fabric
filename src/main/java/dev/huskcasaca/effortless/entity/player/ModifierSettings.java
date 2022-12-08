@@ -1,26 +1,43 @@
 package dev.huskcasaca.effortless.entity.player;
 
+import dev.huskcasaca.effortless.buildmodifier.ReplaceMode;
 import dev.huskcasaca.effortless.buildmodifier.array.Array;
 import dev.huskcasaca.effortless.buildmodifier.mirror.Mirror;
 import dev.huskcasaca.effortless.buildmodifier.mirror.RadialMirror;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
 public record ModifierSettings(
         Array.ArraySettings arraySettings,
         Mirror.MirrorSettings mirrorSettings,
         RadialMirror.RadialMirrorSettings radialMirrorSettings,
-        boolean quickReplace
+
+        ReplaceMode replaceMode
 ) {
 
     public ModifierSettings() {
-        this(new Array.ArraySettings(), new Mirror.MirrorSettings(), new RadialMirror.RadialMirrorSettings(), false);
+        this(new Array.ArraySettings(), new Mirror.MirrorSettings(), new RadialMirror.RadialMirrorSettings(), ReplaceMode.DISABLED);
     }
 
     public ModifierSettings(Mirror.MirrorSettings mirrorSettings, Array.ArraySettings arraySettings,
                             RadialMirror.RadialMirrorSettings radialMirrorSettings) {
-        this(arraySettings, mirrorSettings, radialMirrorSettings, false);
+        this(arraySettings, mirrorSettings, radialMirrorSettings, ReplaceMode.DISABLED);
+    }
+
+    public boolean enableReplace() {
+        return replaceMode != ReplaceMode.DISABLED;
+    }
+
+    public boolean enableNormalReplace() {
+        return replaceMode == ReplaceMode.NORMAL;
+    }
+
+    public boolean enableQuickReplace() {
+        return replaceMode == ReplaceMode.QUICK;
     }
 
     public static ModifierSettings decodeBuf(FriendlyByteBuf friendlyByteBuf) {
@@ -62,9 +79,9 @@ public record ModifierSettings(
             radialMirrorSettings = new RadialMirror.RadialMirrorSettings(radialMirrorEnabled, radialMirrorPosition, radialMirrorSlices, radialMirrorAlternate, radialMirrorRadius, radialMirrorDrawLines, radialMirrorDrawPlanes);
         }
 
-        boolean quickReplace = friendlyByteBuf.readBoolean();
+        int replaceMode = friendlyByteBuf.readInt();
 
-        return new ModifierSettings(arraySettings, mirrorSettings, radialMirrorSettings, quickReplace);
+        return new ModifierSettings(arraySettings, mirrorSettings, radialMirrorSettings, ReplaceMode.values()[replaceMode]);
     }
 
     public static void write(FriendlyByteBuf friendlyByteBuf, ModifierSettings modifierSettings) {
@@ -110,7 +127,7 @@ public record ModifierSettings(
             friendlyByteBuf.writeBoolean(radialMirrorSettings.drawLines());
             friendlyByteBuf.writeBoolean(radialMirrorSettings.drawPlanes());
         }
-        friendlyByteBuf.writeBoolean(modifierSettings.quickReplace());
+        friendlyByteBuf.writeInt(modifierSettings.replaceMode().ordinal());
     }
 
 }

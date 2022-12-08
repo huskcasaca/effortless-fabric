@@ -18,8 +18,8 @@ import java.util.OptionalDouble;
 
 @Environment(EnvType.CLIENT)
 public class BuildRenderTypes extends RenderType {
-    public static final RenderType EB_LINES;
-    public static final RenderType EB_PLANES;
+    public static final RenderType EF_LINES;
+    public static final RenderType EF_PLANES;
     //Between 0 and 7, but dont override vanilla textures
     //Also update dissolve.fsh SamplerX
     private static final int MASK_TEXTURE_INDEX = 2;
@@ -28,29 +28,31 @@ public class BuildRenderTypes extends RenderType {
     private static final ShaderStateShard RENDER_TYPE_DISSOLVE_SHADER = new ShaderStateShard(() -> dissolveShaderInstance);
 
     static {
-        final LineStateShard LINE = new LineStateShard(OptionalDouble.of(2.0));
-        final int INITIAL_BUFFER_SIZE = 128;
         RenderType.CompositeState renderState;
 
         //LINES
         renderState = CompositeState.builder()
-                .setLineState(LINE)
-                .setShaderState(RenderStateShard.RENDERTYPE_LINES_SHADER)
+                .setLineState(new LineStateShard(OptionalDouble.empty()))
+                .setShaderState(RENDERTYPE_LINES_SHADER)
                 .setLayeringState(VIEW_OFFSET_Z_LAYERING)
                 .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
-                .setTextureState(RenderStateShard.NO_TEXTURE)
-                .setDepthTestState(RenderStateShard.NO_DEPTH_TEST)
-                .setLightmapState(RenderStateShard.NO_LIGHTMAP)
+                .setOutputState(ITEM_ENTITY_TARGET)
                 .setWriteMaskState(COLOR_DEPTH_WRITE)
-                .setCullState(RenderStateShard.NO_CULL)
+                .setCullState(NO_CULL)
                 .createCompositeState(false);
-        EB_LINES = RenderType.create("eb_lines",
-                DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.LINES, INITIAL_BUFFER_SIZE, false, false, renderState);
+
+
+        EF_LINES = RenderType.create("ef_lines",
+                DefaultVertexFormat.POSITION_COLOR_NORMAL,
+                VertexFormat.Mode.DEBUG_LINES,
+                256,
+                renderState
+        );
 
         //PLANES
         renderState = CompositeState.builder()
-                .setLineState(LINE)
-                .setShaderState(RenderStateShard.RENDERTYPE_LINES_SHADER)
+                .setLineState(new LineStateShard(OptionalDouble.empty()))
+                .setShaderState(RenderStateShard.POSITION_COLOR_SHADER)
                 .setLayeringState(VIEW_OFFSET_Z_LAYERING)
                 .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
                 .setTextureState(RenderStateShard.NO_TEXTURE)
@@ -59,8 +61,12 @@ public class BuildRenderTypes extends RenderType {
                 .setWriteMaskState(COLOR_WRITE)
                 .setCullState(RenderStateShard.NO_CULL)
                 .createCompositeState(false);
-        EB_PLANES = RenderType.create("eb_planes",
-                DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.TRIANGLE_STRIP, INITIAL_BUFFER_SIZE, false, false, renderState);
+        EF_PLANES = RenderType.create("ef_planes",
+                DefaultVertexFormat.POSITION_COLOR,
+                VertexFormat.Mode.QUADS,
+                256,
+                renderState
+        );
     }
 
 
@@ -69,9 +75,17 @@ public class BuildRenderTypes extends RenderType {
         super(p_173178_, p_173179_, p_173180_, p_173181_, p_173182_, p_173183_, p_173184_, p_173185_);
     }
 
+    public static RenderType lines() {
+        return EF_LINES;
+    }
+
+    public static RenderType planes() {
+        return EF_PLANES;
+    }
+
     public static RenderType getBlockPreviewRenderType(float dissolve, BlockPos blockPos, BlockPos firstPos, BlockPos secondPos, boolean red) {
 
-        String stateName = "eb_texturing_" + dissolve + "_" + blockPos + "_" + firstPos + "_" + secondPos + "_" + red;
+        String stateName = "ef_texturing_" + dissolve + "_" + blockPos + "_" + firstPos + "_" + secondPos + "_" + red;
         TexturingStateShard MY_TEXTURING = new TexturingStateShard(stateName, () -> {
             setShaderParameters(dissolveShaderInstance, dissolve, Vec3.atLowerCornerOf(blockPos), Vec3.atLowerCornerOf(firstPos), Vec3.atLowerCornerOf(secondPos), blockPos == secondPos, red);
             RenderSystem.setShaderColor(1f, 1f, 1f, 0.8f);
@@ -88,7 +102,7 @@ public class BuildRenderTypes extends RenderType {
                 .setOutputState(RenderStateShard.TRANSLUCENT_TARGET)
                 .createCompositeState(true);
         //Unique name for every combination, otherwise it will reuse the previous one
-        String name = "eb_block_previews_" + dissolve + "_" + blockPos + "_" + firstPos + "_" + secondPos + "_" + red;
+        String name = "ef_block_previews_" + dissolve + "_" + blockPos + "_" + firstPos + "_" + secondPos + "_" + red;
         return RenderType.create(name,
                 DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, 2097152, true, true, renderState);
     }

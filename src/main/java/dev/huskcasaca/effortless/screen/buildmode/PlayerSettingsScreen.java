@@ -4,7 +4,6 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import dev.huskcasaca.effortless.Effortless;
-import dev.huskcasaca.effortless.mixin.ScreenRenderHeaderAccessor;
 import dev.huskcasaca.effortless.screen.widget.ExtendedButton;
 import dev.huskcasaca.effortless.screen.widget.Slider;
 import net.fabricmc.api.EnvType;
@@ -213,7 +212,7 @@ public class PlayerSettingsScreen extends Screen {
             int k = this.getRowLeft();
             int l = this.y0 + 4 - (int) this.getScrollAmount();
             // TODO: 7/9/22 access private field renderHeader
-            if (((ScreenRenderHeaderAccessor) this).isRenderHeader()) {
+            if (renderHeader) {
                 this.renderHeader(ms, k, l, tessellator);
             }
 
