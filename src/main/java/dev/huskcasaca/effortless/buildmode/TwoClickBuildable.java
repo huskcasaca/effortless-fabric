@@ -57,7 +57,7 @@ public abstract class TwoClickBuildable extends MultipleClickBuildable {
             if (secondPos == null) return list;
 
             //Limit amount of blocks we can place per row
-            int axisLimit = ReachHelper.getMaxBlocksPerAxis(player);
+            int axisLimit = ReachHelper.getMaxBlockPlacePerAxis(player);
 
             int x1 = firstPos.getX(), x2 = secondPos.getX();
             int y1 = firstPos.getY(), y2 = secondPos.getY();

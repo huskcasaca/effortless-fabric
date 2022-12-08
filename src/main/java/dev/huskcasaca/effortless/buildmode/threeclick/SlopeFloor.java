@@ -17,7 +17,7 @@ public class SlopeFloor extends ThreeClickBuildable {
     public static List<BlockPos> getSlopeFloorBlocks(Player player, int x1, int y1, int z1, int x2, int y2, int z2, int x3, int y3, int z3) {
         List<BlockPos> list = new ArrayList<>();
 
-        int axisLimit = ReachHelper.getMaxBlocksPerAxis(player);
+        int axisLimit = ReachHelper.getMaxBlockPlacePerAxis(player);
 
         //Determine whether to use x or z axis to slope up
         boolean onXAxis = true;

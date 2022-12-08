@@ -15,7 +15,7 @@ public class ServerPlayerEventMixin {
 
     @Inject(method = "changeDimension", at = @At("RETURN"))
     private void onPlayerChangeDimension(ServerLevel serverLevel, CallbackInfoReturnable<Entity> cir) {
-        Effortless.onPlayerChangedDimension((ServerPlayer) (Object) this);
+        Effortless.onPlayerChangedDimension((ServerPlayer) (Object) cir.getReturnValue());
     }
 
 }

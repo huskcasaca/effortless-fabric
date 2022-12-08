@@ -114,7 +114,7 @@ public class ArraySettingsPane extends ExpandableScrollEntry {
             textArrayCount.y = yy;
 
             int currentReach = Math.max(-1, getArrayReach());
-            int maxReach = ReachHelper.getMaxReach(mc.player);
+            int maxReach = ReachHelper.getMaxReachDistance(mc.player);
             ChatFormatting reachColor = isCurrentReachValid(currentReach, maxReach) ? ChatFormatting.GRAY : ChatFormatting.RED;
             String reachText = "Reach: " + reachColor + currentReach + ChatFormatting.GRAY + "/" + ChatFormatting.GRAY + maxReach;
             font.draw(ms, reachText, left + 176 + offset, yy + 5, 0xFFFFFF);

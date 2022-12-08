@@ -1,6 +1,7 @@
 package dev.huskcasaca.effortless;
 
 import dev.huskcasaca.effortless.buildmodifier.BuildModifierHandler;
+import dev.huskcasaca.effortless.command.SettingsCommand;
 import dev.huskcasaca.effortless.entity.player.ModeSettings;
 import dev.huskcasaca.effortless.buildreach.ReachHelper;
 import dev.huskcasaca.effortless.buildmode.BuildMode;
@@ -8,10 +9,11 @@ import dev.huskcasaca.effortless.buildmode.BuildModeHandler;
 import dev.huskcasaca.effortless.buildmode.BuildModeHelper;
 import dev.huskcasaca.effortless.buildmodifier.BuildModifierHelper;
 import dev.huskcasaca.effortless.buildmodifier.UndoRedo;
+import dev.huskcasaca.effortless.entity.player.ModifierSettings;
 import dev.huskcasaca.effortless.network.*;
 import dev.huskcasaca.effortless.network.protocol.player.ClientboundPlayerRequestLookAtPacket;
-import dev.huskcasaca.effortless.buildreach.ReachHelper;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.TextComponent;
@@ -120,6 +122,11 @@ public class Effortless implements ModInitializer {
         );
         BuildModeHelper.setModeSettings(player, modeSettings);
 
+        var modifierSettings = BuildModifierHelper.getModifierSettings(player);
+        modifierSettings = new ModifierSettings();
+
+        BuildModifierHelper.setModifierSettings(player, modifierSettings);
+
         BuildModifierHandler.handleNewPlayer(player);
         BuildModeHandler.handleNewPlayer(player);
         ReachHelper.handleNewPlayer(player);
@@ -156,5 +163,6 @@ public class Effortless implements ModInitializer {
     @Override
     public void onInitialize() {
         ServerPlayerEvents.COPY_FROM.register(Effortless::onPlayerClone);
+        CommandRegistrationCallback.EVENT.register(SettingsCommand::register);
     }
 }

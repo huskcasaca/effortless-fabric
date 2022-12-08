@@ -119,7 +119,7 @@ public abstract class ThreeClickBuildable extends MultipleClickBuildable {
             if (secondPos == null) return list;
 
             //Limit amount of blocks you can place per row
-            int axisLimit = ReachHelper.getMaxBlocksPerAxis(player);
+            int axisLimit = ReachHelper.getMaxBlockPlacePerAxis(player);
 
             int x1 = firstPos.getX(), x2 = secondPos.getX();
             int y1 = firstPos.getY(), y2 = secondPos.getY();
@@ -144,7 +144,7 @@ public abstract class ThreeClickBuildable extends MultipleClickBuildable {
             if (thirdPos == null) return list;
 
             //Limit amount of blocks you can place per row
-            int axisLimit = ReachHelper.getMaxBlocksPerAxis(player);
+            int axisLimit = ReachHelper.getMaxBlockPlacePerAxis(player);
 
             int x1 = firstPos.getX(), x2 = secondPos.getX(), x3 = thirdPos.getX();
             int y1 = firstPos.getY(), y2 = secondPos.getY(), y3 = thirdPos.getY();

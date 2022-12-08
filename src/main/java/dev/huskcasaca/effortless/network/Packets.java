@@ -29,7 +29,7 @@ public class Packets {
     public static final ResourceLocation C2S_PLAYER_SET_BUILD_REACH_PACKET = new ResourceLocation(Effortless.MOD_ID, "player_set_build_reach");
 
     private static final Map<ResourceLocation, Function<FriendlyByteBuf, ? extends Packet<? extends PacketListener>>> idToDeserializer = new HashMap<>() {{
-        put(S2C_PLAYER_BUILD_MODE_PACKET, ClientboundPlayerBuildModifierPacket::new);
+        put(S2C_PLAYER_BUILD_MODE_PACKET, ClientboundPlayerBuildModePacket::new);
         put(S2C_PLAYER_BUILD_MODIFIER_PACKET, ClientboundPlayerBuildModifierPacket::new);
         put(S2C_PLAYER_REACH_PACKET, ClientboundPlayerReachPacket::new);
         put(S2C_PLAYER_REQUEST_LOOK_AT_PACKET, ClientboundPlayerRequestLookAtPacket::new);

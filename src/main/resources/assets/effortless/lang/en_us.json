@@ -97,5 +97,17 @@
   "effortless.action.thickness_5": "5 Blocks Thick",
   "effortless.action.start_center": "Middle",
   "effortless.action.start_corner": "Corner",
-  "commands.reach.usage": "/reach <level>"
+  "commands.reach.usage": "/reach <level>",
+  "commands.effortless.max_reach_distance.success": "Set maxReachDistance of %s to %s",
+  "commands.effortless.max_reach_distance.failure": "Failed to set maxReachDistance of %s",
+  "commands.effortless.max_block_place_per_axis.success": "Set maxBlockPlacePerAxis of %s to %s",
+  "commands.effortless.max_block_place_per_axis.failure": "Failed to set maxBlockPlacePerAxis of %s",
+  "commands.effortless.max_block_place_at_once.success": "Set maxBlockPlaceAtOnce of %s to %s",
+  "commands.effortless.max_block_place_at_once.failure": "Failed to set maxBlockPlaceAtOnce of %s",
+  "commands.effortless.can_break_far.success": "Set canBreakFar of %s to %s",
+  "commands.effortless.can_break_far.failure": "Failed to set canBreakFar of %s",
+  "commands.effortless.enable_undo.success": "Set enableUndo of %s to %s",
+  "commands.effortless.enable_undo.failure": "Failed to set enableUndo of %s",
+  "commands.effortless.undo_stack_size.success": "Set undoStackSize of %s to %s",
+  "commands.effortless.undo_stack_size.failure": "Failed to set undoStackSize of %s"
 }

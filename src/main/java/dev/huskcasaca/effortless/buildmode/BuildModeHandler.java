@@ -66,7 +66,7 @@ public class BuildModeHandler {
             }
 
             //Check if player reach does not exceed startpos
-            int maxReach = ReachHelper.getMaxReach(player);
+            int maxReach = ReachHelper.getMaxReachDistance(player);
             if (buildMode != BuildMode.DISABLE && player.blockPosition().distSqr(startPos) > maxReach * maxReach) {
                 Effortless.log(player, "Placement exceeds your reach.");
                 return;
@@ -83,7 +83,7 @@ public class BuildModeHandler {
         }
 
         //Limit number of blocks you can place
-        int limit = ReachHelper.getMaxBlocksPlacedAtOnce(player);
+        int limit = ReachHelper.getMaxBlockPlaceAtOnce(player);
         if (coordinates.size() > limit) {
             coordinates = coordinates.subList(0, limit);
         }

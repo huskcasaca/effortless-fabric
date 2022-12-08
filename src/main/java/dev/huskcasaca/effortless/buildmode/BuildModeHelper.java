@@ -50,7 +50,7 @@ public class BuildModeHelper {
     }
 
     public static String getSanitizeMessage(ModeSettings modeSettings, Player player) {
-        int maxReach = ReachHelper.getMaxReach(player);
+        int maxReach = ReachHelper.getMaxReachDistance(player);
         String error = "";
 
         //TODO sanitize

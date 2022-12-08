@@ -1,6 +1,5 @@
 package dev.huskcasaca.effortless;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import dev.huskcasaca.effortless.buildmode.BuildModeHandler;
 import dev.huskcasaca.effortless.buildmode.BuildModeHelper;
@@ -9,7 +8,6 @@ import dev.huskcasaca.effortless.event.ClientReloadShadersEvent;
 import dev.huskcasaca.effortless.event.ClientScreenEvent;
 import dev.huskcasaca.effortless.event.ClientScreenInputEvent;
 import dev.huskcasaca.effortless.buildreach.ReachHelper;
-import dev.huskcasaca.effortless.mixin.KeyMappingAccessor;
 import dev.huskcasaca.effortless.network.Packets;
 import dev.huskcasaca.effortless.network.protocol.player.ServerboundPlayerSetBuildModePacket;
 import dev.huskcasaca.effortless.render.BuildRenderTypes;
@@ -33,7 +31,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import org.lwjgl.glfw.GLFW;
 
 import java.io.IOException;
 
@@ -105,7 +102,7 @@ public class EffortlessClient implements ClientModInitializer {
             if (!RadialMenuScreen.instance.isVisible()) {
                 Minecraft.getInstance().setScreen(RadialMenuScreen.instance);
             }
-//            if (ReachHelper.getMaxReach(player) > 0) {
+//            if (ReachHelper.getMaxReachDistance(player) > 0) {
 //            } else {
 //                Effortless.log(player, "Build modes are disabled until your reach has increased. Increase your reach with craftable reach upgrades.");
 //            }
@@ -151,7 +148,7 @@ public class EffortlessClient implements ClientModInitializer {
         if (player == null) return;
 
         //Disabled if max reach is 0, might be set in the config that way.
-        if (ReachHelper.getMaxReach(player) == 0) {
+        if (ReachHelper.getMaxReachDistance(player) == 0) {
             Effortless.log(player, "Build modifiers are disabled until your reach has increased. Increase your reach with craftable reach upgrades.");
         } else {
 

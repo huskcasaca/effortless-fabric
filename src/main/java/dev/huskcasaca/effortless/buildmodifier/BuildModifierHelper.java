@@ -27,7 +27,7 @@ public class BuildModifierHelper {
     }
 
     public static String getSanitizeMessage(ModifierSettings modifierSettings, Player player) {
-        int maxReach = ReachHelper.getMaxReach(player);
+        int maxReach = ReachHelper.getMaxReachDistance(player);
         String error = "";
 
         //Array settings
@@ -67,7 +67,7 @@ public class BuildModifierHelper {
 
     // TODO: 17/9/22
     public static ModifierSettings sanitize(ModifierSettings modifierSettings, Player player) {
-        int maxReach = ReachHelper.getMaxReach(player);
+        int maxReach = ReachHelper.getMaxReachDistance(player);
 
         //Array settings
         var arraySettings = modifierSettings.arraySettings();

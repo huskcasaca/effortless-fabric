@@ -1,5 +1,6 @@
 package dev.huskcasaca.effortless.mixin;
 
+import dev.huskcasaca.effortless.Effortless;
 import dev.huskcasaca.effortless.EffortlessClient;
 import dev.huskcasaca.effortless.buildreach.ReachHelper;
 import dev.huskcasaca.effortless.buildmode.BuildModeHandler;
@@ -73,7 +74,6 @@ public abstract class ClientGamePacketListenerMixin implements ClientPlayerPacke
     @Override
     public void handle(ClientboundPlayerBuildModifierPacket packet) {
         minecraft.execute(() -> {
-
             BuildModifierHelper.setModifierSettings(minecraft.player, BuildModifierHelper.sanitize(packet.modifierSettings(), minecraft.player));
         });
     }

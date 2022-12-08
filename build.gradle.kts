@@ -7,7 +7,7 @@ plugins {
     id("io.github.huskcasaca.gradle-curseforge-plugin") version "1.0.0-alpha"
 }
 
-version = "1.4.0"
+version = "1.4.1"
 group = "dev.huskcasaca"
 
 base {
@@ -83,7 +83,7 @@ publishing {
             id.set(properties.getProperty("curseforge.id").toInt())
 
             artifact(tasks.remapJar) {
-                releaseType = ReleaseType.ALPHA // The release type (required)
+                releaseType = ReleaseType.RELEASE // The release type (required)
                 changelog = Changelog("Changelog...", ChangelogType.TEXT) // The changelog (required)
                 loader = LoaderType.FABRIC
                 gameVersion = MinecraftVersion.VERSION_1_19_2

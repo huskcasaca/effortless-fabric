@@ -10,13 +10,13 @@ import net.minecraft.world.entity.player.Player;
 
 public class ReachHelper {
 
-    public static int MIN_MAX_REACH_DISTANCE = 0;
+    public static int MIN_MAX_REACH_DISTANCE = 1;
     public static int MAX_MAX_REACH_DISTANCE = 512;
 
-    public static int MIN_MAX_BLOCK_PLACE_PER_AXIS = 0;
+    public static int MIN_MAX_BLOCK_PLACE_PER_AXIS = 1;
     public static int MAX_MAX_BLOCK_PLACE_PER_AXIS = 512;
 
-    public static int MIN_MAX_BLOCK_PLACE_AT_ONCE = 0;
+    public static int MIN_MAX_BLOCK_PLACE_AT_ONCE = 1;
     public static int MAX_MAX_BLOCK_PLACE_AT_ONCE = 100_000;
 
     public static int MIN_UNDO_STACK_SIZE = 0;
@@ -35,7 +35,7 @@ public class ReachHelper {
     }
 
     public static String getSanitizeMessage(ReachSettings modeSettings, Player player) {
-        int maxReach = ReachHelper.getMaxReach(player);
+        int maxReach = ReachHelper.getMaxReachDistance(player);
         String error = "";
         //TODO sanitize
         return error;
@@ -58,24 +58,128 @@ public class ReachHelper {
             Packets.sendToClient(new ClientboundPlayerReachPacket(((EffortlessDataProvider) player).getReachSettings()), (ServerPlayer) player);
         }
     }
-    public static int getMaxReach(Player player) {
+    public static int getMaxReachDistance(Player player) {
         return getReachSettings(player).maxReachDistance();
     }
 
-    public static int getPlacementReach(Player player) {
-        return getMaxReach(player) / 4;
+    public static void setMaxReachDistance(Player player, int maxReachDistance) {
+        var reachSettings = getReachSettings(player);
+        reachSettings = new ReachSettings(
+                maxReachDistance,
+                reachSettings.maxBlockPlacePerAxis(),
+                reachSettings.maxBlockPlaceAtOnce(),
+                reachSettings.canBreakFar(),
+                reachSettings.enableUndo(),
+                reachSettings.undoStackSize()
+        );
+        setReachSettings(player, reachSettings);
+        if (player instanceof ServerPlayer) {
+            Packets.sendToClient(new ClientboundPlayerReachPacket(reachSettings), (ServerPlayer) player);
+        }
     }
 
-    public static int getMaxBlocksPlacedAtOnce(Player player) {
+    public static int getPlacementReach(Player player) {
+        return getMaxReachDistance(player) / 4;
+    }
+
+    public static int getMaxBlockPlacePerAxis(Player player) {
+        return getReachSettings(player).maxBlockPlacePerAxis();
+    }
+
+    public static void setMaxBlockPlacePerAxis(Player player, int maxBlockPlacePerAxis) {
+        var reachSettings = getReachSettings(player);
+        reachSettings = new ReachSettings(
+                reachSettings.maxReachDistance(),
+                maxBlockPlacePerAxis,
+                reachSettings.maxBlockPlaceAtOnce(),
+                reachSettings.canBreakFar(),
+                reachSettings.enableUndo(),
+                reachSettings.undoStackSize()
+        );
+        setReachSettings(player, reachSettings);
+        if (player instanceof ServerPlayer) {
+            Packets.sendToClient(new ClientboundPlayerReachPacket(reachSettings), (ServerPlayer) player);
+        }
+    }
+
+    public static int getMaxBlockPlaceAtOnce(Player player) {
         return getReachSettings(player).maxBlockPlaceAtOnce();
     }
 
-    public static int getMaxBlocksPerAxis(Player player) {
-        return getReachSettings(player).maxBlockPlacePerAxis();
+    public static void setMaxBlockPlaceAtOnce(Player player, int maxBlockPlaceAtOnce) {
+        var reachSettings = getReachSettings(player);
+        reachSettings = new ReachSettings(
+                reachSettings.maxReachDistance(),
+                reachSettings.maxBlockPlacePerAxis(),
+                maxBlockPlaceAtOnce,
+                reachSettings.canBreakFar(),
+                reachSettings.enableUndo(),
+                reachSettings.undoStackSize()
+        );
+        setReachSettings(player, reachSettings);
+        if (player instanceof ServerPlayer) {
+            Packets.sendToClient(new ClientboundPlayerReachPacket(reachSettings), (ServerPlayer) player);
+        }
     }
 
     public static boolean canBreakFar(Player player) {
         return getReachSettings(player).canBreakFar();
+    }
+
+    public static void setCanBreakFar(Player player, boolean canBreakFar) {
+        var reachSettings = getReachSettings(player);
+        reachSettings = new ReachSettings(
+                reachSettings.maxReachDistance(),
+                reachSettings.maxBlockPlacePerAxis(),
+                reachSettings.maxBlockPlaceAtOnce(),
+                canBreakFar,
+                reachSettings.enableUndo(),
+                reachSettings.undoStackSize()
+        );
+        setReachSettings(player, reachSettings);
+        if (player instanceof ServerPlayer) {
+            Packets.sendToClient(new ClientboundPlayerReachPacket(reachSettings), (ServerPlayer) player);
+        }
+    }
+
+    public static boolean enableUndo(Player player) {
+        return getReachSettings(player).enableUndo();
+    }
+
+    public static void setEnableUndo(Player player, boolean enableUndo) {
+        var reachSettings = getReachSettings(player);
+        reachSettings = new ReachSettings(
+                reachSettings.maxReachDistance(),
+                reachSettings.maxBlockPlacePerAxis(),
+                reachSettings.maxBlockPlaceAtOnce(),
+                reachSettings.canBreakFar(),
+                enableUndo,
+                reachSettings.undoStackSize()
+        );
+        setReachSettings(player, reachSettings);
+        if (player instanceof ServerPlayer) {
+            Packets.sendToClient(new ClientboundPlayerReachPacket(reachSettings), (ServerPlayer) player);
+        }
+    }
+
+    public static int getUndoStackSize(Player player) {
+        return getReachSettings(player).undoStackSize();
+    }
+
+    public static void setUndoStackSize(Player player, int undoStackSize) {
+        var reachSettings = getReachSettings(player);
+        reachSettings = new ReachSettings(
+                reachSettings.maxReachDistance(),
+                reachSettings.maxBlockPlacePerAxis(),
+                reachSettings.maxBlockPlaceAtOnce(),
+                reachSettings.canBreakFar(),
+                reachSettings.enableUndo(),
+                undoStackSize
+        );
+        setReachSettings(player, reachSettings);
+        if (player instanceof ServerPlayer) {
+            Packets.sendToClient(new ClientboundPlayerReachPacket(reachSettings), (ServerPlayer) player);
+        }
     }
 
 }

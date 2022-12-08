@@ -134,7 +134,7 @@ public class BlockPreviewRenderer {
                 }
 
                 //Limit number of blocks you can place
-                int limit = ReachHelper.getMaxBlocksPlacedAtOnce(player);
+                int limit = ReachHelper.getMaxBlockPlaceAtOnce(player);
                 if (startCoordinates.size() > limit) {
                     startCoordinates = startCoordinates.subList(0, limit);
                 }
