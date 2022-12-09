@@ -118,7 +118,7 @@ public class BuildModeHandler {
             return;
         }
 
-        if (!ReachHelper.canBreakFar(player)) return;
+        if (!ReachHelper.isCanBreakFar(player)) return;
 
         //If first click
         if (currentlyBreaking.get(player) == null) {

@@ -10,7 +10,7 @@ import net.minecraft.network.protocol.Packet;
  */
 public record ClientboundPlayerBuildModePacket(
         ModeSettings modeSettings
-) implements Packet<ClientPlayerPacketListener> {
+) implements Packet<ClientEffortlessPacketListener> {
 
     public ClientboundPlayerBuildModePacket(FriendlyByteBuf friendlyByteBuf) {
         this(new ModeSettings(BuildMode.values()[friendlyByteBuf.readInt()], friendlyByteBuf.readBoolean()));
@@ -23,7 +23,7 @@ public record ClientboundPlayerBuildModePacket(
     }
 
     @Override
-    public void handle(ClientPlayerPacketListener packetListener) {
+    public void handle(ClientEffortlessPacketListener packetListener) {
         packetListener.handle(this);
     }
 

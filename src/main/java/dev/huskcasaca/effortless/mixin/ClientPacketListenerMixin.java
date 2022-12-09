@@ -30,7 +30,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.Objects;
 
 @Mixin(ClientPacketListener.class)
-public abstract class ClientPacketListenerMixin implements ClientPlayerPacketListener {
+public abstract class ClientPacketListenerMixin implements ClientEffortlessPacketListener {
 
     @Shadow
     public abstract void send(Packet<?> packet);

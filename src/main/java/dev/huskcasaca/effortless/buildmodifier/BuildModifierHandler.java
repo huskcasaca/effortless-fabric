@@ -60,32 +60,33 @@ public class BuildModifierHandler {
 
             BlockPreviewRenderer.getInstance().onBlocksPlaced();
 
-            newBlockStates = blockStates;
+//            newBlockStates = blockStates;
 
-        } else {
+        }
+//        else {
 
-            //place blocks
-            for (int i = placeStartPos ? 0 : 1; i < coordinates.size(); i++) {
-                var blockPos = coordinates.get(i);
-                var blockState = blockStates.get(i);
-                var itemStack = itemStacks.get(i);
+        //place blocks
+        for (int i = placeStartPos ? 0 : 1; i < coordinates.size(); i++) {
+            var blockPos = coordinates.get(i);
+            var blockState = blockStates.get(i);
+            var itemStack = itemStacks.get(i);
 
-                if (world.isLoaded(blockPos)) {
-                    //check itemstack empty
-                    if (itemStack.isEmpty()) {
-                        //try to find new stack, otherwise continue
-                        itemStack = InventoryHelper.findItemStackInInventory(player, blockState.getBlock());
-                        if (itemStack.isEmpty()) continue;
-                    }
-                    SurvivalHelper.placeBlock(world, player, blockPos, blockState, itemStack, sideHit, hitVec, false, false, false);
+            if (world.isLoaded(blockPos)) {
+                //check itemstack empty
+                if (itemStack.isEmpty()) {
+                    //try to find new stack, otherwise continue
+                    itemStack = InventoryHelper.findItemStackInInventory(player, blockState.getBlock());
+                    if (itemStack.isEmpty()) continue;
                 }
-            }
-
-            //find actual new blockstates for undo
-            for (var coordinate : coordinates) {
-                newBlockStates.add(world.getBlockState(coordinate));
+                SurvivalHelper.placeBlock(world, player, blockPos, blockState, itemStack, sideHit, hitVec, false, false, false);
             }
         }
+
+        //find actual new blockstates for undo
+        for (var coordinate : coordinates) {
+            newBlockStates.add(world.getBlockState(coordinate));
+        }
+//        }
 
         //Set first previousBlockState to empty if in NORMAL mode, to make undo/redo work
         //(Block is placed by the time it gets here, and unplaced after this)
@@ -111,6 +112,7 @@ public class BuildModifierHandler {
         //remember previous blockstates for undo
         List<BlockState> previousBlockStates = new ArrayList<>(coordinates.size());
         List<BlockState> newBlockStates = new ArrayList<>(coordinates.size());
+
         for (var coordinate : coordinates) {
             previousBlockStates.add(world.getBlockState(coordinate));
         }
@@ -119,31 +121,31 @@ public class BuildModifierHandler {
             BlockPreviewRenderer.getInstance().onBlocksBroken();
 
             //list of air blockstates
-            for (int i = 0; i < coordinates.size(); i++) {
-                newBlockStates.add(Blocks.AIR.defaultBlockState());
-            }
+//            for (int i = 0; i < coordinates.size(); i++) {
+//                newBlockStates.add(Blocks.AIR.defaultBlockState());
+//            }
 
-        } else {
+        }
+//        else {
+        //If the player is going to inst-break grass or a plant, make sure to only break other inst-breakable things
+        boolean onlyInstaBreaking = !player.isCreative() &&
+                world.getBlockState(startCoordinates.get(0)).getDestroySpeed(world, startCoordinates.get(0)) == 0f;
 
-            //If the player is going to inst-break grass or a plant, make sure to only break other inst-breakable things
-            boolean onlyInstaBreaking = !player.isCreative() &&
-                    world.getBlockState(startCoordinates.get(0)).getDestroySpeed(world, startCoordinates.get(0)) == 0f;
-
-            //break all those blocks
-            for (int i = breakStartPos ? 0 : 1; i < coordinates.size(); i++) {
-                var coordinate = coordinates.get(i);
-                if (world.isLoaded(coordinate) && !world.isEmptyBlock(coordinate)) {
-                    if (!onlyInstaBreaking || world.getBlockState(coordinate).getDestroySpeed(world, coordinate) == 0f) {
-                        SurvivalHelper.breakBlock(world, player, coordinate, false);
-                    }
+        //break all those blocks
+        for (int i = breakStartPos ? 0 : 1; i < coordinates.size(); i++) {
+            var coordinate = coordinates.get(i);
+            if (world.isLoaded(coordinate) && !world.isEmptyBlock(coordinate)) {
+                if (!onlyInstaBreaking || world.getBlockState(coordinate).getDestroySpeed(world, coordinate) == 0f) {
+                    SurvivalHelper.breakBlock(world, player, coordinate, false);
                 }
             }
-
-            //find actual new blockstates for undo
-            for (var coordinate : coordinates) {
-                newBlockStates.add(world.getBlockState(coordinate));
-            }
         }
+
+        //find actual new blockstates for undo
+        for (var coordinate : coordinates) {
+            newBlockStates.add(world.getBlockState(coordinate));
+        }
+//        }
 
         //Set first newBlockState to empty if in NORMAL mode, to make undo/redo work
         //(Block isn't broken yet by the time it gets here, and broken after this)

@@ -108,8 +108,8 @@
   "commands.effortless.max_block_place_at_once.failure": "Failed to set maxBlockPlaceAtOnce of %s",
   "commands.effortless.can_break_far.success": "Set canBreakFar of %s to %s",
   "commands.effortless.can_break_far.failure": "Failed to set canBreakFar of %s",
-  "commands.effortless.enable_undo.success": "Set enableUndo of %s to %s",
-  "commands.effortless.enable_undo.failure": "Failed to set enableUndo of %s",
+  "commands.effortless.enable_undo_redo.success": "Set enableUndoRedo of %s to %s",
+  "commands.effortless.enable_undo_redo.failure": "Failed to set enableUndoRedo of %s",
   "commands.effortless.undo_stack_size.success": "Set undoStackSize of %s to %s",
   "commands.effortless.undo_stack_size.failure": "Failed to set undoStackSize of %s",
   "commands.reserved": "NIE"

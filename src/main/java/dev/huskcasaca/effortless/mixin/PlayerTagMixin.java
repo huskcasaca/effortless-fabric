@@ -62,7 +62,7 @@ public abstract class PlayerTagMixin implements EffortlessDataProvider {
                 tag.getInt("maxBlockPlacePerAxis"),
                 tag.getInt("maxBlockPlaceAtOnce"),
                 tag.getBoolean("canBreakFar"),
-                tag.getBoolean("enableUndo"),
+                tag.getBoolean("enableUndoRedo"),
                 tag.getInt("undoStackSize")
         );
     }
@@ -75,7 +75,7 @@ public abstract class PlayerTagMixin implements EffortlessDataProvider {
         tag.putInt("maxBlockPlacePerAxis", reachSettings.maxBlockPlacePerAxis());
         tag.putInt("maxBlockPlaceAtOnce", reachSettings.maxBlockPlaceAtOnce());
         tag.putBoolean("canBreakFar", reachSettings.canBreakFar());
-        tag.putBoolean("enableUndo", reachSettings.enableUndo());
+        tag.putBoolean("enableUndoRedo", reachSettings.enableUndoRedo());
         tag.putInt("undoStackSize", reachSettings.undoStackSize());
 
         //TODO add mode settings

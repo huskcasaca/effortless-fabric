@@ -29,7 +29,7 @@ public class UndoRedo {
     private static final Map<UUID, FixedStack<BlockSet>> redoStacksServer = new HashMap<>();
 
     public static boolean isUndoEnabled(Player player) {
-        return ReachHelper.getReachSettings(player).enableUndo();
+        return ReachHelper.getReachSettings(player).enableUndoRedo();
     }
 
     //add to undo stack
@@ -84,7 +84,10 @@ public class UndoRedo {
     }
 
     public static boolean undo(Player player) {
-        if (!isUndoEnabled(player)) return false;
+        if (!isUndoEnabled(player)) {
+            Effortless.log(player, "Sorry, undo is disabled.");
+            return false;
+        }
         Map<UUID, FixedStack<BlockSet>> undoStacks = player.level.isClientSide ? undoStacksClient : undoStacksServer;
 
         if (!undoStacks.containsKey(player.getUUID())) return false;
@@ -126,8 +129,9 @@ public class UndoRedo {
                         if (!itemStack.isEmpty() && itemStack.getItem() instanceof BlockItem) {
                             previousBlockState = ((BlockItem) itemStack.getItem()).getBlock().defaultBlockState();
                         } else {
-                            if (previousBlockStates.get(i).getBlock() != Blocks.AIR)
+                            if (previousBlockStates.get(i).getBlock() != Blocks.AIR) {
                                 Effortless.logTranslate(player, "", previousBlockStates.get(i).getBlock().getDescriptionId(), " not found in inventory", true);
+                            }
                             previousBlockState = Blocks.AIR.defaultBlockState();
                         }
                     }
@@ -145,7 +149,10 @@ public class UndoRedo {
     }
 
     public static boolean redo(Player player) {
-        if (!isUndoEnabled(player)) return false;
+        if (!isUndoEnabled(player)) {
+            Effortless.log(player, "Sorry, redo is disabled.");
+            return false;
+        }
         Map<UUID, FixedStack<BlockSet>> redoStacks = player.level.isClientSide ? redoStacksClient : redoStacksServer;
 
         if (!redoStacks.containsKey(player.getUUID())) return false;
@@ -226,6 +233,10 @@ public class UndoRedo {
     private static ItemStack findItemStackInInventory(Player player, BlockState blockState) {
         ItemStack itemStack = ItemStack.EMPTY;
         if (blockState == null) return itemStack;
+
+        if (player.isCreative()) {
+            return new ItemStack(blockState.getBlock().asItem());
+        }
 
         //First try previousBlockStates
         //TODO try to find itemstack with right blockstate first

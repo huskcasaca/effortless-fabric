@@ -35,7 +35,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Environment(EnvType.CLIENT)
@@ -248,7 +247,7 @@ public class BlockPreviewRenderer {
             //Draw outlines if tool in hand
             //Find proper raytrace: either normal range or increased range depending on canBreakFar
             HitResult objectMouseOver = Minecraft.getInstance().hitResult;
-            HitResult breakingRaytrace = ReachHelper.canBreakFar(player) ? lookingAt : objectMouseOver;
+            HitResult breakingRaytrace = ReachHelper.isCanBreakFar(player) ? lookingAt : objectMouseOver;
             if (toolInHand && breakingRaytrace != null && breakingRaytrace.getType() == HitResult.Type.BLOCK) {
                 BlockHitResult blockBreakingRaytrace = (BlockHitResult) breakingRaytrace;
                 List<BlockPos> breakCoordinates = BuildModifierHandler.findCoordinates(player, blockBreakingRaytrace.getBlockPos());

@@ -154,14 +154,15 @@ public class SettingsCommand {
             return 0;
         })));
 
-        playerSettingsCommand.then(Commands.literal("enableUndo").then(Commands.argument("value", BoolArgumentType.bool()).executes(context -> {
+        playerSettingsCommand.then(Commands.literal("enableUndoRedo").then(Commands.argument("value", BoolArgumentType.bool()).executes(context -> {
             EntityArgument.getPlayers(context, "player").forEach(player -> {
                 try {
                     var value = BoolArgumentType.getBool(context, "value");
-                    ReachHelper.setEnableUndo(player, value);
-                    context.getSource().sendSuccess(new TranslatableComponent("commands.effortless.enable_undo.success", player.getDisplayName(), value), true);
+                    ReachHelper.setEnableUndoRedo(player, value);
+                    ReachHelper.sync(player);
+                    context.getSource().sendSuccess(new TranslatableComponent("commands.effortless.enable_undo_redo.success", player.getDisplayName(), value), true);
                 } catch (Exception e) {
-                    context.getSource().sendFailure(new TranslatableComponent("commands.effortless.enable_undo.failure", player.getDisplayName()));
+                    context.getSource().sendFailure(new TranslatableComponent("commands.effortless.enable_undo_redo.failure", player.getDisplayName()));
                 }
             });
             return 0;

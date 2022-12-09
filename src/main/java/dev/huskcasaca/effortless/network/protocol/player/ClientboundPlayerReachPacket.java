@@ -6,7 +6,7 @@ import net.minecraft.network.protocol.Packet;
 
 public record ClientboundPlayerReachPacket(
         ReachSettings reachSettings
-) implements Packet<ClientPlayerPacketListener> {
+) implements Packet<ClientEffortlessPacketListener> {
 
     public ClientboundPlayerReachPacket(FriendlyByteBuf friendlyByteBuf) {
         this(
@@ -27,12 +27,12 @@ public record ClientboundPlayerReachPacket(
         friendlyByteBuf.writeInt(reachSettings.maxBlockPlacePerAxis());
         friendlyByteBuf.writeInt(reachSettings.maxBlockPlaceAtOnce());
         friendlyByteBuf.writeBoolean(reachSettings.canBreakFar());
-        friendlyByteBuf.writeBoolean(reachSettings.enableUndo());
+        friendlyByteBuf.writeBoolean(reachSettings.enableUndoRedo());
         friendlyByteBuf.writeInt(reachSettings.undoStackSize());
     }
 
     @Override
-    public void handle(ClientPlayerPacketListener packetListener) {
+    public void handle(ClientEffortlessPacketListener packetListener) {
         packetListener.handle(this);
     }
 }

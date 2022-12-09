@@ -9,7 +9,7 @@ import net.minecraft.network.protocol.Packet;
  */
 public record ClientboundPlayerRequestLookAtPacket(
         boolean placeStartPos
-) implements Packet<ClientPlayerPacketListener> {
+) implements Packet<ClientEffortlessPacketListener> {
 
     public ClientboundPlayerRequestLookAtPacket() {
         this(false);
@@ -25,7 +25,7 @@ public record ClientboundPlayerRequestLookAtPacket(
     }
 
     @Override
-    public void handle(ClientPlayerPacketListener packetListener) {
+    public void handle(ClientEffortlessPacketListener packetListener) {
         packetListener.handle(this);
     }
 }

@@ -5,7 +5,7 @@ public record ReachSettings(
         int maxBlockPlacePerAxis,
         int maxBlockPlaceAtOnce,
         boolean canBreakFar,
-        boolean enableUndo,
+        boolean enableUndoRedo,
         int undoStackSize
 ) {
     public ReachSettings() {
@@ -14,8 +14,8 @@ public record ReachSettings(
                 128,
                 10_000,
                 true,
-                false,
-                10
+                true,
+                200
         );
     }
 

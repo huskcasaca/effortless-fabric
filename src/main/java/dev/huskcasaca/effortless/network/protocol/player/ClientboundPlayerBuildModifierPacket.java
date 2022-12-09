@@ -9,7 +9,7 @@ import net.minecraft.network.protocol.Packet;
  */
 public record ClientboundPlayerBuildModifierPacket(
         ModifierSettings modifierSettings
-) implements Packet<ClientPlayerPacketListener> {
+) implements Packet<ClientEffortlessPacketListener> {
 
     public ClientboundPlayerBuildModifierPacket(FriendlyByteBuf friendlyByteBuf) {
         this(ModifierSettings.decodeBuf(friendlyByteBuf));
@@ -21,7 +21,7 @@ public record ClientboundPlayerBuildModifierPacket(
     }
 
     @Override
-    public void handle(ClientPlayerPacketListener packetListener) {
+    public void handle(ClientEffortlessPacketListener packetListener) {
         packetListener.handle(this);
     }
 

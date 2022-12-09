@@ -2,7 +2,7 @@ package dev.huskcasaca.effortless.network.protocol.player;
 
 import net.minecraft.network.PacketListener;
 
-public interface ClientPlayerPacketListener extends PacketListener {
+public interface ClientEffortlessPacketListener extends PacketListener {
 
     void handle(ClientboundPlayerBuildModePacket packet);
 

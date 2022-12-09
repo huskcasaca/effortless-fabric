@@ -27,7 +27,7 @@ public record ServerboundPlayerSetBuildReachPacket(
         friendlyByteBuf.writeInt(reachSettings.maxBlockPlacePerAxis());
         friendlyByteBuf.writeInt(reachSettings.maxBlockPlaceAtOnce());
         friendlyByteBuf.writeBoolean(reachSettings.canBreakFar());
-        friendlyByteBuf.writeBoolean(reachSettings.enableUndo());
+        friendlyByteBuf.writeBoolean(reachSettings.enableUndoRedo());
         friendlyByteBuf.writeInt(reachSettings.undoStackSize());
     }
 

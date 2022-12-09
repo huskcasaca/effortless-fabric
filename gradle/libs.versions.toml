@@ -15,9 +15,6 @@ jsr305 = "3.0.2"
 modmenu = "3.2.3"
 cloth-config = "6.4.90"
 
-# Publish
-curseforge-publish = "0.1.0"
-
 [libraries]
 minecraft = { group = "com.mojang", name = "minecraft", version.ref = "minecraft" }
 fabric-loader = { group = "net.fabricmc", name = "fabric-loader", version.ref = "fabric-loader" }
