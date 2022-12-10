@@ -48,8 +48,41 @@ Hold ALT key to switch build modes in the radial panel. There are buttons for un
 * [ ] Tweakeroo support
 
 ## Changelog
-### v1.5.1
+### 1.5.1
 * Fix undo/redo in creative mode with no matching item in inventory
+### 1.5.0
+* Add build info in gui
+* Rearrange modifier settings entries
+* Fix block preview issue in place with large coordinates
+### 1.4.2
+* Fix network packet issue
+### 1.4.1
+* Fix player dimension change issue
+### 1.4.0
+* Add vanilla keybindings
+* Build modifier settings is no longer save to player data
+* Fix some mixin missing issue on server side
+* Fix contact info in mod description file
+### 1.3.0
+* Rearrange radial menu buttons
+* Fix wall items placing issue
+* Fix no hitbox item breaking issue
+### 1.2.1
+* Add message when closing radial menu
+* Fix player attach action
+* Fix new player settings issue
+### 1.2.0
+* Fix magnet texture issue
+* Fix modifier settings
+### 1.1.1
+* Add cloth config and modmenu
+* Fix access widener issue
+### 1.1.0
+* Add item magnet
+### 1.0.1
+* Fix left ctrl not working
+### 1.0.0
+* Initial release
 
 ## Credits
 * **[Requioss](https://www.curseforge.com/members/requioss)**, the author of [Effortless Building](https://www.curseforge.com/minecraft/mc-mods/effortless-building) 

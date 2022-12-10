@@ -59,34 +59,31 @@ public class BuildModifierHandler {
         if (world.isClientSide) {
 
             BlockPreviewRenderer.getInstance().onBlocksPlaced();
+            newBlockStates = blockStates;
+        } else {
 
-//            newBlockStates = blockStates;
+            //place blocks
+            for (int i = placeStartPos ? 0 : 1; i < coordinates.size(); i++) {
+                var blockPos = coordinates.get(i);
+                var blockState = blockStates.get(i);
+                var itemStack = itemStacks.get(i);
 
-        }
-//        else {
-
-        //place blocks
-        for (int i = placeStartPos ? 0 : 1; i < coordinates.size(); i++) {
-            var blockPos = coordinates.get(i);
-            var blockState = blockStates.get(i);
-            var itemStack = itemStacks.get(i);
-
-            if (world.isLoaded(blockPos)) {
-                //check itemstack empty
-                if (itemStack.isEmpty()) {
-                    //try to find new stack, otherwise continue
-                    itemStack = InventoryHelper.findItemStackInInventory(player, blockState.getBlock());
-                    if (itemStack.isEmpty()) continue;
+                if (world.isLoaded(blockPos)) {
+                    //check itemstack empty
+                    if (itemStack.isEmpty()) {
+                        //try to find new stack, otherwise continue
+                        itemStack = InventoryHelper.findItemStackInInventory(player, blockState.getBlock());
+                        if (itemStack.isEmpty()) continue;
+                    }
+                    SurvivalHelper.placeBlock(world, player, blockPos, blockState, itemStack, sideHit, hitVec, false, false, false);
                 }
-                SurvivalHelper.placeBlock(world, player, blockPos, blockState, itemStack, sideHit, hitVec, false, false, false);
+            }
+
+            //find actual new blockstates for undo
+            for (var coordinate : coordinates) {
+                newBlockStates.add(world.getBlockState(coordinate));
             }
         }
-
-        //find actual new blockstates for undo
-        for (var coordinate : coordinates) {
-            newBlockStates.add(world.getBlockState(coordinate));
-        }
-//        }
 
         //Set first previousBlockState to empty if in NORMAL mode, to make undo/redo work
         //(Block is placed by the time it gets here, and unplaced after this)
