@@ -29,6 +29,7 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 public class BuildModifierHandler {
@@ -59,7 +60,29 @@ public class BuildModifierHandler {
         if (world.isClientSide) {
 
             BlockPreviewRenderer.getInstance().onBlocksPlaced();
-            newBlockStates = blockStates;
+            if (!itemStacks.isEmpty()) {
+                var blockLeft = new HashMap<Block, Integer>();
+                for (int i = placeStartPos ? 0 : 1; i < coordinates.size(); i++) {
+                    var blockPos = coordinates.get(i);
+                    var blockState = blockStates.get(i);
+                    var itemStack = itemStacks.get(i);
+                    if (!blockLeft.containsKey(blockState.getBlock())) {
+                        blockLeft.put(blockState.getBlock(), InventoryHelper.findTotalBlocksInInventory(player, blockState.getBlock()));
+                    }
+                    var count = blockLeft.get(blockState.getBlock());
+                    if (count <= 0) {
+                        return;
+                    }
+                    blockLeft.put(blockState.getBlock(), count - 1);
+                    if (world.isLoaded(blockPos)) {
+                        SurvivalHelper.placeBlock(world, player, blockPos, blockState, itemStack.copy(), sideHit, hitVec, false, false, false);
+                    }
+                }
+            }
+            //find actual new blockstates for undo
+            for (var coordinate : coordinates) {
+                newBlockStates.add(world.getBlockState(coordinate));
+            }
         } else {
 
             //place blocks
@@ -78,7 +101,6 @@ public class BuildModifierHandler {
                     SurvivalHelper.placeBlock(world, player, blockPos, blockState, itemStack, sideHit, hitVec, false, false, false);
                 }
             }
-
             //find actual new blockstates for undo
             for (var coordinate : coordinates) {
                 newBlockStates.add(world.getBlockState(coordinate));

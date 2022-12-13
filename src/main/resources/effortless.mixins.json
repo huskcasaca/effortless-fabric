@@ -17,7 +17,6 @@
     "ClientPacketListenerMixin",
     "GuiMixin",
     "KeyEventMixin",
-    "LevelRendererMixin",
     "PlayerActionMixin",
     "ScreenMixin",
     "ShaderRendererMixin"

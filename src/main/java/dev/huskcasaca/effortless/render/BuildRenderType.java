@@ -17,7 +17,7 @@ import net.minecraft.world.phys.Vec3;
 import java.util.OptionalDouble;
 
 @Environment(EnvType.CLIENT)
-public class BuildRenderTypes extends RenderType {
+public class BuildRenderType extends RenderType {
     public static final RenderType EF_LINES;
     public static final RenderType EF_PLANES;
     //Between 0 and 7, but dont override vanilla textures
@@ -55,12 +55,13 @@ public class BuildRenderTypes extends RenderType {
                 .setShaderState(RenderStateShard.POSITION_COLOR_SHADER)
                 .setLayeringState(VIEW_OFFSET_Z_LAYERING)
                 .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
-                .setTextureState(RenderStateShard.NO_TEXTURE)
+//                .setTextureState(RenderStateShard.NO_TEXTURE)
                 .setDepthTestState(RenderStateShard.NO_DEPTH_TEST)
-                .setLightmapState(RenderStateShard.NO_LIGHTMAP)
+//                .setLightmapState(RenderStateShard.NO_LIGHTMAP)
                 .setWriteMaskState(COLOR_WRITE)
                 .setCullState(RenderStateShard.NO_CULL)
                 .createCompositeState(false);
+
         EF_PLANES = RenderType.create("ef_planes",
                 DefaultVertexFormat.POSITION_COLOR,
                 VertexFormat.Mode.QUADS,
@@ -71,7 +72,7 @@ public class BuildRenderTypes extends RenderType {
 
 
     // Dummy constructor needed to make java happy
-    public BuildRenderTypes(String p_173178_, VertexFormat p_173179_, VertexFormat.Mode p_173180_, int p_173181_, boolean p_173182_, boolean p_173183_, Runnable p_173184_, Runnable p_173185_) {
+    public BuildRenderType(String p_173178_, VertexFormat p_173179_, VertexFormat.Mode p_173180_, int p_173181_, boolean p_173182_, boolean p_173183_, Runnable p_173184_, Runnable p_173185_) {
         super(p_173178_, p_173179_, p_173180_, p_173181_, p_173182_, p_173183_, p_173184_, p_173185_);
     }
 

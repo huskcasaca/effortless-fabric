@@ -43,86 +43,80 @@ public class ModifierRenderer {
 
         if (mirrorSettings != null && mirrorSettings.enabled() && (mirrorSettings.mirrorX() || mirrorSettings.mirrorY() || mirrorSettings.mirrorZ())) {
             var pos = mirrorSettings.position().subtract(camera.getPosition());
-            renderMirror(poseStack, multiBufferSource, pos, mirrorSettings.radius(), mirrorSettings.getMirrorAxis(), mirrorSettings.drawPlanes(), mirrorSettings.drawLines());
+            renderMirror(multiBufferSource, pos, mirrorSettings.radius(), mirrorSettings.getMirrorAxis(), mirrorSettings.drawPlanes(), mirrorSettings.drawLines());
         }
 
         //Radial mirror lines and areas
         var radialMirrorSettings = BuildModifierHelper.getModifierSettings(player).radialMirrorSettings();
         if (radialMirrorSettings != null && radialMirrorSettings.enabled()) {
             var pos = radialMirrorSettings.position().subtract(camera.getPosition());
-            renderRadial(poseStack, multiBufferSource, pos.add(EPSILON), radialMirrorSettings.radius(), radialMirrorSettings.slices(), radialMirrorSettings.drawPlanes(), radialMirrorSettings.drawLines());
+            renderRadial(multiBufferSource, pos.add(EPSILON), radialMirrorSettings.radius(), radialMirrorSettings.slices(), radialMirrorSettings.drawPlanes(), radialMirrorSettings.drawLines());
         }
     }
 
-    private void drawAxisPlane(PoseStack poseStack, VertexConsumer buffer, Vec3 pos, Integer range, Direction.Axis axis, Color color) {
-        Matrix4f matrix4f = poseStack.last().pose();
+    private void drawAxisPlane(VertexConsumer buffer, Vec3 pos, Integer range, Direction.Axis axis, Color color) {
 
         var min = pos.subtract(range, range, range);
         var max = pos.add(range, range, range);
 
         switch (axis) {
             case Y -> {
-                buffer.vertex(matrix4f, (float) max.x(), (float) pos.y(), (float) max.z()).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_PLANE).endVertex();
-                buffer.vertex(matrix4f, (float) min.x(), (float) pos.y(), (float) max.z()).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_PLANE).endVertex();
-                buffer.vertex(matrix4f, (float) min.x(), (float) pos.y(), (float) min.z()).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_PLANE).endVertex();
-                buffer.vertex(matrix4f, (float) max.x(), (float) pos.y(), (float) min.z()).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_PLANE).endVertex();
+                buffer.vertex((float) max.x(), (float) pos.y(), (float) max.z()).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_PLANE).endVertex();
+                buffer.vertex((float) min.x(), (float) pos.y(), (float) max.z()).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_PLANE).endVertex();
+                buffer.vertex((float) min.x(), (float) pos.y(), (float) min.z()).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_PLANE).endVertex();
+                buffer.vertex((float) max.x(), (float) pos.y(), (float) min.z()).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_PLANE).endVertex();
             }
             case Z -> {
-                buffer.vertex(matrix4f, (float) max.x(), (float) min.y(), (float) pos.z()).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_PLANE).endVertex();
-                buffer.vertex(matrix4f, (float) min.x(), (float) min.y(), (float) pos.z()).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_PLANE).endVertex();
-                buffer.vertex(matrix4f, (float) min.x(), (float) max.y(), (float) pos.z()).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_PLANE).endVertex();
-                buffer.vertex(matrix4f, (float) max.x(), (float) max.y(), (float) pos.z()).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_PLANE).endVertex();
+                buffer.vertex((float) max.x(), (float) min.y(), (float) pos.z()).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_PLANE).endVertex();
+                buffer.vertex((float) min.x(), (float) min.y(), (float) pos.z()).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_PLANE).endVertex();
+                buffer.vertex((float) min.x(), (float) max.y(), (float) pos.z()).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_PLANE).endVertex();
+                buffer.vertex((float) max.x(), (float) max.y(), (float) pos.z()).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_PLANE).endVertex();
             }
             case X -> {
-                buffer.vertex(matrix4f, (float) pos.x(), (float) min.y(), (float) min.z()).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_PLANE).endVertex();
-                buffer.vertex(matrix4f, (float) pos.x(), (float) min.y(), (float) max.z()).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_PLANE).endVertex();
-                buffer.vertex(matrix4f, (float) pos.x(), (float) max.y(), (float) max.z()).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_PLANE).endVertex();
-                buffer.vertex(matrix4f, (float) pos.x(), (float) max.y(), (float) min.z()).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_PLANE).endVertex();
+                buffer.vertex((float) pos.x(), (float) min.y(), (float) min.z()).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_PLANE).endVertex();
+                buffer.vertex((float) pos.x(), (float) min.y(), (float) max.z()).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_PLANE).endVertex();
+                buffer.vertex((float) pos.x(), (float) max.y(), (float) max.z()).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_PLANE).endVertex();
+                buffer.vertex((float) pos.x(), (float) max.y(), (float) min.z()).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_PLANE).endVertex();
             }
         }
     }
 
-    private void drawAxisLine(PoseStack poseStack, VertexConsumer buffer, Vec3 pos, Integer range, Direction.Axis axis, Color color) {
-        Matrix4f matrix4f = poseStack.last().pose();
-
+    private void drawAxisLine(VertexConsumer buffer, Vec3 pos, Integer range, Direction.Axis axis, Color color) {
         var min = pos.subtract(range, range, range);
         var max = pos.add(range, range, range);
 
         switch (axis) {
             case Y -> {
-                buffer.vertex(matrix4f, (float) pos.x, (float) min.y, (float) pos.z).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_LINE).normal(1F, 1F, 1F).endVertex();
-                buffer.vertex(matrix4f, (float) pos.x, (float) max.y, (float) pos.z).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_LINE).normal(1F, 1F, 1F).endVertex();
+                buffer.vertex((float) pos.x, (float) min.y, (float) pos.z).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_LINE).normal(1F, 1F, 1F).endVertex();
+                buffer.vertex((float) pos.x, (float) max.y, (float) pos.z).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_LINE).normal(1F, 1F, 1F).endVertex();
             }
             case Z -> {
-                buffer.vertex(matrix4f, (float) pos.x, (float) pos.y, (float) min.z).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_LINE).normal(1F, 1F, 1F).endVertex();
-                buffer.vertex(matrix4f, (float) pos.x, (float) pos.y, (float) max.z).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_LINE).normal(1F, 1F, 1F).endVertex();
+                buffer.vertex((float) pos.x, (float) pos.y, (float) min.z).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_LINE).normal(1F, 1F, 1F).endVertex();
+                buffer.vertex((float) pos.x, (float) pos.y, (float) max.z).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_LINE).normal(1F, 1F, 1F).endVertex();
             }
             case X -> {
-                buffer.vertex(matrix4f, (float) min.x, (float) pos.y, (float) pos.z).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_LINE).normal(1F, 1F, 1F).endVertex();
-                buffer.vertex(matrix4f, (float) max.x, (float) pos.y, (float) pos.z).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_LINE).normal(1F, 1F, 1F).endVertex();
+                buffer.vertex((float) min.x, (float) pos.y, (float) pos.z).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_LINE).normal(1F, 1F, 1F).endVertex();
+                buffer.vertex((float) max.x, (float) pos.y, (float) pos.z).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_LINE).normal(1F, 1F, 1F).endVertex();
             }
         }
     }
 
-    private void drawVerticalPlane(PoseStack poseStack, VertexConsumer buffer, Vec3 posA, Vec3 posB, Color color) {
-        Matrix4f matrix4f = poseStack.last().pose();
-
+    private void drawVerticalPlane(VertexConsumer buffer, Vec3 posA, Vec3 posB, Color color) {
         var min = posA;
         var max = posB;
 
-        buffer.vertex(matrix4f, (float) min.x(), (float) min.y(), (float) min.z()).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_PLANE).endVertex();
-        buffer.vertex(matrix4f, (float) max.x(), (float) min.y(), (float) max.z()).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_PLANE).endVertex();
-        buffer.vertex(matrix4f, (float) max.x(), (float) max.y(), (float) max.z()).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_PLANE).endVertex();
-        buffer.vertex(matrix4f, (float) min.x(), (float) max.y(), (float) min.z()).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_PLANE).endVertex();
+        buffer.vertex((float) min.x(), (float) min.y(), (float) min.z()).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_PLANE).endVertex();
+        buffer.vertex((float) max.x(), (float) min.y(), (float) max.z()).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_PLANE).endVertex();
+        buffer.vertex((float) max.x(), (float) max.y(), (float) max.z()).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_PLANE).endVertex();
+        buffer.vertex((float) min.x(), (float) max.y(), (float) min.z()).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_PLANE).endVertex();
     }
 
-    private void drawLine(PoseStack poseStack, VertexConsumer buffer, Vec3 posA, Vec3 posB, Color color) {
-        Matrix4f matrix4f = poseStack.last().pose();
-        buffer.vertex(matrix4f, (float) posA.x, (float) posA.y, (float) posA.z).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_LINE).normal(1F, 1F, 1F).endVertex();
-        buffer.vertex(matrix4f, (float) posB.x, (float) posB.y, (float) posB.z).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_LINE).normal(1F, 1F, 1F).endVertex();
+    private void drawLine(VertexConsumer buffer, Vec3 posA, Vec3 posB, Color color) {
+        buffer.vertex((float) posA.x, (float) posA.y, (float) posA.z).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_LINE).normal(1F, 1F, 1F).endVertex();
+        buffer.vertex((float) posB.x, (float) posB.y, (float) posB.z).color(color.getRed(), color.getGreen(), color.getBlue(), ALPHA_LINE).normal(1F, 1F, 1F).endVertex();
     }
 
-    private void renderMirror(PoseStack poseStack, MultiBufferSource.BufferSource multiBufferSource, Vec3 pos, Integer radius, List<Direction.Axis> axis, boolean drawPlanes, boolean drawLines) {
+    private void renderMirror(MultiBufferSource.BufferSource multiBufferSource, Vec3 pos, Integer radius, List<Direction.Axis> axis, boolean drawPlanes, boolean drawLines) {
         for (Direction.Axis a : axis) {
             var color = switch (a) {
                 case X -> COLOR_X;
@@ -131,14 +125,14 @@ public class ModifierRenderer {
             };
             if (drawPlanes) {
                 VertexConsumer buffer = RenderUtils.beginPlanes(multiBufferSource);
-                drawAxisPlane(poseStack, buffer, pos, radius, a, color);
+                drawAxisPlane(buffer, pos, radius, a, color);
                 multiBufferSource.endBatch();
             }
             if (drawLines) {
                 VertexConsumer buffer = RenderUtils.beginLines(multiBufferSource);
                 for (Direction.Axis a1 : Direction.Axis.values()) {
                     if (a1 != a) {
-                        drawAxisLine(poseStack, buffer, pos, radius, a1, color);
+                        drawAxisLine(buffer, pos, radius, a1, color);
                     }
                 }
                 multiBufferSource.endBatch();
@@ -146,7 +140,7 @@ public class ModifierRenderer {
         }
     }
 
-    private void renderRadial(PoseStack poseStack, MultiBufferSource.BufferSource multiBufferSource, Vec3 pos, Integer radius, Integer slices, boolean drawPlanes, boolean drawLines) {
+    private void renderRadial(MultiBufferSource.BufferSource multiBufferSource, Vec3 pos, Integer radius, Integer slices, boolean drawPlanes, boolean drawLines) {
 
         float angle = 2f * ((float) Math.PI) / slices;
         var relStartVec = new Vec3(radius, 0, 0);
@@ -161,19 +155,19 @@ public class ModifierRenderer {
 
             if (drawPlanes) {
                 VertexConsumer buffer = RenderUtils.beginPlanes(multiBufferSource);
-                drawVerticalPlane(poseStack, buffer, posA, posB, COLOR_RAD);
+                drawVerticalPlane(buffer, posA, posB, COLOR_RAD);
                 multiBufferSource.endBatch();
             }
             if (drawLines) {
                 VertexConsumer buffer = RenderUtils.beginLines(multiBufferSource);
-                drawLine(poseStack, buffer, new Vec3(posA.x(), pos.y(), posA.z()), new Vec3(posB.x(), pos.y(), posB.z()), COLOR_RAD);
+                drawLine(buffer, new Vec3(posA.x(), pos.y(), posA.z()), new Vec3(posB.x(), pos.y(), posB.z()), COLOR_RAD);
                 multiBufferSource.endBatch();
             }
         }
 
         if (drawLines) {
             VertexConsumer buffer = RenderUtils.beginLines(multiBufferSource);
-            drawLine(poseStack, buffer, new Vec3(pos.x(), pos.y() - radius, pos.z()), new Vec3(pos.x(), pos.y() + radius, pos.z()), COLOR_RAD);
+            drawLine(buffer, new Vec3(pos.x(), pos.y() - radius, pos.z()), new Vec3(pos.x(), pos.y() + radius, pos.z()), COLOR_RAD);
             multiBufferSource.endBatch();
         }
     }

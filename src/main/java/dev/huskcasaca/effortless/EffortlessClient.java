@@ -1,6 +1,8 @@
 package dev.huskcasaca.effortless;
 
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.Tesselator;
 import dev.huskcasaca.effortless.buildmode.BuildModeHandler;
 import dev.huskcasaca.effortless.buildmode.BuildModeHelper;
 import dev.huskcasaca.effortless.control.Keys;
@@ -10,7 +12,9 @@ import dev.huskcasaca.effortless.event.ClientScreenInputEvent;
 import dev.huskcasaca.effortless.buildreach.ReachHelper;
 import dev.huskcasaca.effortless.network.Packets;
 import dev.huskcasaca.effortless.network.protocol.player.ServerboundPlayerSetBuildModePacket;
-import dev.huskcasaca.effortless.render.BuildRenderTypes;
+import dev.huskcasaca.effortless.render.BlockPreviewRenderer;
+import dev.huskcasaca.effortless.render.BuildRenderType;
+import dev.huskcasaca.effortless.render.ModifierRenderer;
 import dev.huskcasaca.effortless.screen.buildmode.PlayerSettingsScreen;
 import dev.huskcasaca.effortless.screen.buildmode.RadialMenuScreen;
 import dev.huskcasaca.effortless.screen.buildmodifier.ModifierSettingsScreen;
@@ -19,9 +23,12 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.minecraft.client.Camera;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.Mth;
@@ -209,11 +216,11 @@ public class EffortlessClient implements ClientModInitializer {
         return world.clip(new ClipContext(start, end, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player));
     }
 
-    public static void registerShaders(ResourceManager manager, ClientReloadShadersEvent.ShaderRegister.ShadersSink sink) throws IOException {
+    public static void registerShaders(ResourceManager resourceManager, ClientReloadShadersEvent.ShaderRegister.ShadersSink sink) throws IOException {
         sink.registerShader(
                 // TODO: 10/9/22 use custom namespace
-                new ShaderInstance(manager, "dissolve", DefaultVertexFormat.BLOCK),
-                (shaderInstance) -> BuildRenderTypes.dissolveShaderInstance = shaderInstance
+                new ShaderInstance(resourceManager, "dissolve", DefaultVertexFormat.BLOCK),
+                (shaderInstance) -> BuildRenderType.dissolveShaderInstance = shaderInstance
         );
     }
 
@@ -230,6 +237,27 @@ public class EffortlessClient implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(EffortlessClient::onEndClientTick);
 
         ClientReloadShadersEvent.REGISTER_SHADER.register(EffortlessClient::registerShaders);
+
+        WorldRenderEvents.AFTER_ENTITIES.register((context) -> renderBlockPreview(context.matrixStack(), context.camera()));
+        WorldRenderEvents.BEFORE_DEBUG_RENDER.register((context) -> renderModifierSettings(context.matrixStack(), context.camera()));
+
     }
+
+    public static void renderBlockPreview(PoseStack poseStack, Camera camera) {
+        var bufferBuilder = Tesselator.getInstance().getBuilder();
+        var bufferSource = MultiBufferSource.immediate(bufferBuilder);
+        var player = Minecraft.getInstance().player;
+
+        BlockPreviewRenderer.getInstance().render(player, poseStack, bufferSource, camera);
+    }
+
+    public static void renderModifierSettings(PoseStack poseStack, Camera camera) {
+        var bufferBuilder = Tesselator.getInstance().getBuilder();
+        var bufferSource = MultiBufferSource.immediate(bufferBuilder);
+        var player = Minecraft.getInstance().player;
+
+        ModifierRenderer.getInstance().render(player, poseStack, bufferSource, camera);
+    }
+
 
 }

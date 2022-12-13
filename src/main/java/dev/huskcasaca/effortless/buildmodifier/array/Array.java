@@ -8,17 +8,16 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class Array implements Modifier {
 
     public static List<BlockPos> findCoordinates(Player player, BlockPos startPos) {
-        List<BlockPos> coordinates = new ArrayList<>();
+        var coordinates = new LinkedHashSet<BlockPos>();
 
         //find arraysettings for the player
         var arraySettings = BuildModifierHelper.getModifierSettings(player).arraySettings();
-        if (!isEnabled(arraySettings)) return coordinates;
+        if (!isEnabled(arraySettings)) return Collections.emptyList();
 
         var pos = startPos;
         var offset = new Vec3i(arraySettings.offset.getX(), arraySettings.offset.getY(), arraySettings.offset.getZ());
@@ -28,15 +27,15 @@ public class Array implements Modifier {
             coordinates.add(pos);
         }
 
-        return coordinates;
+        return coordinates.stream().toList();
     }
 
     public static List<BlockState> findBlockStates(Player player, BlockPos startPos, BlockState blockState, ItemStack itemStack, List<ItemStack> itemStacks) {
-        List<BlockState> blockStates = new ArrayList<>();
+        var blockStates = new LinkedHashMap<BlockPos, BlockState>();
 
         //find arraysettings for the player that placed the block
         var arraySettings = BuildModifierHelper.getModifierSettings(player).arraySettings();
-        if (!isEnabled(arraySettings)) return blockStates;
+        if (!isEnabled(arraySettings)) return Collections.emptyList();
 
         var pos = startPos;
         var offset = new Vec3i(arraySettings.offset.getX(), arraySettings.offset.getY(), arraySettings.offset.getZ());
@@ -60,11 +59,13 @@ public class Array implements Modifier {
 //			}
 
             //blockState = blockState.getBlock().getStateForPlacement(player.world, pos, )
-            blockStates.add(blockState);
-            itemStacks.add(itemStack);
+            if (blockStates.get(pos) == null) {
+                blockStates.put(pos, blockState);
+                itemStacks.add(itemStack);
+            }
         }
 
-        return blockStates;
+        return blockStates.values().stream().toList();
     }
 
     public static boolean isEnabled(ArraySettings a) {

@@ -192,7 +192,7 @@ public class SurvivalHelper {
         if (BuildModifierHelper.isReplace(player)) {
             if (true) return true;
         } else {
-            return world.getBlockState(pos).isAir();
+            return world.getBlockState(pos).getMaterial().isReplaceable();
         }
         //Check if itemstack is correct
         if (!(itemStack.getItem() instanceof BlockItem) || Block.byItem(itemStack.getItem()) != newBlockState.getBlock()) {

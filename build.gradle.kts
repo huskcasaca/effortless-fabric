@@ -7,7 +7,7 @@ plugins {
     id("io.github.huskcasaca.gradle-curseforge-plugin") version "1.0.0-alpha"
 }
 
-version = "1.5.2"
+version = "1.5.3"
 group = "dev.huskcasaca"
 
 base {

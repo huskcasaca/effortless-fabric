@@ -316,7 +316,7 @@ public class BlockPreviewRenderer {
         if (doRenderBlockPreviews(player, firstPos)) {
 
             //Save current coordinates, blockstates and itemstacks
-            if (!coordinates.isEmpty() && blockStates.size() == coordinates.size() &&
+            if (coordinates != null && blockStates != null && !coordinates.isEmpty() && blockStates.size() == coordinates.size() &&
                     coordinates.size() > 1 && coordinates.size() < PreviewConfig.shaderThresholdRounded()) {
 
                 placedDataList.add(new PlacedData(EffortlessClient.ticksInGame, coordinates, blockStates,
@@ -338,7 +338,7 @@ public class BlockPreviewRenderer {
         if (doRenderBlockPreviews(player, firstPos)) {
 
             //Save current coordinates, blockstates and itemstacks
-            if (!coordinates.isEmpty() && blockStates.size() == coordinates.size() &&
+            if (coordinates != null && blockStates != null && !coordinates.isEmpty() && blockStates.size() == coordinates.size() &&
                     coordinates.size() > 1 && coordinates.size() < PreviewConfig.shaderThresholdRounded()) {
 
                 sortOnDistanceToPlayer(coordinates, player);

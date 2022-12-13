@@ -21,7 +21,7 @@ import java.util.Random;
 public class RenderUtils {
 
     protected static VertexConsumer beginLines(MultiBufferSource.BufferSource renderTypeBuffer) {
-        return renderTypeBuffer.getBuffer(BuildRenderTypes.lines());
+        return renderTypeBuffer.getBuffer(BuildRenderType.lines());
     }
 
     protected static void endLines(MultiBufferSource.BufferSource renderTypeBuffer) {
@@ -29,7 +29,7 @@ public class RenderUtils {
     }
 
     protected static VertexConsumer beginPlanes(MultiBufferSource multiBufferSource) {
-        return multiBufferSource.getBuffer(BuildRenderTypes.planes());
+        return multiBufferSource.getBuffer(BuildRenderType.planes());
     }
 
     protected static void endPlanes(MultiBufferSource.BufferSource renderTypeBuffer) {
@@ -48,7 +48,7 @@ public class RenderUtils {
         poseStack.scale(129 / 128f, 129 / 128f, 129 / 128f);
 
         //Begin block preview rendering
-        RenderType blockPreviewRenderType = BuildRenderTypes.getBlockPreviewRenderType(dissolve, blockPos, firstPos, secondPos, red);
+        RenderType blockPreviewRenderType = BuildRenderType.getBlockPreviewRenderType(dissolve, blockPos, firstPos, secondPos, red);
         VertexConsumer buffer = renderTypeBuffer.getBuffer(blockPreviewRenderType);
 
         try {
@@ -58,7 +58,7 @@ public class RenderUtils {
 //                    1f, 1f, 1f, 0, OverlayTexture.NO_OVERLAY/*, ModelData.EMPTY, blockPreviewRenderType*/);
             dispatcher.getModelRenderer().tesselateBlock(Minecraft.getInstance().level, dispatcher.getBlockModel(blockState), blockState, blockPos, poseStack, buffer, false, new Random(), blockState.getSeed(firstPos), OverlayTexture.NO_OVERLAY);
         } catch (NullPointerException e) {
-            Effortless.logger.warn("RenderHandler::renderBlockPreview cannot render " + blockState.getBlock().toString());
+            Effortless.logger.warn("RenderUtils::renderBlockPreview cannot render " + blockState.getBlock().toString());
 
             //Render outline as backup, escape out of the current renderstack
             poseStack.popPose();

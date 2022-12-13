@@ -48,6 +48,11 @@ Hold ALT key to switch build modes in the radial panel. There are buttons for un
 * [ ] Tweakeroo support
 
 ## Changelog
+### 1.5.3
+* Fix compatibility with OptiFine
+* Fix modifier settings duplicate items
+### 1.5.2
+* Fix insufficient block placing crash issue in survival mod
 ### 1.5.1
 * Fix undo/redo in creative mode with no matching item in inventory
 ### 1.5.0
