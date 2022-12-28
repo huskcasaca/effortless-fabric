@@ -15,7 +15,7 @@ import net.minecraft.world.phys.Vec3;
 public record ServerboundPlayerPlaceBlockPacket(
         boolean blockHit,
         BlockPos blockPos,
-        Direction sideHit,
+        Direction hitSide,
         Vec3 hitVec,
         boolean placeStartPos //prevent double placing in normal mode
 ) implements Packet<ServerEffortlessPacketListener> {
@@ -41,7 +41,7 @@ public record ServerboundPlayerPlaceBlockPacket(
     public void write(FriendlyByteBuf friendlyByteBuf) {
         friendlyByteBuf.writeBoolean(blockHit);
         friendlyByteBuf.writeBlockPos(blockPos);
-        friendlyByteBuf.writeByte(sideHit.get3DDataValue());
+        friendlyByteBuf.writeByte(hitSide.get3DDataValue());
         friendlyByteBuf.writeDouble(hitVec.x);
         friendlyByteBuf.writeDouble(hitVec.y);
         friendlyByteBuf.writeDouble(hitVec.z);

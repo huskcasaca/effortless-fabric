@@ -14,12 +14,12 @@ public interface Buildable {
 
     //Fired when a block would be placed
     //Return a list of coordinates where you want to place blocks
-    List<BlockPos> onRightClick(Player player, BlockPos blockPos, Direction sideHit, Vec3 hitVec, boolean skipRaytrace);
+    List<BlockPos> onUse(Player player, BlockPos blockPos, Direction hitSide, Vec3 hitVec, boolean skipRaytrace);
 
     //Fired continuously for visualization purposes
     List<BlockPos> findCoordinates(Player player, BlockPos blockPos, boolean skipRaytrace);
 
-    Direction getSideHit(Player player);
+    Direction getHitSide(Player player);
 
     Vec3 getHitVec(Player player);
 }

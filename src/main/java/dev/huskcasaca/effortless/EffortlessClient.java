@@ -9,7 +9,7 @@ import dev.huskcasaca.effortless.control.Keys;
 import dev.huskcasaca.effortless.event.ClientReloadShadersEvent;
 import dev.huskcasaca.effortless.event.ClientScreenEvent;
 import dev.huskcasaca.effortless.event.ClientScreenInputEvent;
-import dev.huskcasaca.effortless.buildreach.ReachHelper;
+import dev.huskcasaca.effortless.building.ReachHelper;
 import dev.huskcasaca.effortless.network.Packets;
 import dev.huskcasaca.effortless.network.protocol.player.ServerboundPlayerSetBuildModePacket;
 import dev.huskcasaca.effortless.render.BlockPreviewRenderer;
@@ -47,7 +47,7 @@ public class EffortlessClient implements ClientModInitializer {
     public static KeyMapping[] keyBindings;
     public static HitResult previousLookAt;
     public static HitResult currentLookAt;
-    public static int ticksInGame = 0;
+    private static int ticksInGame = 0;
 
     public static void onStartClientTick(Minecraft client) {
         //Update previousLookAt
@@ -203,7 +203,7 @@ public class EffortlessClient implements ClientModInitializer {
     }
 
     public static HitResult getLookingAt(Player player) {
-        Level world = player.level;
+        var level = player.level;
 
         //base distance off of player ability (config)
         float raytraceRange = ReachHelper.getPlacementReach(player) * 4;
@@ -213,15 +213,19 @@ public class EffortlessClient implements ClientModInitializer {
         var end = new Vec3(player.getX() + look.x * raytraceRange, player.getY() + player.getEyeHeight() + look.y * raytraceRange, player.getZ() + look.z * raytraceRange);
 //        return player.rayTrace(raytraceRange, 1f, RayTraceFluidMode.NEVER);
         //TODO 1.14 check if correct
-        return world.clip(new ClipContext(start, end, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player));
+        return level.clip(new ClipContext(start, end, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player));
     }
 
     public static void registerShaders(ResourceManager resourceManager, ClientReloadShadersEvent.ShaderRegister.ShadersSink sink) throws IOException {
         sink.registerShader(
                 // TODO: 10/9/22 use custom namespace
                 new ShaderInstance(resourceManager, "dissolve", DefaultVertexFormat.BLOCK),
-                (shaderInstance) -> BuildRenderType.dissolveShaderInstance = shaderInstance
+                (shaderInstance) -> BuildRenderType.setDissolveShaderInstance(shaderInstance)
         );
+    }
+
+    public static int getTicksInGame() {
+        return ticksInGame;
     }
 
     @Override
@@ -239,7 +243,7 @@ public class EffortlessClient implements ClientModInitializer {
         ClientReloadShadersEvent.REGISTER_SHADER.register(EffortlessClient::registerShaders);
 
         WorldRenderEvents.AFTER_ENTITIES.register((context) -> renderBlockPreview(context.matrixStack(), context.camera()));
-        WorldRenderEvents.BEFORE_DEBUG_RENDER.register((context) -> renderModifierSettings(context.matrixStack(), context.camera()));
+        WorldRenderEvents.LAST.register((context) -> renderModifierSettings(context.matrixStack(), context.camera()));
 
     }
 

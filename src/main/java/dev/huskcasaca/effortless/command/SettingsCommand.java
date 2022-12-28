@@ -3,18 +3,17 @@ package dev.huskcasaca.effortless.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
-import dev.huskcasaca.effortless.buildmode.BuildAction;
-import dev.huskcasaca.effortless.buildmode.BuildActionHandler;
+import dev.huskcasaca.effortless.building.BuildAction;
+import dev.huskcasaca.effortless.building.BuildActionHandler;
 import dev.huskcasaca.effortless.buildmode.BuildMode;
 import dev.huskcasaca.effortless.buildmode.BuildModeHelper;
 import dev.huskcasaca.effortless.buildmodifier.BuildModifierHelper;
 import dev.huskcasaca.effortless.buildmodifier.ReplaceMode;
-import dev.huskcasaca.effortless.buildreach.ReachHelper;
+import dev.huskcasaca.effortless.building.ReachHelper;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.*;
 
 import java.util.Arrays;
 
@@ -24,7 +23,7 @@ public class SettingsCommand {
 
         var effortlessCommand = Commands.literal("effortless");
 
-        var actionCommand = Commands.literal("performAction");
+        var actionCommand = Commands.literal("action");
 
         Arrays.stream(BuildAction.values()).forEach(buildAction -> {
             actionCommand.then(Commands.literal(buildAction.getCommandName()).executes(context -> {
@@ -89,7 +88,7 @@ public class SettingsCommand {
             }));
         });
 
-        var modifierCommand = Commands.literal("performAction");
+        var modifierCommand = Commands.literal("action");
 
         var arrayCommand = Commands.literal("array");
         var radialArrayCommand = Commands.literal("radialArray");

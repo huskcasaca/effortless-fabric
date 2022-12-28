@@ -1,10 +1,11 @@
 package dev.huskcasaca.effortless.buildmode.threeclick;
 
-import dev.huskcasaca.effortless.buildmode.BuildAction;
-import dev.huskcasaca.effortless.buildmode.BuildActionHandler;
+import dev.huskcasaca.effortless.building.BuildAction;
+import dev.huskcasaca.effortless.building.BuildActionHandler;
 import dev.huskcasaca.effortless.buildmode.ThreeClickBuildable;
 import dev.huskcasaca.effortless.buildmode.twoclick.Circle;
 import dev.huskcasaca.effortless.buildmode.twoclick.Floor;
+import dev.huskcasaca.effortless.buildmode.twoclick.Wall;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
@@ -22,24 +23,58 @@ public class Sphere extends ThreeClickBuildable {
         float centerZ = z1;
 
         //Adjust for CIRCLE_START
-        if (BuildActionHandler.getCircleStart() == BuildAction.CIRCLE_START_CORNER) {
-            centerX = x1 + (x2 - x1) / 2f;
-            centerY = y1 + (y3 - y1) / 2f;
-            centerZ = z1 + (z2 - z1) / 2f;
+
+        float radiusX;
+        float radiusY;
+        float radiusZ;
+
+        if (BuildActionHandler.getOrientation() == BuildAction.FACE_HORIZONTAL) {
+            if (BuildActionHandler.getCircleStart() == BuildAction.CIRCLE_START_CORNER) {
+                centerX = x1 + (x2 - x1) / 2f;
+                centerY = y1 + (y3 - y1) / 2f;
+                centerZ = z1 + (z2 - z1) / 2f;
+            } else {
+                x1 = (int) (centerX - (x2 - centerX));
+                y1 = (int) (centerY - (y3 - centerY));
+                z1 = (int) (centerZ - (z2 - centerZ));
+            }
+            radiusX = Mth.abs(x2 - centerX);
+            radiusY = Mth.abs(y3 - centerY);
+            radiusZ = Mth.abs(z2 - centerZ);
         } else {
-            x1 = (int) (centerX - (x2 - centerX));
-            y1 = (int) (centerY - (y3 - centerY));
-            z1 = (int) (centerZ - (z2 - centerZ));
+            if  (x1 == x2) {
+                if (BuildActionHandler.getCircleStart() == BuildAction.CIRCLE_START_CORNER) {
+                    centerX = x1 + (x3 - x1) / 2f;
+                    centerY = y1 + (y2 - y1) / 2f;
+                    centerZ = z1 + (z2 - z1) / 2f;
+                } else {
+                    x1 = (int) (centerX - (x3 - centerX));
+                    y1 = (int) (centerY - (y2 - centerY));
+                    z1 = (int) (centerZ - (z2 - centerZ));
+                }
+                radiusX = Mth.abs(x3 - centerX);
+                radiusY = Mth.abs(y2 - centerY);
+                radiusZ = Mth.abs(z2 - centerZ);
+            } else {
+                if (BuildActionHandler.getCircleStart() == BuildAction.CIRCLE_START_CORNER) {
+                    centerX = x1 + (x2 - x1) / 2f;
+                    centerY = y1 + (y2 - y1) / 2f;
+                    centerZ = z1 + (z3 - z1) / 2f;
+                } else {
+                    x1 = (int) (centerX - (x2 - centerX));
+                    y1 = (int) (centerY - (y2 - centerY));
+                    z1 = (int) (centerZ - (z3 - centerZ));
+                }
+                radiusX = Mth.abs(x2 - centerX);
+                radiusY = Mth.abs(y2 - centerY);
+                radiusZ = Mth.abs(z3 - centerZ);
+            }
         }
-
-        float radiusX = Mth.abs(x2 - centerX);
-        float radiusY = Mth.abs(y3 - centerY);
-        float radiusZ = Mth.abs(z2 - centerZ);
-
-        if (BuildActionHandler.getFill() == BuildAction.FULL)
+        if (BuildActionHandler.getPlaneFilling() == BuildAction.PLANE_FULL) {
             addSphereBlocks(list, x1, y1, z1, x3, y3, z3, centerX, centerY, centerZ, radiusX, radiusY, radiusZ);
-        else
+        } else {
             addHollowSphereBlocks(list, x1, y1, z1, x3, y3, z3, centerX, centerY, centerZ, radiusX, radiusY, radiusZ);
+        }
 
         return list;
     }
@@ -93,17 +128,33 @@ public class Sphere extends ThreeClickBuildable {
 
     @Override
     public BlockPos findSecondPos(Player player, BlockPos firstPos, boolean skipRaytrace) {
-        return Floor.findFloor(player, firstPos, skipRaytrace);
+        if (BuildActionHandler.getOrientation() == BuildAction.FACE_HORIZONTAL) {
+            return Floor.findFloor(player, firstPos, skipRaytrace);
+        } else {
+            return Wall.findWall(player, firstPos, skipRaytrace);
+        }
     }
 
     @Override
     public BlockPos findThirdPos(Player player, BlockPos firstPos, BlockPos secondPos, boolean skipRaytrace) {
-        return findHeight(player, secondPos, skipRaytrace);
+        if (BuildActionHandler.getOrientation() == BuildAction.FACE_HORIZONTAL) {
+            return findHeight(player, secondPos, skipRaytrace);
+        } else {
+            if (firstPos.getX() == secondPos.getX()) {
+                return findZDepth(player, secondPos, skipRaytrace);
+            } else {
+                return findXDepth(player, secondPos, skipRaytrace);
+            }
+        }
     }
 
     @Override
     public List<BlockPos> getIntermediateBlocks(Player player, int x1, int y1, int z1, int x2, int y2, int z2) {
-        return Circle.getCircleBlocks(player, x1, y1, z1, x2, y2, z2);
+        if (BuildActionHandler.getOrientation() == BuildAction.FACE_HORIZONTAL) {
+            return Circle.getFloorCircleBlocks(player, x1, y1, z1, x2, y2, z2);
+        } else {
+            return Circle.getWallCircleBlocks(player, x1, y1, z1, x2, y2, z2);
+        }
     }
 
     @Override

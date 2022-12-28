@@ -48,6 +48,13 @@ Hold ALT key to switch build modes in the radial panel. There are buttons for un
 * [ ] Tweakeroo support
 
 ## Changelog
+### 1.6.0
+* Add build orientation option for circle modes
+* Add block count indicator
+* Add preview for insufficient block
+* Add build commands
+* Fix array and mirror block duplication issue
+* Fix block breaking issue in survival mode
 ### 1.5.3
 * Fix compatibility with OptiFine
 * Fix modifier settings duplicate items

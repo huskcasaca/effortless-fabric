@@ -14,9 +14,8 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.client.sounds.SoundManager;
+import net.minecraft.network.chat.*;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 
@@ -34,7 +33,7 @@ public class PlayerSettingsScreen extends Screen {
     private Button closeButton;
 
     public PlayerSettingsScreen() {
-        super(new TranslatableComponent("effortless.screen.player_settings"));
+        super(new TranslatableComponent(String.join(".", Effortless.MOD_ID, "screen", "player_settings")));
     }
 
     @Override
@@ -68,24 +67,24 @@ public class PlayerSettingsScreen extends Screen {
     }
 
     @Override
-    public void render(PoseStack ms, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(ms);
+    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
+        this.renderBackground(poseStack);
 
         int yy = top;
-        font.draw(ms, "Shader type", left, yy + 5, 0xFFFFFF);
+        font.draw(poseStack, "Shader type", left, yy + 5, 0xFFFFFF);
 
         yy += 50;
-        font.draw(ms, "Shader speed", left, yy + 5, 0xFFFFFF);
+        font.draw(poseStack, "Shader speed", left, yy + 5, 0xFFFFFF);
 
-        super.render(ms, mouseX, mouseY, partialTicks);
+        super.render(poseStack, mouseX, mouseY, partialTicks);
 
         if (showShaderList)
-            this.shaderTypeList.render(ms, mouseX, mouseY, partialTicks);
+            this.shaderTypeList.render(poseStack, mouseX, mouseY, partialTicks);
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
-        super.mouseClicked(mouseX, mouseY, mouseButton);
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        super.mouseClicked(mouseX, mouseY, button);
         if (showShaderList) {
             if (!shaderTypeList.isMouseOver(mouseX, mouseY) && !shaderTypeButton.isMouseOver(mouseX, mouseY))
                 showShaderList = false;
@@ -103,7 +102,7 @@ public class PlayerSettingsScreen extends Screen {
         DISSOLVE_BLUE("Dissolve Blue"),
         DISSOLVE_ORANGE("Dissolve Orange");
 
-        public Component name;
+        private final Component name;
 
         ShaderType(Component name) {
             this.name = name;
@@ -143,42 +142,44 @@ public class PlayerSettingsScreen extends Screen {
         }
 
         @Override
-        public void setSelected(PlayerSettingsScreen.ShaderTypeList.ShaderTypeEntry selected) {
-            super.setSelected(selected);
-            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
-            Effortless.log("Selected shader " + selected.shaderType.name);
-            shaderTypeButton.setMessage(selected.shaderType.name);
+        public void setSelected(PlayerSettingsScreen.ShaderTypeList.ShaderTypeEntry entry) {
+            super.setSelected(entry);
+            SoundManager soundManager = Minecraft.getInstance().getSoundManager();
+            soundManager.reload();
+            soundManager.play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+            Effortless.log("Selected shader " + entry.shaderType.name);
+            shaderTypeButton.setMessage(entry.shaderType.name);
 //            showShaderList = false;
         }
 
         @Override
-        public boolean mouseClicked(double p_mouseClicked_1_, double p_mouseClicked_3_, int p_mouseClicked_5_) {
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
             if (!showShaderList) return false;
-            return super.mouseClicked(p_mouseClicked_1_, p_mouseClicked_3_, p_mouseClicked_5_);
+            return super.mouseClicked(mouseX, mouseY, button);
         }
 
         @Override
-        public boolean mouseReleased(double p_mouseReleased_1_, double p_mouseReleased_3_, int p_mouseReleased_5_) {
+        public boolean mouseReleased(double mouseX, double mouseY, int button) {
             if (!showShaderList) return false;
-            return super.mouseReleased(p_mouseReleased_1_, p_mouseReleased_3_, p_mouseReleased_5_);
+            return super.mouseReleased(mouseX, mouseY, button);
         }
 
         @Override
-        public boolean mouseDragged(double p_mouseDragged_1_, double p_mouseDragged_3_, int p_mouseDragged_5_, double p_mouseDragged_6_, double p_mouseDragged_8_) {
+        public boolean mouseDragged(double mouseX, double mouseY, int button, double f, double g) {
             if (!showShaderList) return false;
-            return super.mouseDragged(p_mouseDragged_1_, p_mouseDragged_3_, p_mouseDragged_5_, p_mouseDragged_6_, p_mouseDragged_8_);
+            return super.mouseDragged(mouseX, mouseY, button, f, g);
         }
 
         @Override
-        public boolean mouseScrolled(double p_mouseScrolled_1_, double p_mouseScrolled_3_, double p_mouseScrolled_5_) {
+        public boolean mouseScrolled(double mouseX, double mouseY, double scrolled) {
             if (!showShaderList) return false;
-            return super.mouseScrolled(p_mouseScrolled_1_, p_mouseScrolled_3_, p_mouseScrolled_5_);
+            return super.mouseScrolled(mouseX, mouseY, scrolled);
         }
 
         @Override
-        public boolean isMouseOver(double p_isMouseOver_1_, double p_isMouseOver_3_) {
+        public boolean isMouseOver(double mouseX, double mouseY) {
             if (!showShaderList) return false;
-            return super.isMouseOver(p_isMouseOver_1_, p_isMouseOver_3_);
+            return super.isMouseOver(mouseX, mouseY);
         }
 
         protected boolean isFocused() {
@@ -192,32 +193,34 @@ public class PlayerSettingsScreen extends Screen {
 
         //From AbstractList, disabled parts
         @Override
-        public void render(PoseStack ms, int p_render_1_, int p_render_2_, float p_render_3_) {
-            this.renderBackground(ms);
-            int i = this.getScrollbarPosition();
-            int j = i + 6;
-            Tesselator tessellator = Tesselator.getInstance();
-            BufferBuilder bufferbuilder = tessellator.getBuilder();
+        public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
+            this.renderBackground(poseStack);
+            int scrollbarPosition = this.getScrollbarPosition();
+            int scrollbarPositionWithOffset = scrollbarPosition + 6;
+            Tesselator tesselator = Tesselator.getInstance();
+            BufferBuilder bufferbuilder = tesselator.getBuilder();
 //            this.minecraft.getTextureManager().bindTexture(AbstractGui.BACKGROUND_LOCATION);
             RenderSystem.enableBlend();
             RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ZERO, GlStateManager.DestFactor.ONE);
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            float f = 32.0F;
+//            float partialTicks = 32.0F;
             bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
             bufferbuilder.vertex(this.x0, this.y1, 0.0D).color(20, 20, 20, 180).endVertex();
             bufferbuilder.vertex(this.x1, this.y1, 0.0D).color(20, 20, 20, 180).endVertex();
             bufferbuilder.vertex(this.x1, this.y0, 0.0D).color(20, 20, 20, 180).endVertex();
             bufferbuilder.vertex(this.x0, this.y0, 0.0D).color(20, 20, 20, 180).endVertex();
-            tessellator.end();
+            tesselator.end();
             int k = this.getRowLeft();
             int l = this.y0 + 4 - (int) this.getScrollAmount();
             // TODO: 7/9/22 access private field renderHeader
             if (renderHeader) {
-                this.renderHeader(ms, k, l, tessellator);
+                this.renderHeader(poseStack, k, l, tesselator);
             }
 
-            this.renderList(ms, k, l, p_render_1_, p_render_2_, p_render_3_);
+            int insideLeft = this.x0 + this.width / 2 - this.getRowWidth() / 2 + 2;
+            int insideTop = this.y0 + 4;
 
+            this.renderList(poseStack, insideLeft, insideTop, mouseX, mouseY, partialTicks);
             RenderSystem.disableDepthTest();
 //            this.renderHoleBackground(0, this.y0, 255, 255);
 //            this.renderHoleBackground(this.y1, this.height, 255, 255);
@@ -230,13 +233,13 @@ public class PlayerSettingsScreen extends Screen {
 //            bufferbuilder.pos((double)this.x1, (double)(this.y0 + 4), 0.0D).tex(1.0F, 1.0F).color(0, 0, 0, 0).endVertex();
 //            bufferbuilder.pos((double)this.x1, (double)this.y0, 0.0D).tex(1.0F, 0.0F).color(0, 0, 0, 255).endVertex();
 //            bufferbuilder.pos((double)this.x0, (double)this.y0, 0.0D).tex(0.0F, 0.0F).color(0, 0, 0, 255).endVertex();
-//            tessellator.draw();
+//            tesselator.draw();
 //            bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
 //            bufferbuilder.pos((double)this.x0, (double)this.y1, 0.0D).tex(0.0F, 1.0F).color(0, 0, 0, 255).endVertex();
 //            bufferbuilder.pos((double)this.x1, (double)this.y1, 0.0D).tex(1.0F, 1.0F).color(0, 0, 0, 255).endVertex();
 //            bufferbuilder.pos((double)this.x1, (double)(this.y1 - 4), 0.0D).tex(1.0F, 0.0F).color(0, 0, 0, 0).endVertex();
 //            bufferbuilder.pos((double)this.x0, (double)(this.y1 - 4), 0.0D).tex(0.0F, 0.0F).color(0, 0, 0, 0).endVertex();
-//            tessellator.draw();
+//            tesselator.draw();
 
             //SCROLLBAR
             int j1 = this.getMaxScroll();
@@ -249,26 +252,26 @@ public class PlayerSettingsScreen extends Screen {
                 }
 
                 bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-                bufferbuilder.vertex(i, this.y1, 0.0D).uv(0.0F, 1.0F).color(0, 0, 0, 255).endVertex();
-                bufferbuilder.vertex(j, this.y1, 0.0D).uv(1.0F, 1.0F).color(0, 0, 0, 255).endVertex();
-                bufferbuilder.vertex(j, this.y0, 0.0D).uv(1.0F, 0.0F).color(0, 0, 0, 255).endVertex();
-                bufferbuilder.vertex(i, this.y0, 0.0D).uv(0.0F, 0.0F).color(0, 0, 0, 255).endVertex();
-                tessellator.end();
+                bufferbuilder.vertex(scrollbarPosition, this.y1, 0.0D).uv(0.0F, 1.0F).color(0, 0, 0, 255).endVertex();
+                bufferbuilder.vertex(scrollbarPositionWithOffset, this.y1, 0.0D).uv(1.0F, 1.0F).color(0, 0, 0, 255).endVertex();
+                bufferbuilder.vertex(scrollbarPositionWithOffset, this.y0, 0.0D).uv(1.0F, 0.0F).color(0, 0, 0, 255).endVertex();
+                bufferbuilder.vertex(scrollbarPosition, this.y0, 0.0D).uv(0.0F, 0.0F).color(0, 0, 0, 255).endVertex();
+                tesselator.end();
                 bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-                bufferbuilder.vertex(i, l1 + k1, 0.0D).uv(0.0F, 1.0F).color(128, 128, 128, 255).endVertex();
-                bufferbuilder.vertex(j, l1 + k1, 0.0D).uv(1.0F, 1.0F).color(128, 128, 128, 255).endVertex();
-                bufferbuilder.vertex(j, l1, 0.0D).uv(1.0F, 0.0F).color(128, 128, 128, 255).endVertex();
-                bufferbuilder.vertex(i, l1, 0.0D).uv(0.0F, 0.0F).color(128, 128, 128, 255).endVertex();
-                tessellator.end();
+                bufferbuilder.vertex(scrollbarPosition, l1 + k1, 0.0D).uv(0.0F, 1.0F).color(128, 128, 128, 255).endVertex();
+                bufferbuilder.vertex(scrollbarPositionWithOffset, l1 + k1, 0.0D).uv(1.0F, 1.0F).color(128, 128, 128, 255).endVertex();
+                bufferbuilder.vertex(scrollbarPositionWithOffset, l1, 0.0D).uv(1.0F, 0.0F).color(128, 128, 128, 255).endVertex();
+                bufferbuilder.vertex(scrollbarPosition, l1, 0.0D).uv(0.0F, 0.0F).color(128, 128, 128, 255).endVertex();
+                tesselator.end();
                 bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-                bufferbuilder.vertex(i, l1 + k1 - 1, 0.0D).uv(0.0F, 1.0F).color(192, 192, 192, 255).endVertex();
-                bufferbuilder.vertex(j - 1, l1 + k1 - 1, 0.0D).uv(1.0F, 1.0F).color(192, 192, 192, 255).endVertex();
-                bufferbuilder.vertex(j - 1, l1, 0.0D).uv(1.0F, 0.0F).color(192, 192, 192, 255).endVertex();
-                bufferbuilder.vertex(i, l1, 0.0D).uv(0.0F, 0.0F).color(192, 192, 192, 255).endVertex();
-                tessellator.end();
+                bufferbuilder.vertex(scrollbarPosition, l1 + k1 - 1, 0.0D).uv(0.0F, 1.0F).color(192, 192, 192, 255).endVertex();
+                bufferbuilder.vertex(scrollbarPositionWithOffset - 1, l1 + k1 - 1, 0.0D).uv(1.0F, 1.0F).color(192, 192, 192, 255).endVertex();
+                bufferbuilder.vertex(scrollbarPositionWithOffset - 1, l1, 0.0D).uv(1.0F, 0.0F).color(192, 192, 192, 255).endVertex();
+                bufferbuilder.vertex(scrollbarPosition, l1, 0.0D).uv(0.0F, 0.0F).color(192, 192, 192, 255).endVertex();
+                tesselator.end();
             }
 
-//            this.renderDecorations(p_render_1_, p_render_2_);
+//            this.renderDecorations(mouseX, mouseY);
             RenderSystem.enableTexture();
             RenderSystem.disableBlend();
         }
@@ -286,14 +289,14 @@ public class PlayerSettingsScreen extends Screen {
             }
 
             @Override
-            public void render(PoseStack ms, int itemIndex, int rowTop, int rowLeft, int rowWidth, int rowHeight, int mouseX, int mouseY, boolean hovered, float partialTicks) {
+            public void render(PoseStack poseStack, int itemIndex, int rowTop, int rowLeft, int rowWidth, int rowHeight, int mouseX, int mouseY, boolean hovered, float partialTicks) {
                 if (rowTop + 10 > ShaderTypeList.this.y0 && rowTop + rowHeight - 5 < ShaderTypeList.this.y1)
-                    drawString(ms, font, shaderType.name, ShaderTypeList.this.x0 + 8, rowTop + 4, 0xFFFFFF);
+                    drawString(poseStack, font, shaderType.name, ShaderTypeList.this.x0 + 8, rowTop + 4, 0xFFFFFF);
             }
 
             @Override
-            public boolean mouseClicked(double p_mouseClicked_1_, double p_mouseClicked_3_, int p_mouseClicked_5_) {
-                if (p_mouseClicked_5_ == 0) {
+            public boolean mouseClicked(double mouseX, double mouseY, int button) {
+                if (button == 0) {
                     setSelected(this);
                     return true;
                 } else {

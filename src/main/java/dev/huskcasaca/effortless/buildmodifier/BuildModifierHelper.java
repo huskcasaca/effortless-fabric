@@ -6,13 +6,12 @@ import dev.huskcasaca.effortless.buildmodifier.array.Array;
 import dev.huskcasaca.effortless.buildmodifier.mirror.Mirror;
 import dev.huskcasaca.effortless.buildmodifier.mirror.RadialMirror;
 import dev.huskcasaca.effortless.entity.player.ModifierSettings;
-import dev.huskcasaca.effortless.buildreach.ReachHelper;
+import dev.huskcasaca.effortless.building.ReachHelper;
 import dev.huskcasaca.effortless.network.Packets;
 import dev.huskcasaca.effortless.network.protocol.player.ClientboundPlayerBuildModifierPacket;
 import dev.huskcasaca.effortless.network.protocol.player.ServerboundPlayerSetBuildModifierPacket;
 import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.*;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
@@ -79,8 +78,8 @@ public class BuildModifierHelper {
 
         //Array settings
         var arraySettings = modifierSettings.arraySettings();
-        if (arraySettings.count() < 0) {
-            error += "Array count may not be negative. It has been reset to 0. \n";
+        if (arraySettings.count() < 1) {
+            error += "Array count has to be at least 1. It has been reset to 1. \n";
         }
 
         if (arraySettings.reach() > maxReach) {
@@ -119,12 +118,12 @@ public class BuildModifierHelper {
         //Array settings
         var arraySettings = modifierSettings.arraySettings();
         int count = arraySettings.count();
-        if (count < 0) {
-            count = 0;
+        if (count < 1) {
+            count = 1;
         }
 
         if (arraySettings.reach() > maxReach) {
-            count = 0;
+            count = 1;
         }
         arraySettings = new Array.ArraySettings(
                 arraySettings.enabled(),

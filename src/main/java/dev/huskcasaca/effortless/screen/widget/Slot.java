@@ -60,7 +60,7 @@ public abstract class Slot extends AbstractContainerEventHandler implements Widg
         return true;
     }
 
-    protected abstract boolean isSelectedItem(int p_isSelectedItem_1_);
+    protected abstract boolean isSelectedItem(int slotIndex);
 
     protected int getMaxPosition() {
         return this.getItemCount() * this.itemHeight + this.headerHeight;
@@ -68,23 +68,23 @@ public abstract class Slot extends AbstractContainerEventHandler implements Widg
 
     protected abstract void renderBackground();
 
-    protected void updateItemPosition(int p_updateItemPosition_1_, int p_updateItemPosition_2_, int p_updateItemPosition_3_, float p_updateItemPosition_4_) {
+    protected void updateItemPosition(int p_updateItemPosition_1_, int p_updateItemPosition_2_, int p_updateItemPosition_3_, float partialTicks) {
     }
 
-    protected abstract void renderItem(PoseStack ms, int p_renderItem_1_, int p_renderItem_2_, int p_renderItem_3_, int p_renderItem_4_, int p_renderItem_5_, int p_renderItem_6_, float p_renderItem_7_);
+    protected abstract void renderItem(PoseStack poseStack, int slotIndex, int posX, int posY, int heightIn, int mouseXIn, int mouseYIn, float partialTicks);
 
-    protected void renderHeader(int p_renderHeader_1_, int p_renderHeader_2_, Tesselator p_renderHeader_3_) {
+    protected void renderHeader(int p_renderHeader_1_, int p_renderHeader_2_, Tesselator tesselator) {
     }
 
     protected void clickedHeader(int p_clickedHeader_1_, int p_clickedHeader_2_) {
     }
 
-    public int getItemAtPosition(double p_getItemAtPosition_1_, double p_getItemAtPosition_3_) {
+    public int getItemAtPosition(double posX, double posY) {
         int i = this.x0 + this.width / 2 - this.getRowWidth() / 2;
         int j = this.x0 + this.width / 2 + this.getRowWidth() / 2;
-        int k = Mth.floor(p_getItemAtPosition_3_ - (double) this.y0) - this.headerHeight + (int) this.yo - 4;
+        int k = Mth.floor(posY - (double) this.y0) - this.headerHeight + (int) this.yo - 4;
         int l = k / this.itemHeight;
-        return p_getItemAtPosition_1_ < (double) this.getScrollbarPosition() && p_getItemAtPosition_1_ >= (double) i && p_getItemAtPosition_1_ <= (double) j && l >= 0 && k >= 0 && l < this.getItemCount() ? l : -1;
+        return posX < (double) this.getScrollbarPosition() && posX >= (double) i && posX <= (double) j && l >= 0 && k >= 0 && l < this.getItemCount() ? l : -1;
     }
 
     protected void capYPosition() {
@@ -99,24 +99,24 @@ public abstract class Slot extends AbstractContainerEventHandler implements Widg
         return (int) this.yo;
     }
 
-    public boolean isMouseInList(double p_isMouseInList_1_, double p_isMouseInList_3_) {
-        return p_isMouseInList_3_ >= (double) this.y0 && p_isMouseInList_3_ <= (double) this.y1 && p_isMouseInList_1_ >= (double) this.x0 && p_isMouseInList_1_ <= (double) this.x1;
+    public boolean isMouseInList(double posX, double posY) {
+        return posY >= (double) this.y0 && posY <= (double) this.y1 && posX >= (double) this.x0 && posX <= (double) this.x1;
     }
 
-    public abstract void render(PoseStack ms, int p_render_1_, int p_render_2_, float p_render_3_);
+    public abstract void render(PoseStack poseStack, int mouseXIn, int mouseYIn, float partialTicks);
 
     protected void updateScrollingState(double p_updateScrollingState_1_, double p_updateScrollingState_3_, int p_updateScrollingState_5_) {
         this.scrolling = p_updateScrollingState_5_ == 0 && p_updateScrollingState_1_ >= (double) this.getScrollbarPosition() && p_updateScrollingState_1_ < (double) (this.getScrollbarPosition() + 6);
     }
 
-    public boolean mouseClicked(double p_mouseClicked_1_, double p_mouseClicked_3_, int p_mouseClicked_5_) {
-        this.updateScrollingState(p_mouseClicked_1_, p_mouseClicked_3_, p_mouseClicked_5_);
-        if (this.isVisible() && this.isMouseInList(p_mouseClicked_1_, p_mouseClicked_3_)) {
-            int i = this.getItemAtPosition(p_mouseClicked_1_, p_mouseClicked_3_);
-            if (i == -1 && p_mouseClicked_5_ == 0) {
-                this.clickedHeader((int) (p_mouseClicked_1_ - (double) (this.x0 + this.width / 2 - this.getRowWidth() / 2)), (int) (p_mouseClicked_3_ - (double) this.y0) + (int) this.yo - 4);
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        this.updateScrollingState(mouseX, mouseY, button);
+        if (this.isVisible() && this.isMouseInList(mouseX, mouseY)) {
+            int i = this.getItemAtPosition(mouseX, mouseY);
+            if (i == -1 && button == 0) {
+                this.clickedHeader((int) (mouseX - (double) (this.x0 + this.width / 2 - this.getRowWidth() / 2)), (int) (mouseY - (double) this.y0) + (int) this.yo - 4);
                 return true;
-            } else if (i != -1 && this.selectItem(i, p_mouseClicked_5_, p_mouseClicked_1_, p_mouseClicked_3_)) {
+            } else if (i != -1 && this.selectItem(i, button, mouseX, mouseY)) {
                 if (this.children().size() > i) {
                     this.setFocused(this.children().get(i));
                 }
@@ -131,21 +131,21 @@ public abstract class Slot extends AbstractContainerEventHandler implements Widg
         }
     }
 
-    public boolean mouseReleased(double p_mouseReleased_1_, double p_mouseReleased_3_, int p_mouseReleased_5_) {
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
         if (this.getFocused() != null) {
-            this.getFocused().mouseReleased(p_mouseReleased_1_, p_mouseReleased_3_, p_mouseReleased_5_);
+            this.getFocused().mouseReleased(mouseX, mouseY, button);
         }
 
         return false;
     }
 
-    public boolean mouseDragged(double p_mouseDragged_1_, double p_mouseDragged_3_, int p_mouseDragged_5_, double p_mouseDragged_6_, double p_mouseDragged_8_) {
-        if (super.mouseDragged(p_mouseDragged_1_, p_mouseDragged_3_, p_mouseDragged_5_, p_mouseDragged_6_, p_mouseDragged_8_)) {
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double p_mouseDragged_6_, double p_mouseDragged_8_) {
+        if (super.mouseDragged(mouseX, mouseY, button, p_mouseDragged_6_, p_mouseDragged_8_)) {
             return true;
-        } else if (this.isVisible() && p_mouseDragged_5_ == 0 && this.scrolling) {
-            if (p_mouseDragged_3_ < (double) this.y0) {
+        } else if (this.isVisible() && button == 0 && this.scrolling) {
+            if (mouseY < (double) this.y0) {
                 this.yo = 0.0D;
-            } else if (p_mouseDragged_3_ > (double) this.y1) {
+            } else if (mouseY > (double) this.y1) {
                 this.yo = this.getMaxScroll();
             } else {
                 double d0 = this.getMaxScroll();
@@ -170,24 +170,24 @@ public abstract class Slot extends AbstractContainerEventHandler implements Widg
         }
     }
 
-    public boolean mouseScrolled(double p_mouseScrolled_1_, double p_mouseScrolled_3_, double p_mouseScrolled_5_) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrolled) {
         if (!this.isVisible()) {
             return false;
         } else {
-            this.yo -= p_mouseScrolled_5_ * (double) this.itemHeight / 2.0D;
+            this.yo -= scrolled * (double) this.itemHeight / 2.0D;
             return true;
         }
     }
 
-    public boolean keyPressed(int p_keyPressed_1_, int p_keyPressed_2_, int p_keyPressed_3_) {
+    public boolean keyPressed(int i, int j, int k) {
         if (!this.isVisible()) {
             return false;
-        } else if (super.keyPressed(p_keyPressed_1_, p_keyPressed_2_, p_keyPressed_3_)) {
+        } else if (super.keyPressed(i, j, k)) {
             return true;
-        } else if (p_keyPressed_1_ == 264) {
+        } else if (i == 264) {
             this.moveSelection(1);
             return true;
-        } else if (p_keyPressed_1_ == 265) {
+        } else if (i == 265) {
             this.moveSelection(-1);
             return true;
         } else {
@@ -195,31 +195,31 @@ public abstract class Slot extends AbstractContainerEventHandler implements Widg
         }
     }
 
-    protected void moveSelection(int p_moveSelection_1_) {
+    protected void moveSelection(int i) {
     }
 
-    public boolean charTyped(char p_charTyped_1_, int p_charTyped_2_) {
-        return this.isVisible() && super.charTyped(p_charTyped_1_, p_charTyped_2_);
+    public boolean charTyped(char eventChar, int eventKey) {
+        return this.isVisible() && super.charTyped(eventChar, eventKey);
     }
 
-    public boolean isMouseOver(double p_isMouseOver_1_, double p_isMouseOver_3_) {
-        return this.isMouseInList(p_isMouseOver_1_, p_isMouseOver_3_);
+    public boolean isMouseOver(double mouseX, double mouseY) {
+        return this.isMouseInList(mouseX, mouseY);
     }
 
     public int getRowWidth() {
         return 220;
     }
 
-    protected void renderList(PoseStack ms, int p_renderList_1_, int p_renderList_2_, int p_renderList_3_, int p_renderList_4_, float p_renderList_5_) {
+    protected void renderList(PoseStack poseStack, int insideLeft, int insideTop, int mouseXIn, int mouseYIn, float partialTicks) {
         int i = this.getItemCount();
-        Tesselator tessellator = Tesselator.getInstance();
-        BufferBuilder bufferbuilder = tessellator.getBuilder();
+        Tesselator tesselator = Tesselator.getInstance();
+        BufferBuilder bufferbuilder = tesselator.getBuilder();
 
         for (int j = 0; j < i; ++j) {
-            int k = p_renderList_2_ + j * this.itemHeight + this.headerHeight;
+            int k = insideTop + j * this.itemHeight + this.headerHeight;
             int l = this.itemHeight - 4;
             if (k > this.y1 || k + l < this.y0) {
-                this.updateItemPosition(j, p_renderList_1_, k, p_renderList_5_);
+                this.updateItemPosition(j, insideLeft, k, partialTicks);
             }
 
             if (this.renderSelection && this.isSelectedItem(j)) {
@@ -233,18 +233,18 @@ public abstract class Slot extends AbstractContainerEventHandler implements Widg
                 bufferbuilder.vertex(j1, k + l + 2, 0.0D).endVertex();
                 bufferbuilder.vertex(j1, k - 2, 0.0D).endVertex();
                 bufferbuilder.vertex(i1, k - 2, 0.0D).endVertex();
-                tessellator.end();
+                tesselator.end();
                 RenderSystem.setShaderColor(0.0F, 0.0F, 0.0F, 1.0F);
                 bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
                 bufferbuilder.vertex(i1 + 1, k + l + 1, 0.0D).endVertex();
                 bufferbuilder.vertex(j1 - 1, k + l + 1, 0.0D).endVertex();
                 bufferbuilder.vertex(j1 - 1, k - 1, 0.0D).endVertex();
                 bufferbuilder.vertex(i1 + 1, k - 1, 0.0D).endVertex();
-                tessellator.end();
+                tesselator.end();
                 RenderSystem.enableTexture();
             }
 
-            this.renderItem(ms, j, p_renderList_1_, k, l, p_renderList_3_, p_renderList_4_, p_renderList_5_);
+            this.renderItem(poseStack, j, insideLeft, k, l, mouseXIn, mouseYIn, partialTicks);
         }
 
     }

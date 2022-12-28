@@ -1,4 +1,4 @@
-package dev.huskcasaca.effortless.buildreach;
+package dev.huskcasaca.effortless.building;
 
 import dev.huskcasaca.effortless.Effortless;
 import dev.huskcasaca.effortless.entity.player.EffortlessDataProvider;

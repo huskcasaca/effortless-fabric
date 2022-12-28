@@ -1,6 +1,6 @@
 package dev.huskcasaca.effortless.buildmode;
 
-import dev.huskcasaca.effortless.buildreach.ReachHelper;
+import dev.huskcasaca.effortless.building.ReachHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;
@@ -12,10 +12,10 @@ import java.util.List;
 public abstract class TwoClickBuildable extends MultipleClickBuildable {
 
     @Override
-    public List<BlockPos> onRightClick(Player player, BlockPos blockPos, Direction sideHit, Vec3 hitVec, boolean skipRaytrace) {
+    public List<BlockPos> onUse(Player player, BlockPos blockPos, Direction hitSide, Vec3 hitVec, boolean skipRaytrace) {
         List<BlockPos> list = new ArrayList<>();
 
-        var rightClickTable = player.level.isClientSide ? rightClickClientTable : rightClickServerTable;
+        var rightClickTable = player.level.isClientSide ? rightClickTableClient : rightClickTableServer;
         int rightClickNr = rightClickTable.get(player.getUUID());
 
         rightClickNr++;
@@ -30,7 +30,7 @@ public abstract class TwoClickBuildable extends MultipleClickBuildable {
 
             //First click, remember starting position
             firstPosTable.put(player.getUUID(), blockPos);
-            sideHitTable.put(player.getUUID(), sideHit);
+            hitSideTable.put(player.getUUID(), hitSide);
             hitVecTable.put(player.getUUID(), hitVec);
             //Keep list empty, dont place any blocks yet
         } else {
@@ -45,7 +45,7 @@ public abstract class TwoClickBuildable extends MultipleClickBuildable {
     @Override
     public List<BlockPos> findCoordinates(Player player, BlockPos blockPos, boolean skipRaytrace) {
         List<BlockPos> list = new ArrayList<>();
-        var rightClickTable = player.level.isClientSide ? rightClickClientTable : rightClickServerTable;
+        var rightClickTable = player.level.isClientSide ? rightClickTableClient : rightClickTableServer;
         int rightClickNr = rightClickTable.get(player.getUUID());
         var firstPos = firstPosTable.get(player.getUUID());
 
@@ -71,7 +71,7 @@ public abstract class TwoClickBuildable extends MultipleClickBuildable {
             if (z2 - z1 >= axisLimit) z2 = z1 + axisLimit - 1;
             if (z1 - z2 >= axisLimit) z2 = z1 - axisLimit + 1;
 
-            list.addAll(getAllBlocks(player, x1, y1, z1, x2, y2, z2));
+            list.addAll(getFinalBlocks(player, x1, y1, z1, x2, y2, z2));
         }
 
         return list;
@@ -81,5 +81,5 @@ public abstract class TwoClickBuildable extends MultipleClickBuildable {
     protected abstract BlockPos findSecondPos(Player player, BlockPos firstPos, boolean skipRaytrace);
 
     //After first and second pos are known, we want all the blocks
-    protected abstract List<BlockPos> getAllBlocks(Player player, int x1, int y1, int z1, int x2, int y2, int z2);
+    public abstract List<BlockPos> getFinalBlocks(Player player, int x1, int y1, int z1, int x2, int y2, int z2);
 }

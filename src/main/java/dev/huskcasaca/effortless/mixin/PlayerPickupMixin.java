@@ -1,6 +1,6 @@
 package dev.huskcasaca.effortless.mixin;
 
-import dev.huskcasaca.effortless.buildreach.ReachHelper;
+import dev.huskcasaca.effortless.building.ReachHelper;
 import dev.huskcasaca.effortless.buildmode.BuildModeHelper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;

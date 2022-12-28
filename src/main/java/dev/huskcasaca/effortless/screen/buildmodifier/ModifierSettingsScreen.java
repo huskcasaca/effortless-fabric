@@ -14,9 +14,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.network.chat.*;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -33,7 +31,7 @@ public class ModifierSettingsScreen extends Screen {
     private RadialMirrorSettingsPane radialMirrorSettingsPane;
 
     public ModifierSettingsScreen() {
-        super(new TranslatableComponent("effortless.screen.modifier_settings"));
+        super(new TranslatableComponent(Effortless.MOD_ID + ".screen.modifier_settings"));
     }
 
     @Override
@@ -75,14 +73,14 @@ public class ModifierSettingsScreen extends Screen {
     @Override
     //Set colors using GL11, use the fontObj field to display text
     //Use drawTexturedModalRect() to transfers areas of a texture resource to the screen
-    public void render(PoseStack ms, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(ms);
+    public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
+        this.renderBackground(poseStack);
 
-        scrollPane.render(ms, mouseX, mouseY, partialTicks);
+        scrollPane.render(poseStack, mouseX, mouseY, partialTicks);
 
-        buttonDone.render(ms, mouseX, mouseY, partialTicks);
+        buttonDone.render(poseStack, mouseX, mouseY, partialTicks);
 
-        scrollPane.drawTooltip(ms, this, mouseX, mouseY);
+        scrollPane.drawTooltip(poseStack, this, mouseX, mouseY);
     }
 
 
@@ -102,14 +100,14 @@ public class ModifierSettingsScreen extends Screen {
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
-        super.mouseClicked(mouseX, mouseY, mouseButton);
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        super.mouseClicked(mouseX, mouseY, button);
         renderables.forEach(renderable -> {
-            if (renderable instanceof Button button) {
-                button.mouseClicked(mouseX, mouseY, mouseButton);
+            if (renderable instanceof Button btn) {
+                btn.mouseClicked(mouseX, mouseY, button);
             }
         });
-        return scrollPane.mouseClicked(mouseX, mouseY, mouseButton);
+        return scrollPane.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override

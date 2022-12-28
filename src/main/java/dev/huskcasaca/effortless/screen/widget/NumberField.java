@@ -11,8 +11,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.*;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.text.DecimalFormat;
@@ -81,14 +80,14 @@ public class NumberField extends GuiComponent {
         this.tooltip = tooltip;
     }
 
-    public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
-        boolean result = textField.mouseClicked(mouseX, mouseY, mouseButton);
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        boolean result = textField.mouseClicked(mouseX, mouseY, button);
 
         //Check if clicked inside textfield
         boolean flag = mouseX >= x + buttonWidth && mouseX < x + width - buttonWidth && mouseY >= y && mouseY < y + height;
 
         //Rightclicked inside textfield
-        if (flag && mouseButton == 1) {
+        if (flag && button == 1) {
             textField.setValue("");
             textField.setFocus(true);
             result = true;
@@ -97,17 +96,17 @@ public class NumberField extends GuiComponent {
         return result;
     }
 
-    public void drawNumberField(PoseStack ms, int mouseX, int mouseY, float partialTicks) {
+    public void drawNumberField(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
         textField.y = y + 1;
         minusButton.y = y - 1;
         plusButton.y = y - 1;
 
-        textField.render(ms, mouseX, mouseY, partialTicks);
-        minusButton.render(ms, mouseX, mouseY, partialTicks);
-        plusButton.render(ms, mouseX, mouseY, partialTicks);
+        textField.render(poseStack, mouseX, mouseY, partialTicks);
+        minusButton.render(poseStack, mouseX, mouseY, partialTicks);
+        plusButton.render(poseStack, mouseX, mouseY, partialTicks);
     }
 
-    public void drawTooltip(PoseStack ms, Screen screen, int mouseX, int mouseY) {
+    public void drawTooltip(PoseStack poseStack, Screen screen, int mouseX, int mouseY) {
         boolean insideTextField = mouseX >= x + buttonWidth && mouseX < x + width - buttonWidth && mouseY >= y && mouseY < y + height;
         boolean insideMinusButton = mouseX >= x && mouseX < x + buttonWidth && mouseY >= y && mouseY < y + height;
         boolean insidePlusButton = mouseX >= x + width - buttonWidth && mouseX < x + width && mouseY >= y && mouseY < y + height;
@@ -136,7 +135,7 @@ public class NumberField extends GuiComponent {
                     .append(new TextComponent("5").withStyle(ChatFormatting.RED)));
         }
 
-        screen.renderComponentTooltip(ms, textLines, mouseX - 10, mouseY + 25);
+        screen.renderComponentTooltip(poseStack, textLines, mouseX - 10, mouseY + 25);
 
     }
 

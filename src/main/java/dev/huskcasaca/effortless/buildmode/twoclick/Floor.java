@@ -1,10 +1,10 @@
 package dev.huskcasaca.effortless.buildmode.twoclick;
 
-import dev.huskcasaca.effortless.buildmode.BuildAction;
-import dev.huskcasaca.effortless.buildmode.BuildActionHandler;
+import dev.huskcasaca.effortless.building.BuildAction;
+import dev.huskcasaca.effortless.building.BuildActionHandler;
 import dev.huskcasaca.effortless.buildmode.BuildModeHandler;
 import dev.huskcasaca.effortless.buildmode.TwoClickBuildable;
-import dev.huskcasaca.effortless.buildreach.ReachHelper;
+import dev.huskcasaca.effortless.building.ReachHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
@@ -40,7 +40,7 @@ public class Floor extends TwoClickBuildable {
     public static List<BlockPos> getFloorBlocks(Player player, int x1, int y1, int z1, int x2, int y2, int z2) {
         List<BlockPos> list = new ArrayList<>();
 
-        if (BuildActionHandler.getFill() == BuildAction.FULL)
+        if (BuildActionHandler.getPlaneFilling() == BuildAction.PLANE_FULL)
             addFloorBlocks(list, x1, x2, y1, z1, z2);
         else
             addHollowFloorBlocks(list, x1, x2, y1, z1, z2);
@@ -72,7 +72,7 @@ public class Floor extends TwoClickBuildable {
     }
 
     @Override
-    protected List<BlockPos> getAllBlocks(Player player, int x1, int y1, int z1, int x2, int y2, int z2) {
+    public List<BlockPos> getFinalBlocks(Player player, int x1, int y1, int z1, int x2, int y2, int z2) {
         return getFloorBlocks(player, x1, y1, z1, x2, y2, z2);
     }
 

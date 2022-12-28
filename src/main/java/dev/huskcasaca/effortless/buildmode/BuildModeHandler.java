@@ -4,7 +4,7 @@ import dev.huskcasaca.effortless.Effortless;
 import dev.huskcasaca.effortless.entity.player.EffortlessDataProvider;
 import dev.huskcasaca.effortless.buildmodifier.BuildModifierHandler;
 import dev.huskcasaca.effortless.buildmodifier.BuildModifierHelper;
-import dev.huskcasaca.effortless.buildreach.ReachHelper;
+import dev.huskcasaca.effortless.building.ReachHelper;
 import dev.huskcasaca.effortless.utils.SurvivalHelper;
 import dev.huskcasaca.effortless.network.Packets;
 import dev.huskcasaca.effortless.network.protocol.player.ClientboundPlayerBuildModePacket;
@@ -27,12 +27,12 @@ public class BuildModeHandler {
 
     //Static variables are shared between client and server in singleplayer
     //We need them separate
-    public static Dictionary<Player, Boolean> currentlyBreakingClient = new Hashtable<>();
-    public static Dictionary<Player, Boolean> currentlyBreakingServer = new Hashtable<>();
+    private static final Dictionary<Player, Boolean> currentlyBreakingClient = new Hashtable<>();
+    private static final Dictionary<Player, Boolean> currentlyBreakingServer = new Hashtable<>();
 
     //Uses a network message to get the previous raytraceresult from the player
     //The server could keep track of all raytraceresults but this might lag with many players
-    //Raytraceresult is needed for sideHit and hitVec
+    //Raytraceresult is needed for hitSide and hitVec
     public static void onBlockPlacedPacketReceived(Player player, ServerboundPlayerPlaceBlockPacket packet) {
 
         //Check if not in the middle of breaking
@@ -52,12 +52,12 @@ public class BuildModeHandler {
         if (packet.blockHit() && packet.blockPos() != null) {
             startPos = packet.blockPos();
 
-            //Offset in direction of sidehit if not quickreplace and not replaceable
+            //Offset in direction of hitSide if not quickreplace and not replaceable
             //TODO 1.13 replaceable
             boolean replaceable = player.level.getBlockState(startPos).getMaterial().isReplaceable();
-            boolean becomesDoubleSlab = SurvivalHelper.doesBecomeDoubleSlab(player, startPos, packet.sideHit());
+            boolean becomesDoubleSlab = SurvivalHelper.doesBecomeDoubleSlab(player, startPos, packet.hitSide());
             if (!modifierSettings.enableQuickReplace() && !replaceable && !becomesDoubleSlab) {
-                startPos = startPos.relative(packet.sideHit());
+                startPos = startPos.relative(packet.hitSide());
             }
 
             //Get under tall grass and other replaceable blocks
@@ -75,7 +75,8 @@ public class BuildModeHandler {
 
         //Even when no starting block is found, call buildmode instance
         //We might want to place things in the air
-        List<BlockPos> coordinates = buildMode.instance.onRightClick(player, startPos, packet.sideHit(), packet.hitVec(), modifierSettings.enableQuickReplace());
+        var skipRaytrace = modifierSettings.enableQuickReplace();
+        var coordinates = buildMode.getInstance().onUse(player, startPos, packet.hitSide(), packet.hitVec(), skipRaytrace);
 
         if (coordinates.isEmpty()) {
             currentlyBreaking.put(player, false);
@@ -88,13 +89,13 @@ public class BuildModeHandler {
             coordinates = coordinates.subList(0, limit);
         }
 
-        var sideHit = buildMode.instance.getSideHit(player);
-        if (sideHit == null) sideHit = packet.sideHit();
+        var hitSide = buildMode.getInstance().getHitSide(player);
+        if (hitSide == null) hitSide = packet.hitSide();
 
-        var hitVec = buildMode.instance.getHitVec(player);
+        var hitVec = buildMode.getInstance().getHitVec(player);
         if (hitVec == null) hitVec = packet.hitVec();
 
-        BuildModifierHandler.onBlockPlaced(player, coordinates, sideHit, hitVec, packet.placeStartPos());
+        BuildModifierHandler.onBlockPlaced(player, coordinates, hitSide, hitVec, packet.placeStartPos());
 
         //Only works when finishing a buildmode is equal to placing some blocks
         //No intermediate blocks allowed
@@ -131,7 +132,7 @@ public class BuildModeHandler {
 
         //Get coordinates
         var buildMode = modeSettings.buildMode();
-        var coordinates = buildMode.instance.onRightClick(player, startPos, Direction.UP, Vec3.ZERO, true);
+        var coordinates = buildMode.getInstance().onUse(player, startPos, Direction.UP, Vec3.ZERO, true);
 
         if (coordinates.isEmpty()) {
             currentlyBreaking.put(player, true);
@@ -150,7 +151,7 @@ public class BuildModeHandler {
         List<BlockPos> coordinates = new ArrayList<>();
 
         var modeSettings = BuildModeHelper.getModeSettings(player);
-        coordinates.addAll(modeSettings.buildMode().instance.findCoordinates(player, startPos, skipRaytrace));
+        coordinates.addAll(modeSettings.buildMode().getInstance().findCoordinates(player, startPos, skipRaytrace));
 
         return coordinates;
     }
@@ -163,7 +164,7 @@ public class BuildModeHandler {
         var currentlyBreaking = player.level.isClientSide ? currentlyBreakingClient : currentlyBreakingServer;
         currentlyBreaking.remove(player);
 
-        BuildModeHelper.getModeSettings(player).buildMode().instance.initialize(player);
+        BuildModeHelper.getModeSettings(player).buildMode().getInstance().initialize(player);
     }
 
     public static boolean isCurrentlyPlacing(Player player) {

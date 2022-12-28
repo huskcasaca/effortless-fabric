@@ -7,7 +7,7 @@ public enum ReplaceMode {
     NORMAL("normal_replace"),
     QUICK("quick_replace");
 
-    public String name;
+    private final String name;
 
     ReplaceMode(String name) {
         this.name = name;

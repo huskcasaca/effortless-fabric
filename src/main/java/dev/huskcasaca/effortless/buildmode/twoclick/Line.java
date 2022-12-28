@@ -2,7 +2,7 @@ package dev.huskcasaca.effortless.buildmode.twoclick;
 
 import dev.huskcasaca.effortless.buildmode.BuildModeHandler;
 import dev.huskcasaca.effortless.buildmode.TwoClickBuildable;
-import dev.huskcasaca.effortless.buildreach.ReachHelper;
+import dev.huskcasaca.effortless.building.ReachHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
@@ -99,7 +99,7 @@ public class Line extends TwoClickBuildable {
     }
 
     @Override
-    protected List<BlockPos> getAllBlocks(Player player, int x1, int y1, int z1, int x2, int y2, int z2) {
+    public List<BlockPos> getFinalBlocks(Player player, int x1, int y1, int z1, int x2, int y2, int z2) {
         return getLineBlocks(player, x1, y1, z1, x2, y2, z2);
     }
 

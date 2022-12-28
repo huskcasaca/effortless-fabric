@@ -1,7 +1,7 @@
 package dev.huskcasaca.effortless.buildmode.threeclick;
 
-import dev.huskcasaca.effortless.buildmode.BuildAction;
-import dev.huskcasaca.effortless.buildmode.BuildActionHandler;
+import dev.huskcasaca.effortless.building.BuildAction;
+import dev.huskcasaca.effortless.building.BuildActionHandler;
 import dev.huskcasaca.effortless.buildmode.ThreeClickBuildable;
 import dev.huskcasaca.effortless.buildmode.twoclick.Floor;
 import dev.huskcasaca.effortless.buildmode.twoclick.Line;
@@ -17,7 +17,7 @@ public class Cube extends ThreeClickBuildable {
     public static List<BlockPos> getFloorBlocksUsingCubeFill(Player player, int x1, int y1, int z1, int x2, int y2, int z2) {
         List<BlockPos> list = new ArrayList<>();
 
-        if (BuildActionHandler.getCubeFill() == BuildAction.CUBE_SKELETON)
+        if (BuildActionHandler.getCubeFilling() == BuildAction.CUBE_SKELETON)
             Floor.addHollowFloorBlocks(list, x1, x2, y1, z1, z2);
         else
             Floor.addFloorBlocks(list, x1, x2, y1, z1, z2);
@@ -28,7 +28,7 @@ public class Cube extends ThreeClickBuildable {
     public static List<BlockPos> getCubeBlocks(Player player, int x1, int y1, int z1, int x2, int y2, int z2) {
         List<BlockPos> list = new ArrayList<>();
 
-        switch (BuildActionHandler.getCubeFill()) {
+        switch (BuildActionHandler.getCubeFilling()) {
             case CUBE_FULL:
                 addCubeBlocks(list, x1, x2, y1, y2, z1, z2);
                 break;
@@ -99,7 +99,7 @@ public class Cube extends ThreeClickBuildable {
     }
 
     @Override
-    protected List<BlockPos> getFinalBlocks(Player player, int x1, int y1, int z1, int x2, int y2, int z2, int x3, int y3, int z3) {
+    public List<BlockPos> getFinalBlocks(Player player, int x1, int y1, int z1, int x2, int y2, int z2, int x3, int y3, int z3) {
         return getCubeBlocks(player, x1, y1, z1, x3, y3, z3);
     }
 }

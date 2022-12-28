@@ -17,6 +17,7 @@
 package dev.huskcasaca.effortless.mixin;
 
 import com.mojang.brigadier.CommandDispatcher;
+import dev.huskcasaca.effortless.command.BuildCommand;
 import dev.huskcasaca.effortless.command.SettingsCommand;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -35,6 +36,7 @@ public abstract class CommandMixin {
 
     @Inject(method = "<init>", at = @At(value = "TAIL", target = "Lnet/minecraft/server/commands/WorldBorderCommand;register(Lcom/mojang/brigadier/CommandDispatcher;)V"))
     private void addCommands(Commands.CommandSelection commandSelection, CallbackInfo ci) {
-        SettingsCommand.register(this.dispatcher);
+        SettingsCommand.register(dispatcher);
+        BuildCommand.register(dispatcher);
     }
 }

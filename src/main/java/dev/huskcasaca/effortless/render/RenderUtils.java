@@ -1,43 +1,49 @@
 package dev.huskcasaca.effortless.render;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
-import dev.huskcasaca.effortless.Effortless;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+import java.util.List;
 import java.util.Random;
 
 @Environment(EnvType.CLIENT)
 public class RenderUtils {
 
-    protected static VertexConsumer beginLines(MultiBufferSource.BufferSource renderTypeBuffer) {
+    private static final Random RAND = new Random();
+
+    private static final Vec3 ERROR_OUTLINE_COLOR = new Vec3(1, 0, 0);
+    private static final Vec3 DEFAULT_OUTLINE_COLOR = new Vec3(1, 1, 1);
+
+    public static VertexConsumer beginLines(MultiBufferSource.BufferSource renderTypeBuffer) {
         return renderTypeBuffer.getBuffer(BuildRenderType.lines());
     }
 
-    protected static void endLines(MultiBufferSource.BufferSource renderTypeBuffer) {
+    public static void endLines(MultiBufferSource.BufferSource renderTypeBuffer) {
         renderTypeBuffer.endBatch();
     }
 
-    protected static VertexConsumer beginPlanes(MultiBufferSource multiBufferSource) {
+    public static VertexConsumer beginPlanes(MultiBufferSource multiBufferSource) {
         return multiBufferSource.getBuffer(BuildRenderType.planes());
     }
 
-    protected static void endPlanes(MultiBufferSource.BufferSource renderTypeBuffer) {
+    public static void endPlanes(MultiBufferSource.BufferSource renderTypeBuffer) {
         renderTypeBuffer.endBatch();
     }
 
-    protected static void renderBlockPreview(PoseStack poseStack, MultiBufferSource.BufferSource renderTypeBuffer, BlockRenderDispatcher dispatcher,
-                                             BlockPos blockPos, BlockState blockState, float dissolve, BlockPos firstPos, BlockPos secondPos, boolean red) {
+    public static void renderBlockDissolveShader(PoseStack poseStack, MultiBufferSource.BufferSource renderTypeBuffer, BlockRenderDispatcher dispatcher, BlockPos blockPos, BlockState blockState, float dissolve, BlockPos firstPos, BlockPos secondPos, boolean red) {
         if (blockState == null) return;
 
         poseStack.pushPose();
@@ -48,48 +54,57 @@ public class RenderUtils {
         poseStack.scale(129 / 128f, 129 / 128f, 129 / 128f);
 
         //Begin block preview rendering
-        RenderType blockPreviewRenderType = BuildRenderType.getBlockPreviewRenderType(dissolve, blockPos, firstPos, secondPos, red);
-        VertexConsumer buffer = renderTypeBuffer.getBuffer(blockPreviewRenderType);
+        var blockPreviewRenderType = BuildRenderType.getBlockPreviewRenderType(dissolve, blockPos, firstPos, secondPos, red);
+        var buffer = renderTypeBuffer.getBuffer(blockPreviewRenderType);
 
-        try {
-            BakedModel model = dispatcher.getBlockModel(blockState);
-            // TODO: 8/9/22
-//            dispatcher.getModelRenderer().renderModel(poseStack.last(), buffer, blockState, model,
-//                    1f, 1f, 1f, 0, OverlayTexture.NO_OVERLAY/*, ModelData.EMPTY, blockPreviewRenderType*/);
-            dispatcher.getModelRenderer().tesselateBlock(Minecraft.getInstance().level, dispatcher.getBlockModel(blockState), blockState, blockPos, poseStack, buffer, false, new Random(), blockState.getSeed(firstPos), OverlayTexture.NO_OVERLAY);
-        } catch (NullPointerException e) {
-            Effortless.logger.warn("RenderUtils::renderBlockPreview cannot render " + blockState.getBlock().toString());
-
-            //Render outline as backup, escape out of the current renderstack
-            poseStack.popPose();
-            renderTypeBuffer.endBatch();
-            VertexConsumer lineBuffer = beginLines(renderTypeBuffer);
-            renderBlockOutline(poseStack, lineBuffer, blockPos, new Vec3(1f, 1f, 1f));
-            endLines(renderTypeBuffer);
-            buffer = renderTypeBuffer.getBuffer(Sheets.translucentCullBlockSheet()); //any type will do, as long as we have something on the stack
-            poseStack.pushPose();
-        }
+        var level = Minecraft.getInstance().level;
+        var model = dispatcher.getBlockModel(blockState);
+        var seed = blockState.getSeed(firstPos);
+        // TODO: 8/9/22
+        dispatcher.getModelRenderer().tesselateBlock(level, model, blockState, blockPos, poseStack, buffer, false, RAND, seed, OverlayTexture.NO_OVERLAY);
 
         renderTypeBuffer.endBatch();
         poseStack.popPose();
     }
 
-    protected static void renderBlockOutline(PoseStack poseStack, VertexConsumer buffer, BlockPos pos, Vec3 color) {
-        renderBlockOutline(poseStack, buffer, pos, pos, color);
+    public static void renderBlockOutlines(PoseStack poseStack, MultiBufferSource.BufferSource renderTypeBuffer, BlockRenderDispatcher dispatcher, BlockPos blockPos, BlockState blockState, float dissolve, BlockPos firstPos, BlockPos secondPos, boolean red) {
+        if (blockState == null) return;
+        poseStack.pushPose();
+
+        //Begin block preview rendering
+        var buffer = renderTypeBuffer.getBuffer(RenderType.lines());
+
+        RenderSystem.lineWidth(2f);
+
+        var voxelShape = blockState.getShape(Minecraft.getInstance().level, blockPos);
+        var camera = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
+        var color = red ? ERROR_OUTLINE_COLOR : DEFAULT_OUTLINE_COLOR;
+        renderVoxelShape(poseStack, buffer, voxelShape, blockPos.getX() - camera.x(), blockPos.getY() - camera.y(), blockPos.getZ() - camera.z(), (float) color.x(), (float) color.y(), (float) color.z(), 1f);
+
+        renderTypeBuffer.endBatch();
+        poseStack.popPose();
     }
 
-    //Renders outline. Pos1 has to be minimal x,y,z and pos2 maximal x,y,z
-    protected static void renderBlockOutline(PoseStack poseStack, VertexConsumer buffer, BlockPos pos1, BlockPos pos2, Vec3 color) {
-        AABB aabb = new AABB(pos1, pos2.offset(1, 1, 1)).inflate(0.0020000000949949026);
-
-        LevelRenderer.renderLineBox(poseStack, buffer, aabb, (float) color.x, (float) color.y, (float) color.z, 0.4f);
-//        WorldRenderer.drawSelectionBoundingBox(aabb, (float) color.x, (float) color.y, (float) color.z, 0.4f);
+    private static void renderVoxelShape(PoseStack poseStack, VertexConsumer vertexConsumer, VoxelShape voxelShape, double d, double e, double f, float g, float h, float i, float j) {
+        List<AABB> list = voxelShape.toAabbs();
+        for (AABB aabb : list) {
+            renderShape(poseStack, vertexConsumer, Shapes.create(aabb.move(0.0, 0.0, 0.0)), d, e, f, g, h, i, j);
+        }
     }
 
-    //Renders outline with given bounding box
-    protected static void renderBlockOutline(PoseStack poseStack, VertexConsumer buffer, BlockPos pos, VoxelShape collisionShape, Vec3 color) {
-//        WorldRenderer.drawShape(collisionShape, pos.getX(), pos.getY(), pos.getZ(), (float) color.x, (float) color.y, (float) color.z, 0.4f);
-        LevelRenderer.renderVoxelShape(poseStack, buffer, collisionShape, pos.getX(), pos.getY(), pos.getZ(), (float) color.x, (float) color.y, (float) color.z, 0.4f);
+    private static void renderShape(PoseStack poseStack, VertexConsumer vertexConsumer, VoxelShape voxelShape, double d, double e, double f, float g, float h, float i, float j) {
+        PoseStack.Pose pose = poseStack.last();
+        voxelShape.forAllEdges((k, l, m, n, o, p) -> {
+            float q = (float)(n - k);
+            float r = (float)(o - l);
+            float s = (float)(p - m);
+            float t = Mth.sqrt(q * q + r * r + s * s);
+            q /= t;
+            r /= t;
+            s /= t;
+            vertexConsumer.vertex(pose.pose(), (float)(k + d), (float)(l + e), (float)(m + f)).color(g, h, i, j).normal(pose.normal(), q, r, s).endVertex();
+            vertexConsumer.vertex(pose.pose(), (float)(n + d), (float)(o + e), (float)(p + f)).color(g, h, i, j).normal(pose.normal(), q, r, s).endVertex();
+        });
     }
 
     //TODO

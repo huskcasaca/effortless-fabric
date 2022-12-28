@@ -7,6 +7,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Single extends OneClickBuildable {
@@ -16,26 +17,31 @@ public class Single extends OneClickBuildable {
     }
 
     @Override
-    public List<BlockPos> onRightClick(Player player, BlockPos blockPos, Direction sideHit, Vec3 hitVec, boolean skipRaytrace) {
-        List<BlockPos> list = new ArrayList<>();
-        if (blockPos != null) list.add(blockPos);
-        return list;
+    public List<BlockPos> onUse(Player player, BlockPos blockPos, Direction hitSide, Vec3 hitVec, boolean skipRaytrace) {
+        if (blockPos == null) return Collections.emptyList();
+        return getFinalBlocks(player, blockPos.getX(), blockPos.getY(), blockPos.getZ());
     }
 
     @Override
     public List<BlockPos> findCoordinates(Player player, BlockPos blockPos, boolean skipRaytrace) {
-        List<BlockPos> list = new ArrayList<>();
-        if (blockPos != null) list.add(blockPos);
-        return list;
+        if (blockPos == null) return Collections.emptyList();
+        return getFinalBlocks(player, blockPos.getX(), blockPos.getY(), blockPos.getZ());
     }
 
     @Override
-    public Direction getSideHit(Player player) {
+    public Direction getHitSide(Player player) {
         return null;
     }
 
     @Override
     public Vec3 getHitVec(Player player) {
         return null;
+    }
+
+    @Override
+    public List<BlockPos> getFinalBlocks(Player player, int x1, int y1, int z1) {
+        List<BlockPos> list = new ArrayList<>();
+        list.add(new BlockPos(x1, y1, z1));
+        return list;
     }
 }

@@ -1,6 +1,6 @@
 package dev.huskcasaca.effortless.network.protocol.player;
 
-import dev.huskcasaca.effortless.buildmode.BuildAction;
+import dev.huskcasaca.effortless.building.BuildAction;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 

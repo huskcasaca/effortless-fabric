@@ -2,7 +2,7 @@ package dev.huskcasaca.effortless.mixin;
 
 import dev.huskcasaca.effortless.Effortless;
 import dev.huskcasaca.effortless.EffortlessClient;
-import dev.huskcasaca.effortless.buildreach.ReachHelper;
+import dev.huskcasaca.effortless.building.ReachHelper;
 import dev.huskcasaca.effortless.buildmode.BuildModeHandler;
 import dev.huskcasaca.effortless.buildmode.BuildModeHelper;
 import dev.huskcasaca.effortless.buildmodifier.BuildModifierHelper;

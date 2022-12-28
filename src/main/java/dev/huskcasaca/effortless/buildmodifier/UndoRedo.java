@@ -2,7 +2,7 @@ package dev.huskcasaca.effortless.buildmodifier;
 
 import dev.huskcasaca.effortless.Effortless;
 import dev.huskcasaca.effortless.render.BlockPreviewRenderer;
-import dev.huskcasaca.effortless.buildreach.ReachHelper;
+import dev.huskcasaca.effortless.building.ReachHelper;
 import dev.huskcasaca.effortless.utils.FixedStack;
 import dev.huskcasaca.effortless.utils.InventoryHelper;
 import dev.huskcasaca.effortless.utils.SurvivalHelper;
@@ -36,7 +36,7 @@ public class UndoRedo {
     public static void addUndo(Player player, BlockSet blockSet) {
         if (!isUndoEnabled(player)) return;
 
-        Map<UUID, FixedStack<BlockSet>> undoStacks = player.level.isClientSide ? undoStacksClient : undoStacksServer;
+        var undoStacks = player.level.isClientSide ? undoStacksClient : undoStacksServer;
 
         //Assert coordinates is as long as previous and new blockstate lists
         if (blockSet.coordinates().size() != blockSet.previousBlockStates().size() ||
@@ -71,7 +71,7 @@ public class UndoRedo {
 
     private static void addRedo(Player player, BlockSet blockSet) {
         if (!isUndoEnabled(player)) return;
-        Map<UUID, FixedStack<BlockSet>> redoStacks = player.level.isClientSide ? redoStacksClient : redoStacksServer;
+        var redoStacks = player.level.isClientSide ? redoStacksClient : redoStacksServer;
 
         //(No asserts necessary, it's private)
 
@@ -88,7 +88,7 @@ public class UndoRedo {
             Effortless.log(player, "Sorry, undo is disabled.");
             return false;
         }
-        Map<UUID, FixedStack<BlockSet>> undoStacks = player.level.isClientSide ? undoStacksClient : undoStacksServer;
+        var undoStacks = player.level.isClientSide ? undoStacksClient : undoStacksServer;
 
         if (!undoStacks.containsKey(player.getUUID())) return false;
 
@@ -153,7 +153,7 @@ public class UndoRedo {
             Effortless.log(player, "Sorry, redo is disabled.");
             return false;
         }
-        Map<UUID, FixedStack<BlockSet>> redoStacks = player.level.isClientSide ? redoStacksClient : redoStacksServer;
+        var redoStacks = player.level.isClientSide ? redoStacksClient : redoStacksServer;
 
         if (!redoStacks.containsKey(player.getUUID())) return false;
 
@@ -212,8 +212,8 @@ public class UndoRedo {
     }
 
     public static void clear(Player player) {
-        Map<UUID, FixedStack<BlockSet>> undoStacks = player.level.isClientSide ? undoStacksClient : undoStacksServer;
-        Map<UUID, FixedStack<BlockSet>> redoStacks = player.level.isClientSide ? redoStacksClient : redoStacksServer;
+        var undoStacks = player.level.isClientSide ? undoStacksClient : undoStacksServer;
+        var redoStacks = player.level.isClientSide ? redoStacksClient : redoStacksServer;
         if (undoStacks.containsKey(player.getUUID())) {
             undoStacks.get(player.getUUID()).clear();
         }

@@ -43,7 +43,7 @@ public abstract class ExpandableScrollEntry implements ScrollPane.IScrollEntry {
     }
 
     @Override
-    public void drawTooltip(PoseStack ms, Screen guiScreen, int mouseX, int mouseY) {
+    public void drawTooltip(PoseStack poseStack, Screen guiScreen, int mouseX, int mouseY) {
     }
 
     @Override

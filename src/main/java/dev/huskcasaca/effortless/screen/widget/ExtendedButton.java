@@ -7,8 +7,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.*;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -16,8 +15,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ExtendedButton extends Button {
-    public ExtendedButton(int xPos, int yPos, int width, int height, Component displayString, OnPress handler) {
-        super(xPos, yPos, width, height, displayString, handler);
+    public ExtendedButton(int posX, int posY, int width, int height, Component displayString, OnPress handler) {
+        super(posX, posY, width, height, displayString, handler);
     }
 
     /**

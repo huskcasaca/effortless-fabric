@@ -4,6 +4,7 @@ import dev.huskcasaca.effortless.Effortless;
 import dev.huskcasaca.effortless.config.ConfigManager;
 import dev.huskcasaca.effortless.config.EffortlessConfig;
 import dev.huskcasaca.effortless.config.PreviewConfig;
+import dev.huskcasaca.effortless.render.BlockRenderOptions;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
@@ -13,9 +14,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.*;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Consumer;
@@ -27,20 +26,20 @@ import java.util.function.Function;
 public class EffortlessConfigScreen {
 
     private static final Function<Boolean, Component> yesNoTextSupplier = bool -> {
-        if (bool) return new TranslatableComponent("effortless.settings.toggle.on").withStyle(ChatFormatting.GREEN);
-        else return new TranslatableComponent("effortless.settings.toggle.off").withStyle(ChatFormatting.RED);
+        if (bool) return new TranslatableComponent(Effortless.MOD_ID + ".settings.toggle.on").withStyle(ChatFormatting.GREEN);
+        else return new TranslatableComponent(Effortless.MOD_ID + ".settings.toggle.off").withStyle(ChatFormatting.RED);
     };
 
     static String getSettingsNamespace() {
-        return Effortless.MOD_ID + "." + "settings";
+        return String.join(".", Effortless.MOD_ID, "settings");
     }
 
     static String getSettingsNamespaceTooltip(String path) {
-        return Effortless.MOD_ID + "." + "settings" + "." + path + "." + "tooltip";
+        return String.join(".", Effortless.MOD_ID, "settings", path, "tooltip");
     }
 
     static String getSettingsNamespaceTooltip(String path, int ordinal) {
-        return Effortless.MOD_ID + "." + "settings" + "." + path + "." + "tooltip" + "_" + ordinal;
+        return String.join(".", Effortless.MOD_ID, "settings", path, "tooltip" + "_" + ordinal);
     }
 
     public static Screen createConfigScreen(Screen parentScreen) {
@@ -52,7 +51,7 @@ public class EffortlessConfigScreen {
 
         final var builder = ConfigBuilder.create()
                 .setParentScreen(parentScreen)
-                .setTitle(new TranslatableComponent("effortless.settings.title"))
+                .setTitle(new TranslatableComponent(Effortless.MOD_ID + ".settings.title"))
                 .transparentBackground()
                 .setDoesConfirmSave(true)
                 .setSavingRunnable(() -> {
@@ -62,16 +61,16 @@ public class EffortlessConfigScreen {
                 });
 
 
-        final var configCategory = builder.getOrCreateCategory(new TranslatableComponent("effortless.settings.category.config.title"));
+        final var configCategory = builder.getOrCreateCategory(new TranslatableComponent(String.join(".", Effortless.MOD_ID, "settings", "category", "config", "title")));
 
         final var entryBuilder = builder.entryBuilder();
 
-        final var previewSubCat = entryBuilder.startSubCategory(new TranslatableComponent("effortless.settings.category.config.preview.title"));
+        final var previewSubCat = entryBuilder.startSubCategory(new TranslatableComponent(String.join(".", Effortless.MOD_ID, "settings", "category", "config", "preview", "title")));
 
-        final var alwaysShowBlockPreview = new BooleanEntryData("always_show_block_preview", defaults.getPreviewConfig().isAlwaysShowBlockPreview(), config.getPreviewConfig().isAlwaysShowBlockPreview(), config.getPreviewConfig()::setAlwaysShowBlockPreview);
         final var showBuildInfo = new BooleanEntryData("show_build_info", defaults.getPreviewConfig().isShowBuildInfo(), config.getPreviewConfig().isShowBuildInfo(), config.getPreviewConfig()::setShowBuildInfo);
-        final var useShaders = new BooleanEntryData("use_shaders", defaults.getPreviewConfig().isUseShaders(), config.getPreviewConfig().isUseShaders(), config.getPreviewConfig()::setUseShaders);
-        final var shaderThreshold = new SliderEntryData("shader_threshold", defaults.getPreviewConfig().getShaderThreshold(), config.getPreviewConfig().getShaderThreshold(), PreviewConfig.MIN_SHADER_THRESHOLD, PreviewConfig.MAX_SHADER_THRESHOLD, config.getPreviewConfig()::setShaderThreshold);
+        final var alwaysShowBlockPreview = new BooleanEntryData("always_show_block_preview", defaults.getPreviewConfig().isAlwaysShowBlockPreview(), config.getPreviewConfig().isAlwaysShowBlockPreview(), config.getPreviewConfig()::setAlwaysShowBlockPreview);
+//        final var useShaders = new BooleanEntryData("use_shaders", defaults.getPreviewConfig().isUseShaders(), config.getPreviewConfig().isUseShaders(), config.getPreviewConfig()::setUseShaders);
+//        final var shaderThreshold = new SliderEntryData("shader_threshold", defaults.getPreviewConfig().getShaderThreshold(), config.getPreviewConfig().getShaderThreshold(), PreviewConfig.MIN_SHADER_THRESHOLD, PreviewConfig.MAX_SHADER_THRESHOLD, config.getPreviewConfig()::setShaderThreshold);
         final var dissolveTimeMultiplier = new SliderEntryData("shader_dissolve_time_multiplier", defaults.getPreviewConfig().getShaderDissolveTimeMultiplier(), config.getPreviewConfig().getShaderDissolveTimeMultiplier(), PreviewConfig.MIN_SHADER_DISSOLVE_TIME_MULTIPLIER, PreviewConfig.MAX_SHADER_DISSOLVE_TIME_MULTIPLIER, config.getPreviewConfig()::setShaderDissolveTimeMultiplier);
 
 
@@ -92,30 +91,38 @@ public class EffortlessConfigScreen {
                         .build()
         );
         previewSubCat.add(
-                entryBuilder.startBooleanToggle(new TranslatableComponent(useShaders.getTitleKey()), useShaders.currentValue)
-                        .setTooltip(new TranslatableComponent(useShaders.getTooltipKey()))
-                        .setDefaultValue(useShaders.defaultValue)
-                        .setSaveConsumer(useShaders.saveConsumer)
-                        .setYesNoTextSupplier(yesNoTextSupplier)
+                entryBuilder.startEnumSelector(new TextComponent("Block Preview Mode"), BlockRenderOptions.class, config.getPreviewConfig().getBlockPreviewMode())
+                        .setTooltip(new TranslatableComponent("effortless.settings.block_preview_type.tooltip"))
+                        .setDefaultValue(defaults.getPreviewConfig().getBlockPreviewMode())
+                        .setSaveConsumer(config.getPreviewConfig()::setBlockPreviewMode)
+                        .setEnumNameProvider(anEnum -> new TranslatableComponent(((BlockRenderOptions) anEnum).getNameKey()))
                         .build()
         );
-        previewSubCat.add(
-                entryBuilder.startIntSlider(new TranslatableComponent(shaderThreshold.getTitleKey()), shaderThreshold.currentValue, shaderThreshold.minValue, shaderThreshold.maxValue)
-                        .setTooltip(
-                                new TranslatableComponent(getSettingsNamespaceTooltip(shaderThreshold.name()))
-                        )
-                        .setDefaultValue(shaderThreshold.defaultValue)
-                        .setSaveConsumer((integer) -> {
-                            int rounded = Math.toIntExact(Math.round(integer / 1000.0));
-                            config.getPreviewConfig().setShaderThreshold(rounded * 1000);
-                        })
-                        .setTextGetter((integer) -> {
-                            // round double
-                            int rounded = Math.toIntExact(Math.round(integer / 1000.0));
-                            return new TextComponent(integer <= rounded ? "Disabled" : rounded * 1000 + " blocks");
-                        })
-                        .build()
-        );
+//        previewSubCat.add(
+//                entryBuilder.startBooleanToggle(Component.translatable(useShaders.getTitleKey()), useShaders.currentValue)
+//                        .setTooltip(Component.translatable(useShaders.getTooltipKey()))
+//                        .setDefaultValue(useShaders.defaultValue)
+//                        .setSaveConsumer(useShaders.saveConsumer)
+//                        .setYesNoTextSupplier(yesNoTextSupplier)
+//                        .build()
+//        );
+//        previewSubCat.add(
+//                entryBuilder.startIntSlider(Component.translatable(shaderThreshold.getTitleKey()), shaderThreshold.currentValue, shaderThreshold.minValue, shaderThreshold.maxValue)
+//                        .setTooltip(
+//                                Component.translatable(getSettingsNamespaceTooltip(shaderThreshold.name()))
+//                        )
+//                        .setDefaultValue(shaderThreshold.defaultValue)
+//                        .setSaveConsumer((integer) -> {
+//                            int rounded = Math.toIntExact(Math.round(integer / 1000.0));
+//                            config.getPreviewConfig().setShaderThreshold(rounded * 1000);
+//                        })
+//                        .setTextGetter((integer) -> {
+//                            // round double
+//                            int rounded = Math.toIntExact(Math.round(integer / 1000.0));
+//                            return Component.literal(integer <= rounded ? "Disabled" : rounded * 1000 + " blocks");
+//                        })
+//                        .build()
+//        );
         previewSubCat.add(
                 entryBuilder.startIntSlider(new TranslatableComponent(dissolveTimeMultiplier.getTitleKey()), dissolveTimeMultiplier.currentValue, dissolveTimeMultiplier.minValue, dissolveTimeMultiplier.maxValue)
                         .setTooltip(

@@ -11,17 +11,16 @@ import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class RadialMirror implements Modifier {
 
-    public static List<BlockPos> findCoordinates(Player player, BlockPos startPos) {
-        List<BlockPos> coordinates = new ArrayList<>();
+    public static Set<BlockPos> findCoordinates(Player player, BlockPos startPos) {
+        var coordinates = new LinkedHashSet<BlockPos>();
 
         //find radial mirror settings for the player
         var radialMirrorSettings = BuildModifierHelper.getModifierSettings(player).radialMirrorSettings();
-        if (!isEnabled(radialMirrorSettings, startPos)) return coordinates;
+        if (!isEnabled(radialMirrorSettings, startPos)) return Collections.emptySet();
 
         //get angle between slices
         double sliceAngle = 2 * Math.PI / radialMirrorSettings.slices;
@@ -49,14 +48,12 @@ public class RadialMirror implements Modifier {
         return coordinates;
     }
 
-    public static List<BlockState> findBlockStates(Player player, BlockPos startPos, BlockState blockState, ItemStack itemStack, List<ItemStack> itemStacks) {
-        List<BlockState> blockStates = new ArrayList<>();
-        List<BlockPos> coordinates = new ArrayList<>(); //to keep track of duplicates
+    public static Map<BlockPos, BlockState> findBlockStates(Player player, BlockPos startPos, BlockState blockState, ItemStack itemStack, List<ItemStack> itemStacks) {
+        var blockStates = new LinkedHashMap<BlockPos, BlockState>();
 
         //find radial mirror settings for the player that placed the block
         var radialMirrorSettings = BuildModifierHelper.getModifierSettings(player).radialMirrorSettings();
-        if (!isEnabled(radialMirrorSettings, startPos)) return blockStates;
-
+        if (!isEnabled(radialMirrorSettings, startPos)) return Collections.emptyMap();
 
         //get angle between slices
         double sliceAngle = 2 * Math.PI / radialMirrorSettings.slices;
@@ -91,8 +88,6 @@ public class RadialMirror implements Modifier {
 
             Vec3 relNewVec = relStartVec.yRot((float) curAngle);
             BlockPos newBlockPos = new BlockPos(radialMirrorSettings.position.add(relNewVec));
-            if (coordinates.contains(newBlockPos) || newBlockPos.equals(startPos)) continue; //filter out duplicates
-            coordinates.add(newBlockPos);
 
             //Randomizer bag synergy
 //			if (randomizerBagItem != null) {
@@ -105,8 +100,7 @@ public class RadialMirror implements Modifier {
 
             //rotate
             newBlockState = rotateBlockState(player, startPos, relNewVec, newBlockState, radialMirrorSettings.alternate && i % 2 == 1);
-
-            blockStates.add(newBlockState);
+            blockStates.putIfAbsent(newBlockPos, newBlockState);
             itemStacks.add(itemStack);
         }
 

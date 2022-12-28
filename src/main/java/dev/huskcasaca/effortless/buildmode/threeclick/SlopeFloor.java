@@ -1,10 +1,10 @@
 package dev.huskcasaca.effortless.buildmode.threeclick;
 
-import dev.huskcasaca.effortless.buildmode.BuildAction;
-import dev.huskcasaca.effortless.buildmode.BuildActionHandler;
+import dev.huskcasaca.effortless.building.BuildAction;
+import dev.huskcasaca.effortless.building.BuildActionHandler;
 import dev.huskcasaca.effortless.buildmode.ThreeClickBuildable;
 import dev.huskcasaca.effortless.buildmode.twoclick.Floor;
-import dev.huskcasaca.effortless.buildreach.ReachHelper;
+import dev.huskcasaca.effortless.building.ReachHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 
@@ -25,7 +25,7 @@ public class SlopeFloor extends ThreeClickBuildable {
         int xLength = Math.abs(x2 - x1);
         int zLength = Math.abs(z2 - z1);
 
-        if (BuildActionHandler.getRaisedEdge() == BuildAction.SHORT_EDGE) {
+        if (BuildActionHandler.getRaisedEdge() == BuildAction.RAISE_SHORT_EDGE) {
             //Slope along short edge
             if (zLength > xLength) onXAxis = false;
         } else {
@@ -91,7 +91,7 @@ public class SlopeFloor extends ThreeClickBuildable {
     }
 
     @Override
-    protected List<BlockPos> getFinalBlocks(Player player, int x1, int y1, int z1, int x2, int y2, int z2, int x3, int y3, int z3) {
+    public List<BlockPos> getFinalBlocks(Player player, int x1, int y1, int z1, int x2, int y2, int z2, int x3, int y3, int z3) {
         return getSlopeFloorBlocks(player, x1, y1, z1, x2, y2, z2, x3, y3, z3);
     }
 }

@@ -1,9 +1,10 @@
 package dev.huskcasaca.effortless.buildmode;
 
 import dev.huskcasaca.effortless.Effortless;
+import dev.huskcasaca.effortless.building.BuildActionHandler;
 import dev.huskcasaca.effortless.entity.player.EffortlessDataProvider;
 import dev.huskcasaca.effortless.entity.player.ModeSettings;
-import dev.huskcasaca.effortless.buildreach.ReachHelper;
+import dev.huskcasaca.effortless.building.ReachHelper;
 import dev.huskcasaca.effortless.network.Packets;
 import dev.huskcasaca.effortless.network.protocol.player.ClientboundPlayerBuildModePacket;
 import dev.huskcasaca.effortless.network.protocol.player.ServerboundPlayerSetBuildModePacket;
@@ -25,7 +26,7 @@ public class BuildModeHelper {
             return I18n.get(mode.getNameKey());
         } else {
             StringBuilder modeName = new StringBuilder();
-            for (BuildOption option : mode.options) {
+            for (BuildMode.Option option : mode.getOptions()) {
                 modeName.append(I18n.get(BuildActionHandler.getOptionSetting(option).getNameKey()));
                 modeName.append(" ");
             }

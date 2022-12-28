@@ -17,17 +17,18 @@ import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+
+import static net.minecraft.world.level.block.Mirror.*;
 
 public class Mirror implements Modifier {
 
-    public static List<BlockPos> findCoordinates(Player player, BlockPos startPos) {
-        List<BlockPos> coordinates = new ArrayList<>();
+    public static Set<BlockPos> findCoordinates(Player player, BlockPos startPos) {
+        var coordinates = new LinkedHashSet<BlockPos>();
 
         //find mirrorsettings for the player
         var mirrorSettings = BuildModifierHelper.getModifierSettings(player).mirrorSettings();
-        if (!isEnabled(mirrorSettings, startPos)) return coordinates;
+        if (!isEnabled(mirrorSettings, startPos)) return Collections.emptySet();
 
         if (mirrorSettings.mirrorX) coordinateMirrorX(mirrorSettings, startPos, coordinates);
         if (mirrorSettings.mirrorY) coordinateMirrorY(mirrorSettings, startPos, coordinates);
@@ -36,7 +37,7 @@ public class Mirror implements Modifier {
         return coordinates;
     }
 
-    private static void coordinateMirrorX(MirrorSettings mirrorSettings, BlockPos oldBlockPos, List<BlockPos> coordinates) {
+    private static void coordinateMirrorX(MirrorSettings mirrorSettings, BlockPos oldBlockPos, HashSet<BlockPos> coordinates) {
         //find mirror position
         double x = mirrorSettings.position.x + (mirrorSettings.position.x - oldBlockPos.getX() - 0.5);
         BlockPos newBlockPos = new BlockPos(x, oldBlockPos.getY(), oldBlockPos.getZ());
@@ -46,7 +47,7 @@ public class Mirror implements Modifier {
         if (mirrorSettings.mirrorZ) coordinateMirrorZ(mirrorSettings, newBlockPos, coordinates);
     }
 
-    private static void coordinateMirrorY(MirrorSettings mirrorSettings, BlockPos oldBlockPos, List<BlockPos> coordinates) {
+    private static void coordinateMirrorY(MirrorSettings mirrorSettings, BlockPos oldBlockPos, HashSet<BlockPos> coordinates) {
         //find mirror position
         double y = mirrorSettings.position.y + (mirrorSettings.position.y - oldBlockPos.getY() - 0.5);
         BlockPos newBlockPos = new BlockPos(oldBlockPos.getX(), y, oldBlockPos.getZ());
@@ -55,19 +56,19 @@ public class Mirror implements Modifier {
         if (mirrorSettings.mirrorZ) coordinateMirrorZ(mirrorSettings, newBlockPos, coordinates);
     }
 
-    private static void coordinateMirrorZ(MirrorSettings mirrorSettings, BlockPos oldBlockPos, List<BlockPos> coordinates) {
+    private static void coordinateMirrorZ(MirrorSettings mirrorSettings, BlockPos oldBlockPos, HashSet<BlockPos> coordinates) {
         //find mirror position
         double z = mirrorSettings.position.z + (mirrorSettings.position.z - oldBlockPos.getZ() - 0.5);
         BlockPos newBlockPos = new BlockPos(oldBlockPos.getX(), oldBlockPos.getY(), z);
         coordinates.add(newBlockPos);
     }
 
-    public static List<BlockState> findBlockStates(Player player, BlockPos startPos, BlockState blockState, ItemStack itemStack, List<ItemStack> itemStacks) {
-        List<BlockState> blockStates = new ArrayList<>();
+    public static Map<BlockPos, BlockState> findBlockStates(Player player, BlockPos startPos, BlockState blockState, ItemStack itemStack, List<ItemStack> itemStacks) {
+        var blockStates = new LinkedHashMap<BlockPos, BlockState>();
 
         //find mirrorsettings for the player
         MirrorSettings mirrorSettings = BuildModifierHelper.getModifierSettings(player).mirrorSettings();
-        if (!isEnabled(mirrorSettings, startPos)) return blockStates;
+        if (!isEnabled(mirrorSettings, startPos)) return Collections.emptyMap();
 
         //Randomizer bag synergy
 //		AbstractRandomizerBagItem randomizerBagItem = null;
@@ -87,8 +88,7 @@ public class Mirror implements Modifier {
         return blockStates;
     }
 
-    private static void blockStateMirrorX(Player player, MirrorSettings mirrorSettings, BlockPos oldBlockPos, BlockState oldBlockState,
-                                          Container bagInventory, ItemStack itemStack, InteractionHand hand, List<BlockState> blockStates, List<ItemStack> itemStacks) {
+    private static void blockStateMirrorX(Player player, MirrorSettings mirrorSettings, BlockPos oldBlockPos, BlockState oldBlockState, Container bagInventory, ItemStack itemStack, InteractionHand hand, Map<BlockPos, BlockState> blockStates, List<ItemStack> itemStacks) {
         //find mirror position
         double x = mirrorSettings.position.x + (mirrorSettings.position.x - oldBlockPos.getX() - 0.5);
         BlockPos newBlockPos = new BlockPos(x, oldBlockPos.getY(), oldBlockPos.getZ());
@@ -100,10 +100,10 @@ public class Mirror implements Modifier {
 //		}
 
         //Find blockstate
-        BlockState newBlockState = oldBlockState == null ? null : oldBlockState.mirror(net.minecraft.world.level.block.Mirror.FRONT_BACK);
+        BlockState newBlockState = oldBlockState == null ? null : oldBlockState.mirror(FRONT_BACK);
 
         //Store blockstate and itemstack
-        blockStates.add(newBlockState);
+        blockStates.put(newBlockPos, newBlockState);
         itemStacks.add(itemStack);
 
         if (mirrorSettings.mirrorY)
@@ -112,8 +112,7 @@ public class Mirror implements Modifier {
             blockStateMirrorZ(player, mirrorSettings, newBlockPos, newBlockState, bagInventory, itemStack, hand, blockStates, itemStacks);
     }
 
-    private static void blockStateMirrorY(Player player, MirrorSettings mirrorSettings, BlockPos oldBlockPos, BlockState oldBlockState,
-                                          Container bagInventory, ItemStack itemStack, InteractionHand hand, List<BlockState> blockStates, List<ItemStack> itemStacks) {
+    private static void blockStateMirrorY(Player player, MirrorSettings mirrorSettings, BlockPos oldBlockPos, BlockState oldBlockState, Container bagInventory, ItemStack itemStack, InteractionHand hand, Map<BlockPos, BlockState> blockStates, List<ItemStack> itemStacks) {
         //find mirror position
         double y = mirrorSettings.position.y + (mirrorSettings.position.y - oldBlockPos.getY() - 0.5);
         BlockPos newBlockPos = new BlockPos(oldBlockPos.getX(), y, oldBlockPos.getZ());
@@ -128,15 +127,14 @@ public class Mirror implements Modifier {
         BlockState newBlockState = oldBlockState == null ? null : getVerticalMirror(oldBlockState);
 
         //Store blockstate and itemstack
-        blockStates.add(newBlockState);
+        blockStates.put(newBlockPos, newBlockState);
         itemStacks.add(itemStack);
 
         if (mirrorSettings.mirrorZ)
             blockStateMirrorZ(player, mirrorSettings, newBlockPos, newBlockState, bagInventory, itemStack, hand, blockStates, itemStacks);
     }
 
-    private static void blockStateMirrorZ(Player player, MirrorSettings mirrorSettings, BlockPos oldBlockPos, BlockState oldBlockState,
-                                          Container bagInventory, ItemStack itemStack, InteractionHand hand, List<BlockState> blockStates, List<ItemStack> itemStacks) {
+    private static void blockStateMirrorZ(Player player, MirrorSettings mirrorSettings, BlockPos oldBlockPos, BlockState oldBlockState, Container bagInventory, ItemStack itemStack, InteractionHand hand, Map<BlockPos, BlockState> blockStates, List<ItemStack> itemStacks) {
         //find mirror position
         double z = mirrorSettings.position.z + (mirrorSettings.position.z - oldBlockPos.getZ() - 0.5);
         BlockPos newBlockPos = new BlockPos(oldBlockPos.getX(), oldBlockPos.getY(), z);
@@ -148,10 +146,10 @@ public class Mirror implements Modifier {
 //		}
 
         //Find blockstate
-        BlockState newBlockState = oldBlockState == null ? null : oldBlockState.mirror(net.minecraft.world.level.block.Mirror.LEFT_RIGHT);
+        BlockState newBlockState = oldBlockState == null ? null : oldBlockState.mirror(LEFT_RIGHT);
 
         //Store blockstate and itemstack
-        blockStates.add(newBlockState);
+        blockStates.put(newBlockPos, newBlockState);
         itemStacks.add(itemStack);
     }
 

@@ -14,7 +14,7 @@ import net.minecraft.world.phys.Vec3;
 public record ServerboundPlayerBreakBlockPacket(
         boolean blockHit,
         BlockPos blockPos,
-        Direction sideHit,
+        Direction hitSide,
         Vec3 hitVec
 ) implements Packet<ServerEffortlessPacketListener> {
 
@@ -35,7 +35,7 @@ public record ServerboundPlayerBreakBlockPacket(
     public void write(FriendlyByteBuf friendlyByteBuf) {
         friendlyByteBuf.writeBoolean(blockHit);
         friendlyByteBuf.writeBlockPos(blockPos);
-        friendlyByteBuf.writeInt(sideHit.get3DDataValue());
+        friendlyByteBuf.writeInt(hitSide.get3DDataValue());
         friendlyByteBuf.writeDouble(hitVec.x);
         friendlyByteBuf.writeDouble(hitVec.y);
         friendlyByteBuf.writeDouble(hitVec.z);

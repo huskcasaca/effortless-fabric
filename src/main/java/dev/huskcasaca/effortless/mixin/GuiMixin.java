@@ -1,17 +1,19 @@
 package dev.huskcasaca.effortless.mixin;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.*;
 import dev.huskcasaca.effortless.buildmode.BuildMode;
 import dev.huskcasaca.effortless.buildmode.BuildModeHelper;
 import dev.huskcasaca.effortless.buildmodifier.BuildModifierHelper;
 import dev.huskcasaca.effortless.config.ConfigManager;
+import dev.huskcasaca.effortless.render.BlockPreviewRenderer;
 import dev.huskcasaca.effortless.screen.buildmode.RadialMenuScreen;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.*;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Final;
@@ -22,6 +24,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Mixin(Gui.class)
 public abstract class GuiMixin {
@@ -41,9 +44,16 @@ public abstract class GuiMixin {
 
     @Shadow protected abstract Player getCameraPlayer();
 
+    @Shadow @Final private ItemRenderer itemRenderer;
+
+    private static final Direction.AxisDirection side = Direction.AxisDirection.POSITIVE;
+    private static final int SPACING_X = 18;
+    private static final int SPACING_Y = 18;
+
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;renderSavingIndicator(Lcom/mojang/blaze3d/vertex/PoseStack;)V", shift = At.Shift.AFTER))
     private void renderGui(PoseStack poseStack, float f, CallbackInfo ci) {
         renderBuildMode(poseStack);
+        renderBuildingStack(poseStack);
     }
 
     private void renderBuildMode(PoseStack poseStack) {
@@ -106,6 +116,58 @@ public abstract class GuiMixin {
             positionY -= 10;
         }
 
+    }
+
+    private void renderBuildingStack(PoseStack poseStack) {
+        if (!ConfigManager.getGlobalPreviewConfig().isShowBuildInfo()) {
+            return;
+        }
+        if (RadialMenuScreen.getInstance().isVisible()) {
+            return;
+        }
+        var player = minecraft.player;
+        var mode = BuildModeHelper.getBuildMode(getCameraPlayer());
+
+        if (mode == BuildMode.DISABLE) {
+            return;
+        }
+
+        var validItemStacks = BlockPreviewRenderer.getInstance().getCurrentPlacing().stream().flatMap((e) -> e.getValidItemStacks().stream()).toList();
+        var invalidItemStacks = BlockPreviewRenderer.getInstance().getCurrentPlacing().stream().flatMap((e) -> e.getInvalidItemStacks().stream()).toList();
+
+        var defaultWidth = screenWidth / 2 + ((side == Direction.AxisDirection.POSITIVE) ? 10 : - 10 - SPACING_X);
+        var defaultHeight = screenHeight / 2 - 8 - (validItemStacks.size() + invalidItemStacks.size() - 1) / 9 * SPACING_Y / 2;
+        var positionX = new AtomicInteger(0);
+        var positionY = new AtomicInteger(0);
+
+        var sign = ((side == Direction.AxisDirection.POSITIVE) ? 1 : - 1);
+
+        validItemStacks.forEach(stack -> {
+            var width = defaultWidth + positionX.get() * SPACING_X * sign;
+            var height = defaultHeight + positionY.get() * SPACING_Y;
+            itemRenderer.renderGuiItem(stack, width, height);
+            itemRenderer.renderGuiItemDecorations(getFont(), stack, width, height, Integer.toString(stack.getCount()));
+            if (positionX.get() >= 8) {
+                positionX.set(0);
+                positionY.getAndIncrement();
+            } else {
+                positionX.getAndIncrement();
+            }
+        });
+
+        invalidItemStacks.forEach(stack -> {
+            var width = defaultWidth + positionX.get() * SPACING_X * sign;
+            var height = defaultHeight + positionY.get() * SPACING_Y;
+            itemRenderer.renderGuiItem(stack, width, height);
+            itemRenderer.renderGuiItemDecorations(getFont(), stack, width, height, ChatFormatting.RED + Integer.toString(stack.getCount()) + ChatFormatting.RESET);
+            if (positionX.get() >= 8) {
+                positionX.set(0);
+                positionY.getAndIncrement();
+            } else {
+                positionX.getAndIncrement();
+            }
+        });
 
     }
+
 }
