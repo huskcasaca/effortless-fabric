@@ -2,6 +2,18 @@
 [Effortless Fabric](https://www.curseforge.com/minecraft/mc-mods/effortless-fabric) is a fabric version of [Effortless Building](https://www.curseforge.com/minecraft/mc-mods/effortless-building).
 This mod implements most features from Effortless Building, but removed randomizer bag and reach upgrade items to make it a pure vanilla compat one.
 
+## Screenshots
+### Building Menu
+![Radial Menu](screenshots/radial_menu.png)
+### Line Mode
+![Line Mode](screenshots/line_mode.png)
+### Filled Wall Mode
+![Filled Wall Mode](screenshots/filled_wall_mode.png)
+### Filled Floor Mode
+![Filled Floor Mode](screenshots/filled_floor_mode.png)
+### Filled Cube Mode
+![Filled Cube Mode](screenshots/filled_cube_mode.png)
+
 ## Building
 
 Hold ALT key to switch build modes in the radial panel. There are buttons for undo/redo, modifier settings and replace modes on the left. The options for each build mode (like a filled vs hollow wall) are on the right.
@@ -48,6 +60,8 @@ Hold ALT key to switch build modes in the radial panel. There are buttons for un
 * [ ] Tweakeroo support
 
 ## Changelog
+### 1.6.1
+* Fix compatability with Gravity API
 ### 1.6.0
 * Add build orientation option for circle modes
 * Add block count indicator

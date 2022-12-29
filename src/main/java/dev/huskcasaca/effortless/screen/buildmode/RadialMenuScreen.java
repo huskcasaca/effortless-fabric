@@ -46,22 +46,22 @@ import static dev.huskcasaca.effortless.building.BuildActionHandler.*;
 public class RadialMenuScreen extends Screen {
 
     private static final RadialMenuScreen INSTANCE = new RadialMenuScreen();
-    private static final Vector4f radialButtonColor = new Vector4f(0f, 0f, 0f, .5f);
-    private static final Vector4f sideButtonColor = new Vector4f(.5f, .5f, .5f, .5f);
-    private static final Vector4f highlightColor = new Vector4f(.6f, .8f, 1f, .6f);
-    private static final Vector4f selectedColor = new Vector4f(0f, .5f, 1f, .5f);
-    private static final Vector4f highlightSelectedColor = new Vector4f(0.2f, .7f, 1f, .7f);
-    private static final int whiteTextColor = 0xffffffff;
-    private static final int watermarkTextColor = 0x88888888;
-    private static final int descriptionTextColor = 0xdd888888;
-    private static final int optionTextColor = 0xeeeeeeff;
-    private static final double ringInnerEdge = 38;
-    private static final double ringOuterEdge = 75;
-    private static final double categoryLineOuterEdge = 42;
-    private static final double textDistance = 90;
-    private static final double buttonDistance = 120;
-    private static final float fadeSpeed = 0.5f;
-    private static final int descriptionHeight = 100;
+    private static final Vector4f RADIAL_BUTTON_COLOR = new Vector4f(0f, 0f, 0f, .5f);
+    private static final Vector4f SIDE_BUTTON_COLOR = new Vector4f(.5f, .5f, .5f, .5f);
+    private static final Vector4f HIGHLIGHT_COLOR = new Vector4f(.6f, .8f, 1f, .6f);
+    private static final Vector4f SELECTED_COLOR = new Vector4f(0f, .5f, 1f, .5f);
+    private static final Vector4f HIGHLIGHT_SELECTED_COLOR = new Vector4f(0.2f, .7f, 1f, .7f);
+    private static final int WHITE_TEXT_COLOR = 0xffffffff;
+    private static final int WATERMARK_TEXT_COLOR = 0x88888888;
+    private static final int DESCRIPTION_TEXT_COLOR = 0xdd888888;
+    private static final int OPTION_TEXT_COLOR = 0xeeeeeeff;
+    private static final double RING_INNER_EDGE = 38;
+    private static final double RING_OUTER_EDGE = 80;
+    private static final double CATEGORY_LINE_OUTER_EDGE = 42;
+    private static final double TEXT_DISTANCE = 90;
+    private static final double BUTTON_DISTANCE = 120;
+    private static final float FADE_SPEED = 0.5f;
+    private static final int DESCRIPTION_HEIGHT = 100;
 
     public static final int MODE_OPTION_ROW_HEIGHT = 39;
 
@@ -109,7 +109,7 @@ public class RadialMenuScreen extends Screen {
 
     @Override
     public void render(PoseStack poseStack, final int mouseX, final int mouseY, final float partialTicks) {
-        visibility += fadeSpeed * partialTicks;
+        visibility += FADE_SPEED * partialTicks;
         if (visibility > 1f) visibility = 1f;
         if (minecraft.level != null) {
             fillGradient(poseStack, 0, 0, this.width, this.height,  (int) (visibility * 0xC0) << 24 | 0x101010, (int) (visibility * 0xD0) << 24 | 0x101010);
@@ -159,10 +159,10 @@ public class RadialMenuScreen extends Screen {
         int baseY = -13;
         int buttonOffset = 26;
 
-        buttons.add(new MenuButton(BuildAction.UNDO,     -buttonDistance - buttonOffset, baseY + 0,            Direction.WEST));
-        buttons.add(new MenuButton(BuildAction.REDO,     -buttonDistance - 0,            baseY + 0,            Direction.EAST));
-        buttons.add(new MenuButton(BuildAction.MODIFIER, -buttonDistance - buttonOffset, baseY + buttonOffset, Direction.WEST));
-        buttons.add(new MenuButton(BuildAction.REPLACE,  -buttonDistance - 0,            baseY + buttonOffset, Direction.EAST));
+        buttons.add(new MenuButton(BuildAction.UNDO,     -BUTTON_DISTANCE - buttonOffset, baseY + 0,            Direction.WEST));
+        buttons.add(new MenuButton(BuildAction.REDO,     -BUTTON_DISTANCE - 0,            baseY + 0,            Direction.EAST));
+        buttons.add(new MenuButton(BuildAction.MODIFIER, -BUTTON_DISTANCE - buttonOffset, baseY + buttonOffset, Direction.WEST));
+        buttons.add(new MenuButton(BuildAction.REPLACE,  -BUTTON_DISTANCE - 0,            baseY + buttonOffset, Direction.EAST));
 
         //Add buildmode dependent options
         var options = currentBuildMode.getOptions();
@@ -173,7 +173,7 @@ public class RadialMenuScreen extends Screen {
             var buttonsInRow = new ArrayList<MenuButton>();
             for (int col = 0; col < options[row].getActions().length; col++) {
                 var action = options[row].getActions()[col];
-                var button = new MenuButton(action, buttonDistance + col * buttonOffset, options.length / -2f * MODE_OPTION_ROW_HEIGHT + 26 + row * MODE_OPTION_ROW_HEIGHT, Direction.DOWN);
+                var button = new MenuButton(action, BUTTON_DISTANCE + col * buttonOffset, options.length / -2f * MODE_OPTION_ROW_HEIGHT + 26 + row * MODE_OPTION_ROW_HEIGHT, Direction.DOWN);
                 buttons.add(button);
                 optionButtons.add(button);
                 buttonsInRow.add(button);
@@ -187,7 +187,7 @@ public class RadialMenuScreen extends Screen {
         doAction = null;
 
         //Draw buildmode backgrounds
-        drawRadialButtonBackgrounds(currentBuildMode, buffer, middleX, middleY, mouseXCenter, mouseYCenter, mouseRadians, ringInnerEdge, ringOuterEdge, quarterCircle, modes);
+        drawRadialButtonBackgrounds(currentBuildMode, buffer, middleX, middleY, mouseXCenter, mouseYCenter, mouseRadians, RING_INNER_EDGE, RING_OUTER_EDGE, quarterCircle, modes);
 
         //Draw action backgrounds
         drawSideButtonBackgrounds(buffer, middleX, middleY, mouseXCenter, mouseYCenter, buttons);
@@ -196,9 +196,9 @@ public class RadialMenuScreen extends Screen {
         RenderSystem.disableBlend();
         RenderSystem.enableTexture();
 
-        drawIcons(poseStack, tesselator, buffer, middleX, middleY, ringInnerEdge, ringOuterEdge, modes, buttons);
+        drawIcons(poseStack, tesselator, buffer, middleX, middleY, RING_INNER_EDGE, RING_OUTER_EDGE, modes, buttons);
 
-        drawTexts(poseStack, currentBuildMode, middleX, middleY, textDistance, buttonDistance, modes, buttons, optionsTexting);
+        drawTexts(poseStack, currentBuildMode, middleX, middleY, TEXT_DISTANCE, BUTTON_DISTANCE, modes, buttons, optionsTexting);
 
         poseStack.popPose();
     }
@@ -234,8 +234,8 @@ public class RadialMenuScreen extends Screen {
 
         for (int i = 0; i < modes.size(); i++) {
             ModeRegion modeRegion = modes.get(i);
-            final double beginRadians = i * radiansPerObject - quarterCircle;
-            final double endRadians = (i + 1) * radiansPerObject - quarterCircle;
+            final double beginRadians = (i - 0.5) * radiansPerObject - quarterCircle;
+            final double endRadians = (i + 0.5) * radiansPerObject - quarterCircle;
 
             modeRegion.x1 = Math.cos(beginRadians);
             modeRegion.x2 = Math.cos(endRadians);
@@ -254,12 +254,12 @@ public class RadialMenuScreen extends Screen {
 
             final boolean isSelected = currentBuildMode.ordinal() == i;
             final boolean isMouseInQuad = inTriangle(x1m1, y1m1, x2m2, y2m2, x2m1, y2m1, mouseXCenter, mouseYCenter) || inTriangle(x1m1, y1m1, x1m2, y1m2, x2m2, y2m2, mouseXCenter, mouseYCenter);
-            final boolean isHighlighted = beginRadians <= mouseRadians && mouseRadians <= endRadians && isMouseInQuad;
+            final boolean isHighlighted = ((beginRadians <= mouseRadians && mouseRadians <= endRadians) || (beginRadians <= (mouseRadians - 2 * Math.PI) && (mouseRadians - 2 * Math.PI) <= endRadians)) && isMouseInQuad;
 
-            Vector4f color = radialButtonColor;
-            if (isSelected) color = selectedColor;
-            if (isHighlighted) color = highlightColor;
-            if (isSelected && isHighlighted) color = highlightSelectedColor;
+            Vector4f color = RADIAL_BUTTON_COLOR;
+            if (isSelected) color = SELECTED_COLOR;
+            if (isHighlighted) color = HIGHLIGHT_COLOR;
+            if (isSelected && isHighlighted) color = HIGHLIGHT_SELECTED_COLOR;
 
             if (isHighlighted) {
                 modeRegion.highlighted = true;
@@ -274,10 +274,10 @@ public class RadialMenuScreen extends Screen {
             //Category line
             color = modeRegion.mode.getCategory().getColor();
 
-            final double x1m3 = Math.cos(beginRadians + fragment) * categoryLineOuterEdge;
-            final double x2m3 = Math.cos(endRadians - fragment) * categoryLineOuterEdge;
-            final double y1m3 = Math.sin(beginRadians + fragment) * categoryLineOuterEdge;
-            final double y2m3 = Math.sin(endRadians - fragment) * categoryLineOuterEdge;
+            final double x1m3 = Math.cos(beginRadians + fragment) * CATEGORY_LINE_OUTER_EDGE;
+            final double x2m3 = Math.cos(endRadians - fragment) * CATEGORY_LINE_OUTER_EDGE;
+            final double y1m3 = Math.sin(beginRadians + fragment) * CATEGORY_LINE_OUTER_EDGE;
+            final double y2m3 = Math.sin(endRadians - fragment) * CATEGORY_LINE_OUTER_EDGE;
 
             buffer.vertex(middleX + x1m1, middleY + y1m1, getBlitOffset()).color(color.x(), color.y(), color.z(), color.w()).endVertex();
             buffer.vertex(middleX + x2m1, middleY + y2m1, getBlitOffset()).color(color.x(), color.y(), color.z(), color.w()).endVertex();
@@ -293,10 +293,10 @@ public class RadialMenuScreen extends Screen {
 
             final boolean isHighlighted = btn.x1 <= mouseXCenter && btn.x2 >= mouseXCenter && btn.y1 <= mouseYCenter && btn.y2 >= mouseYCenter;
 
-            Vector4f color = sideButtonColor;
-            if (isSelected) color = selectedColor;
-            if (isHighlighted) color = highlightColor;
-            if (isSelected && isHighlighted) color = highlightSelectedColor;
+            Vector4f color = SIDE_BUTTON_COLOR;
+            if (isSelected) color = SELECTED_COLOR;
+            if (isHighlighted) color = HIGHLIGHT_COLOR;
+            if (isSelected && isHighlighted) color = HIGHLIGHT_SELECTED_COLOR;
 
             if (isHighlighted) {
                 btn.highlighted = true;
@@ -346,11 +346,11 @@ public class RadialMenuScreen extends Screen {
         for (int row = 0; row < options.length; row++) {
             BuildMode.Option option = options[row];
             if (option == null) continue;
-            font.drawShadow(poseStack, I18n.get(option.getNameKey()), (int) (middleX + buttonDistance - 9), (int) middleY + options.length / -2f * MODE_OPTION_ROW_HEIGHT + 3 + row * MODE_OPTION_ROW_HEIGHT, optionTextColor);
+            font.drawShadow(poseStack, I18n.get(option.getNameKey()), (int) (middleX + buttonDistance - 9), (int) middleY + options.length / -2f * MODE_OPTION_ROW_HEIGHT + 3 + row * MODE_OPTION_ROW_HEIGHT, OPTION_TEXT_COLOR);
         }
 
         String credits = I18n.get(Effortless.MOD_ID + "."+ "credits");
-        font.drawShadow(poseStack, credits, width - font.width(credits) - 10, height - 15, watermarkTextColor);
+        font.drawShadow(poseStack, credits, width - font.width(credits) - 10, height - 15, WATERMARK_TEXT_COLOR);
 
         //Draw buildmode text
         for (final ModeRegion modeRegion : modes) {
@@ -369,11 +369,11 @@ public class RadialMenuScreen extends Screen {
                     fixed_x -= font.width(text) / 2;
                 }
 
-                font.drawShadow(poseStack, text, (int) middleX + fixed_x, (int) middleY + fixed_y, whiteTextColor);
+                font.drawShadow(poseStack, text, (int) middleX + fixed_x, (int) middleY + fixed_y, WHITE_TEXT_COLOR);
 
                 //Draw description
                 text = I18n.get(modeRegion.mode.getDescriptionKey());
-                font.drawShadow(poseStack, text, (int) middleX - font.width(text) / 2f, (int) middleY + descriptionHeight, descriptionTextColor);
+                font.drawShadow(poseStack, text, (int) middleX - font.width(text) / 2f, (int) middleY + DESCRIPTION_HEIGHT, DESCRIPTION_TEXT_COLOR);
             }
         }
 
@@ -390,18 +390,18 @@ public class RadialMenuScreen extends Screen {
 
                 switch (button.textSide) {
                     case WEST -> {
-                        font.draw(poseStack, text, (int) (middleX + button.x1 - 8) - font.width(text), (int) (middleY + button.y1 + 6), whiteTextColor);
+                        font.draw(poseStack, text, (int) (middleX + button.x1 - 8) - font.width(text), (int) (middleY + button.y1 + 6), WHITE_TEXT_COLOR);
                     }
                     case EAST -> {
-                        font.draw(poseStack, text, (int) (middleX + button.x2 + 8), (int) (middleY + button.y1 + 6), whiteTextColor);
+                        font.draw(poseStack, text, (int) (middleX + button.x2 + 8), (int) (middleY + button.y1 + 6), WHITE_TEXT_COLOR);
                     }
                     case UP, NORTH -> {
-                        font.draw(poseStack, keybindFormatted, (int) (middleX + (button.x1 + button.x2) * 0.5 - font.width(keybindFormatted) * 0.5), (int) (middleY + button.y1 - 26), whiteTextColor);
-                        font.draw(poseStack, text, (int) (middleX + (button.x1 + button.x2) * 0.5 - font.width(text) * 0.5), (int) (middleY + button.y1 - 14), whiteTextColor);
+                        font.draw(poseStack, keybindFormatted, (int) (middleX + (button.x1 + button.x2) * 0.5 - font.width(keybindFormatted) * 0.5), (int) (middleY + button.y1 - 26), WHITE_TEXT_COLOR);
+                        font.draw(poseStack, text, (int) (middleX + (button.x1 + button.x2) * 0.5 - font.width(text) * 0.5), (int) (middleY + button.y1 - 14), WHITE_TEXT_COLOR);
                     }
                     case DOWN, SOUTH -> {
-                        font.draw(poseStack, text, (int) (middleX + (button.x1 + button.x2) * 0.5 - font.width(text) * 0.5), (int) (middleY + button.y1 + 26), whiteTextColor);
-                        font.draw(poseStack, keybindFormatted, (int) (middleX + (button.x1 + button.x2) * 0.5 - font.width(keybindFormatted) * 0.5), (int) (middleY + button.y1 + 38), whiteTextColor);
+                        font.draw(poseStack, text, (int) (middleX + (button.x1 + button.x2) * 0.5 - font.width(text) * 0.5), (int) (middleY + button.y1 + 26), WHITE_TEXT_COLOR);
+                        font.draw(poseStack, keybindFormatted, (int) (middleX + (button.x1 + button.x2) * 0.5 - font.width(keybindFormatted) * 0.5), (int) (middleY + button.y1 + 38), WHITE_TEXT_COLOR);
                     }
                 }
 
