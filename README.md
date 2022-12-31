@@ -60,6 +60,8 @@ Hold ALT key to switch build modes in the radial panel. There are buttons for un
 * [ ] Tweakeroo support
 
 ## Changelog
+### 1.6.2
+* Fix block breaking issue on server side
 ### 1.6.1
 * Fix compatability with Gravity API
 ### 1.6.0

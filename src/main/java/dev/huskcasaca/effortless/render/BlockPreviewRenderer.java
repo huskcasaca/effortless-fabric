@@ -134,7 +134,7 @@ public class BlockPreviewRenderer {
                         RenderUtils.renderBlockDissolveShader(poseStack, multiBufferSource, dispatcher, blockPos, blockState, dissolve, firstPos, secondPos, false);
                         continue;
                     }
-                    var count = blockLeft.get(blockState.getBlock());
+                    var count = blockLeft.getOrDefault(blockState.getBlock(), 0);
                     if (count > 0) {
                         RenderUtils.renderBlockDissolveShader(poseStack, multiBufferSource, dispatcher, blockPos, blockState, dissolve, firstPos, secondPos, false);
                         blockLeft.put(blockState.getBlock(), count - 1);
@@ -170,7 +170,7 @@ public class BlockPreviewRenderer {
                         RenderUtils.renderBlockOutlines(poseStack, multiBufferSource, dispatcher, blockPos, blockState, dissolve, firstPos, secondPos, false);
                         continue;
                     }
-                    var count = blockLeft.get(blockState.getBlock());
+                    var count = blockLeft.getOrDefault(blockState.getBlock(), 0);
                     if (count > 0) {
                         RenderUtils.renderBlockOutlines(poseStack, multiBufferSource, dispatcher, blockPos, blockState, dissolve, firstPos, secondPos, false);
                         blockLeft.put(blockState.getBlock(), count - 1);
@@ -210,7 +210,7 @@ public class BlockPreviewRenderer {
                     if (player.isCreative()) {
                         valid.put(blockState.getBlock(), valid.getOrDefault(blockState.getBlock(), 0) + 1);
                     } else {
-                        var count = left.get(blockState.getBlock());
+                        var count = left.getOrDefault(blockState.getBlock(), 0);
                         if (count > 0) {
                             left.put(blockState.getBlock(), count - 1);
                             valid.put(blockState.getBlock(), valid.getOrDefault(blockState.getBlock(), 0) + 1);
@@ -507,6 +507,7 @@ public class BlockPreviewRenderer {
         public List<ItemStack> getValidItemStacks() {
             var result = new ArrayList<ItemStack>();
             useResult.valid.forEach((block, count) -> {
+                // FIXME: 31/12/22
                 if (block.equals(Blocks.AIR)) return;
                 while (count > 0) {
                     var itemStack = new ItemStack(block.asItem());

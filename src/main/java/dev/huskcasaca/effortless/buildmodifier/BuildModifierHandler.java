@@ -67,7 +67,7 @@ public class BuildModifierHandler {
                 if (!blockLeft.containsKey(blockState.getBlock())) {
                     blockLeft.put(blockState.getBlock(), InventoryHelper.findTotalBlocksInInventory(player, blockState.getBlock()));
                 }
-                var count = blockLeft.get(blockState.getBlock());
+                var count = blockLeft.getOrDefault(blockState.getBlock(), 0);
                 if (player.isCreative() || count > 0) {
                     if (level.isLoaded(blockPos)) {
                         SurvivalHelper.placeBlock(level, player, blockPos, blockState, itemStack.copy(), hitSide, hitVec, false, false, false);

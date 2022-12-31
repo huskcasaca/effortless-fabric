@@ -1,29 +1,23 @@
 package dev.huskcasaca.effortless.utils;
 
 import dev.huskcasaca.effortless.buildmodifier.BuildModifierHelper;
-import dev.huskcasaca.effortless.config.ConfigManager;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Registry;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.pattern.BlockInWorld;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
@@ -126,8 +120,7 @@ public class SurvivalHelper {
             return true;
         }
 
-        if (!(itemStack.getItem() instanceof BlockItem))
-            return false;
+        if (!(itemStack.getItem() instanceof BlockItem)) return false;
         Block block = ((BlockItem) itemStack.getItem()).getBlock();
 
         if (!canPlace(level, player, pos, blockState /*, itemStack, skipCollisionCheck, facing.getOpposite()*/)) {
@@ -158,216 +151,56 @@ public class SurvivalHelper {
 
     }
 
-    //Used for all breaking of blocks in this mod.
-    //Checks if area is loaded, if appropriate tool is used in survival mode, and drops the block directly into the players inventory
-    public static boolean breakBlock(Level level, Player player, BlockPos pos, boolean skipChecks) {
-        if (!level.isLoaded(pos) && !level.isEmptyBlock(pos)) return false;
-
-        //Check if can break
-        if (skipChecks || canBreak(level, player, pos)) {
-//            player.addStat(StatList.getBlockStats(level.getNewBlockState(pos).getBlock()));
-//            player.addExhaustion(0.005F);
-
-            //Drop existing block
-            dropBlock(level, player, pos);
-
-            //Damage tool
-            player.getMainHandItem().mineBlock(level, level.getBlockState(pos), pos, player);
-            Minecraft.getInstance().particleEngine.destroy(pos, level.getBlockState(pos));
-
-            level.removeBlock(pos, false);
-            return true;
+    public static boolean breakBlock(Level level, Player player, BlockPos blockPos, boolean skipChecks) {
+//        if (!level.isLoaded(blockPos) && !level.isEmptyBlock(blockPos)) return false;
+        if (!skipChecks && !canBreak(level, player, blockPos)) return false;
+        //Drop existing block
+        if (level.isClientSide()) {
+            Minecraft.getInstance().gameMode.destroyBlock(blockPos);
+        } else {
+            ((ServerPlayer) player).gameMode.destroyBlock(blockPos);
         }
-        return false;
+        return true;
     }
 
     //Gives items directly to player
-    public static void dropBlock(Level level, Player player, BlockPos pos) {
-        if (player.isCreative()) return;
+    public static boolean dropBlock(Level level, Player player, BlockPos pos) {
+        if (!(player instanceof ServerPlayer)) return false;
+        if (player.isCreative()) return false;
+//        if (!level.isLoaded(pos) && !level.isEmptyBlock(pos)) return false;
 
-        BlockState blockState = level.getBlockState(pos);
-        Block block = blockState.getBlock();
+        var blockState = level.getBlockState(pos);
+//        if (blockState.isAir()) return false;
 
-        block.playerDestroy(level, player, pos, blockState, level.getBlockEntity(pos), player.getMainHandItem());
+        var block = blockState.getBlock();
 
-        //TODO drop items in inventory instead of level
-
-//        List<ItemStack> drops = new ArrayList<>();
-//
-//        //From Block#harvestBlock
-//        int silktouch = EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH, player.getHeldItemMainhand());
-//        if (block.canSilkHarvest(level, pos, blockState, player) && silktouch > 0) {
-//
-//            //From Block#getSilkTouchDrop (protected)
-//            Item item = Item.getItemFromBlock(block);
-//            int i = 0;
-//
-//            if (item.getHasSubtypes())
-//            {
-//                i = block.getMetaFromState(blockState);
-//            }
-//
-//            drops.add(new ItemStack(item, 1, i));
-//
-//            net.minecraftforge.event.ForgeEventFactory.fireBlockHarvesting(drops, level, pos, blockState, 0, 1.0f, true, player);
-//        }
-//
-//        int fortune = EnchantmentHelper.getEnchantmentLevel(Enchantments.FORTUNE, player.getHeldItemMainhand());
-//        drops.addAll(block.getDrops(level, pos, blockState, fortune));
-//        for (ItemStack drop : drops)
-//        {
-//            ItemHandlerHelper.giveItemToPlayer(player, drop);
-//        }
-    }
-
-    /**
-     * Check if player can place a block.
-     * Turn randomizer bag into itemstack inside before.
-     *
-     * @param level
-     * @param player
-     * @param pos
-     * @param newBlockState      the blockstate that is going to be placed
-     * @param itemStack          the itemstack used for placing
-     * @param skipCollisionCheck skips collision check with entities
-     * @param sidePlacedOn
-     * @return Whether the player may place the block at pos with itemstack
-     */
-    public static boolean canPlace(Level level, Player player, BlockPos pos, BlockState newBlockState, ItemStack itemStack, boolean skipCollisionCheck, Direction sidePlacedOn) {
-
-        if (BuildModifierHelper.isReplace(player)) {
-            return true;
-        } else {
-            return level.getBlockState(pos).getMaterial().isReplaceable();
-        }
-        /* TODO: 13/12/22 placement check
-        //Check if itemstack is correct
-        if (!(itemStack.getItem() instanceof BlockItem) || Block.byItem(itemStack.getItem()) != newBlockState.getBlock()) {
-//            Effortless.log(player, "Cannot (re)place block", true);
-//            Effortless.log("SurvivalHelper#canPlace: itemstack " + itemStack.toString() + " does not match blockstate " + newBlockState.toString());
-            //Happens when breaking blocks, no need to notify in that case
+        if (!player.hasCorrectToolForDrops(blockState)) {
             return false;
         }
 
-        Block block = ((BlockItem) itemStack.getItem()).getBlock();
-
-//        Effortless.log(player, "isEmpty " + !itemStack.isEmpty() + " canPlayerEdit " + canPlayerEdit(player, level, pos, itemStack) + " mayPlace " + mayPlace(level, block, newBlockState, pos, skipCollisionCheck, sidePlacedOn, player) + " canReplace " + canReplace(level, player, pos));
-        return !itemStack.isEmpty() && canPlayerEdit(player, level, pos, itemStack) &&
-//                mayPlace(level, block, newBlockState, pos, skipCollisionCheck, sidePlacedOn, player) &&
-                canReplace(level, player, pos);
-         */
+        block.playerDestroy(level, player, pos, blockState, level.getBlockEntity(pos), player.getMainHandItem());
+        //TODO drop items in inventory instead of level
+        return true;
     }
+
 
     public static boolean canPlace(Level level, Player player, BlockPos pos, BlockState newBlockState) {
         if (!level.mayInteract(player, pos)) return false;
-        if (player.getAbilities().mayBuild) {
-            if (BuildModifierHelper.isReplace(player)) {
-                if (player.isCreative()) {
-                    return true;
-                } else {
-                    return !level.getBlockState(pos).is(BlockTags.FEATURES_CANNOT_REPLACE);
-                }
-            } else {
-                return level.getBlockState(pos).getMaterial().isReplaceable(); // fluid
-            }
-        } else {
-            return false;
+        if (!player.getAbilities().mayBuild) return false;
+        if (BuildModifierHelper.isReplace(player)) {
+            if (player.isCreative()) return true;
+            return !level.getBlockState(pos).is(BlockTags.FEATURES_CANNOT_REPLACE); // fluid
         }
+        return level.getBlockState(pos).getMaterial().isReplaceable(); // fluid
     }
 
     //Can break using held tool? (or in creative)
     public static boolean canBreak(Level level, Player player, BlockPos pos) {
         if (!level.mayInteract(player, pos)) return false;
-        if (player.getAbilities().mayBuild) {
-            if (player.isCreative()) {
-                return true;
-            } else {
-                return !level.getBlockState(pos).is(BlockTags.FEATURES_CANNOT_REPLACE);
-            }
-        } else {
-            return false;
-        }
+        if (!player.getAbilities().mayBuild) return false;
+        if (player.isCreative()) return true;
+        return !level.getBlockState(pos).is(BlockTags.FEATURES_CANNOT_REPLACE);
     }
-
-    //Can be harvested with hand? (or in creative)
-    private static boolean canReplace(Level level, Player player, BlockPos pos) {
-        // TODO: 3/9/22 fix state
-        if (true) return true;
-
-        BlockState state = level.getBlockState(pos);
-
-        int miningLevel = ConfigManager.quickReplaceMiningLevel;
-        // TODO: 19/9/22 remove
-        switch (miningLevel) {
-            case -1:
-                return !state.requiresCorrectToolForDrops();
-            case 0:
-                return !state.is(BlockTags.NEEDS_STONE_TOOL) &&
-                        !state.is(BlockTags.NEEDS_IRON_TOOL) &&
-                        !state.is(BlockTags.NEEDS_DIAMOND_TOOL);
-            case 1:
-                return !state.is(BlockTags.NEEDS_IRON_TOOL) &&
-                        !state.is(BlockTags.NEEDS_DIAMOND_TOOL);
-            case 2:
-                return !state.is(BlockTags.NEEDS_DIAMOND_TOOL);
-            case 3:
-            case 4:
-                return true;
-        }
-
-        return false;
-    }
-
-    //From Player#mayUseItemAt
-    private static boolean canPlayerEdit(Player player, Level level, BlockPos pos, ItemStack stack) {
-        if (!level.mayInteract(player, pos)) return false;
-
-        if (player.getAbilities().mayBuild) {
-            //True in creative and survival mode
-            return true;
-        } else {
-            //Adventure mode
-            BlockInWorld blockinworld = new BlockInWorld(level, pos, false);
-            return false;
-            // FIXME: 20/11/22
-//            return stack.hasAdventureModePlaceTagForBlock(level.registryAccess().registryOrThrow(Registry.), blockinworld);
-        }
-    }
-
-    //From World#mayPlace
-    private static boolean mayPlace(Level level, Block blockIn, BlockState newBlockState, BlockPos pos, boolean skipCollisionCheck, Direction sidePlacedOn, @Nullable Entity placer) {
-        var oldBlockState = level.getBlockState(pos);
-        var voxelShape = skipCollisionCheck ? null : blockIn.defaultBlockState().getCollisionShape(level, pos);
-
-        if (voxelShape != null && !level.isUnobstructed(placer, voxelShape)) {
-            return false;
-        }
-
-        //Check if double slab
-        if (placer != null && doesBecomeDoubleSlab(((Player) placer), pos, sidePlacedOn)) {
-            return true;
-        }
-
-        //Check if same block
-        //Necessary otherwise extra items will be dropped
-        if (oldBlockState == newBlockState) {
-            return false;
-        }
-
-        //TODO 1.14 check what Material.CIRCUITS has become
-        if (oldBlockState.getMaterial() == Material.BUILDABLE_GLASS && blockIn == Blocks.ANVIL) {
-            return true;
-        }
-
-        //Check quickreplace
-        if (placer instanceof Player && BuildModifierHelper.getModifierSettings(((Player) placer)).enableQuickReplace()) {
-            return true;
-        }
-
-        //TODO 1.13 replaceable
-        return oldBlockState.getMaterial().isReplaceable() /*&& canPlaceBlockOnSide(level, pos, sidePlacedOn)*/;
-    }
-
 
     public static boolean doesBecomeDoubleSlab(Player player, BlockPos pos, Direction facing) {
         BlockState placedBlockState = player.level.getBlockState(pos);
@@ -379,19 +212,6 @@ public class SurvivalHelper {
         if (itemstack.isEmpty() || !(itemstack.getItem() instanceof BlockItem) || !(((BlockItem) itemstack.getItem()).getBlock() instanceof SlabBlock heldSlab))
             return false;
 
-        if (placedBlockState.getBlock() == heldSlab) {
-            //TODO 1.13
-//            IProperty<?> variantProperty = heldSlab.getVariantProperty();
-//            Comparable<?> placedVariant = placedBlockState.getValue(variantProperty);
-//            BlockSlab.EnumBlockHalf placedHalf = placedBlockState.getValue(BlockSlab.HALF);
-//
-//            Comparable<?> heldVariant = heldSlab.getTypeForItem(itemstack);
-//
-//            if ((facing == EnumFacing.UP && placedHalf == BlockSlab.EnumBlockHalf.BOTTOM || facing == EnumFacing.DOWN && placedHalf == BlockSlab.EnumBlockHalf.TOP) && placedVariant == heldVariant)
-//            {
-//                return true;
-//            }
-        }
         return false;
     }
 }

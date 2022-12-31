@@ -134,7 +134,7 @@ public abstract class PlayerActionMixin {
         for (var interactionHand : InteractionHand.values()) {
             var itemStack = player.getItemInHand(interactionHand);
             HitResult lookingAt = getLookingAt(player);
-            if (!(itemStack.getItem() instanceof BlockItem blockItem)) return;
+            if (!(itemStack.getItem() instanceof BlockItem)) return;
             if (lookingAt.getType() == HitResult.Type.BLOCK) {
                 //find position in distance
                 BlockHitResult blockLookingAt = (BlockHitResult) lookingAt;
