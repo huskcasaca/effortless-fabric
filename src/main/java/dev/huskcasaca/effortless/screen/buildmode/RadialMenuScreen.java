@@ -5,7 +5,7 @@ import com.mojang.blaze3d.vertex.*;
 import dev.huskcasaca.effortless.building.BuildAction;
 import dev.huskcasaca.effortless.building.BuildActionHandler;
 import net.minecraft.client.sounds.SoundManager;
-import org.joml.Vector4f;
+import com.mojang.math.Vector4f;
 import dev.huskcasaca.effortless.Effortless;
 import dev.huskcasaca.effortless.buildmode.*;
 import dev.huskcasaca.effortless.buildmodifier.BuildModifierHelper;

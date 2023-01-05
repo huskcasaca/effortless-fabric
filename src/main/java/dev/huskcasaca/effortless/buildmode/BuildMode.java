@@ -7,7 +7,7 @@ import dev.huskcasaca.effortless.buildmode.oneclick.Single;
 import dev.huskcasaca.effortless.buildmode.oneclick.Disable;
 import dev.huskcasaca.effortless.buildmode.threeclick.*;
 import dev.huskcasaca.effortless.buildmode.twoclick.*;
-import org.joml.Vector4f;
+import com.mojang.math.Vector4f;
 
 public enum BuildMode {
     DISABLE("disable", new Disable(), Category.BASIC),

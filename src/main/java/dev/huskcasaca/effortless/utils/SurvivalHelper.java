@@ -191,7 +191,7 @@ public class SurvivalHelper {
             if (player.isCreative()) return true;
             return !level.getBlockState(pos).is(BlockTags.FEATURES_CANNOT_REPLACE); // fluid
         }
-        return level.getBlockState(pos).canBeReplaced(); // fluid
+        return level.getBlockState(pos).getMaterial().isReplaceable(); // fluid
     }
 
     //Can break using held tool? (or in creative)

@@ -276,7 +276,7 @@ public class BlockPreviewRenderer {
 
             //Check if tool (or none) in hand
             //TODO 1.13 replaceable
-            boolean replaceable = player.level.getBlockState(startPos).canBeReplaced();
+            boolean replaceable = player.level.getBlockState(startPos).getMaterial().isReplaceable();
             boolean becomesDoubleSlab = SurvivalHelper.doesBecomeDoubleSlab(player, startPos, blockLookingAt.getDirection());
             if (!BuildModifierHelper.isQuickReplace(player) && !toolInHand && !replaceable && !becomesDoubleSlab) {
                 startPos = startPos.relative(blockLookingAt.getDirection());

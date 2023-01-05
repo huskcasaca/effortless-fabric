@@ -30,7 +30,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.ShaderInstance;
-import net.minecraft.server.packs.resources.ResourceProvider;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
@@ -216,10 +216,10 @@ public class EffortlessClient implements ClientModInitializer {
         return level.clip(new ClipContext(start, end, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player));
     }
 
-    public static void registerShaders(ResourceProvider resourceProvider, ClientReloadShadersEvent.ShaderRegister.ShadersSink sink) throws IOException {
+    public static void registerShaders(ResourceManager resourceManager, ClientReloadShadersEvent.ShaderRegister.ShadersSink sink) throws IOException {
         sink.registerShader(
                 // TODO: 10/9/22 use custom namespace
-                new ShaderInstance(resourceProvider, "dissolve", DefaultVertexFormat.BLOCK),
+                new ShaderInstance(resourceManager, "dissolve", DefaultVertexFormat.BLOCK),
                 (shaderInstance) -> BuildRenderType.setDissolveShaderInstance(shaderInstance)
         );
     }

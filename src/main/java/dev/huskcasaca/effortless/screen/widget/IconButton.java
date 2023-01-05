@@ -30,7 +30,7 @@ public class IconButton extends Button {
     }
 
     public IconButton(int x, int y, int width, int height, int iconX, int iconY, int iconWidth, int iconHeight, int iconAltX, int iconAltY, ResourceLocation resourceLocation, Button.OnPress onPress) {
-        super(x, y, width, height, Component.empty(), onPress, Button.DEFAULT_NARRATION);
+        super(x, y, width, height, Component.empty(), onPress);
         this.iconX = iconX;
         this.iconY = iconY;
         this.iconWidth = iconWidth;
@@ -56,7 +56,7 @@ public class IconButton extends Button {
     public void render(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
         super.render(poseStack, mouseX, mouseY, partialTicks);
         if (this.visible) {
-            this.isHovered = mouseX >= this.getX() && mouseY >= this.getY() && mouseX < this.getX() + this.width && mouseY < this.getY() + this.height;
+            this.isHovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
             RenderSystem.setShaderTexture(0, this.resourceLocation);
             int currentIconX = this.iconX;
             int currentIconY = this.iconY;
@@ -67,12 +67,12 @@ public class IconButton extends Button {
             }
 
             //Draws a textured rectangle at the current z-value. Used to be drawTexturedModalRect in Gui.
-            this.blit(poseStack, this.getX(), this.getY(), currentIconX, currentIconY, this.iconWidth, this.iconHeight);
+            this.blit(poseStack, this.x, this.y, currentIconX, currentIconY, this.iconWidth, this.iconHeight);
         }
     }
 
     public void drawTooltip(PoseStack poseStack, Screen screen, int mouseX, int mouseY) {
-        boolean flag = mouseX >= getX() && mouseX < getX() + width && mouseY >= getY() && mouseY < getY() + height;
+        boolean flag = mouseX >= x && mouseX < x + width && mouseY >= y && mouseY < y + height;
 
         if (flag) {
             screen.renderComponentTooltip(poseStack, tooltip, mouseX - 10, mouseY + 25);

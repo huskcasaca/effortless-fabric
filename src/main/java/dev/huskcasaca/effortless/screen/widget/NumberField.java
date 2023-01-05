@@ -9,7 +9,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
@@ -33,7 +33,7 @@ public class NumberField extends GuiComponent {
 
     List<Component> tooltip = new ArrayList<>();
 
-    public NumberField(Font font, List<Renderable> renderables, int x, int y, int width, int height) {
+    public NumberField(Font font, List<Widget> renderables, int x, int y, int width, int height) {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -46,14 +46,14 @@ public class NumberField extends GuiComponent {
             if (Screen.hasShiftDown()) valueChanged = 10f;
 
             setNumber(getNumber() - valueChanged);
-        }, Button.DEFAULT_NARRATION);
+        });
         plusButton = new Button(x + width - buttonWidth, y - 1, buttonWidth, height + 2, Component.literal("+"), button -> {
             float valueChanged = 1f;
             if (Screen.hasControlDown()) valueChanged = 5f;
             if (Screen.hasShiftDown()) valueChanged = 10f;
 
             setNumber(getNumber() + valueChanged);
-        }, Button.DEFAULT_NARRATION);
+        });
 
         renderables.add(minusButton);
         renderables.add(plusButton);
@@ -97,9 +97,9 @@ public class NumberField extends GuiComponent {
     }
 
     public void drawNumberField(PoseStack poseStack, int mouseX, int mouseY, float partialTicks) {
-        textField.setY(y + 1);
-        minusButton.setY(y - 1);
-        plusButton.setY(y - 1);
+        textField.y = y + 1;
+        minusButton.y = y - 1;
+        plusButton.y = y - 1;
 
         textField.render(poseStack, mouseX, mouseY, partialTicks);
         minusButton.render(poseStack, mouseX, mouseY, partialTicks);

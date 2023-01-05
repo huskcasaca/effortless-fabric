@@ -86,7 +86,7 @@ publishing {
                 releaseType = ReleaseType.RELEASE // The release type (required)
                 changelog = Changelog("Changelog...", ChangelogType.TEXT) // The changelog (required)
                 loader = LoaderType.FABRIC
-                gameVersion = MinecraftVersion.VERSION_1_19_3
+                gameVersion = MinecraftVersion.VERSION_1_19_2
                 javaVersion = JavaVersion.VERSION_17
             }
         }
